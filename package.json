@@ -6,7 +6,8 @@
   "author": "Robin Berjon <robin@berjon.com>",
   "license": "MIT",
   "scripts": {
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "start": "tauri dev"
   },
   "bin": {},
   "repository": {
