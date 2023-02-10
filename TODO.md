@@ -3,8 +3,9 @@
 
 ## Plumbing
 
-- [ ] Set up basic Tauri app and get it to render a simple HTML page
+- [x] Set up basic Tauri app and get it to render a simple HTML page
 - [ ] Use the HTML page to figure out what the story is in terms of import and all that crap
+- [ ] Wire reloading shortcut
 - [ ] Expose a simple Rust function to the front end
 - [ ] Set up the VS Code debug stuff as per Tauri docs
 
