@@ -8,7 +8,7 @@
 - [x] Wire reloading shortcut
 - [x] Expose a simple Rust function to the front end
 - [x] Set up the VS Code debug stuff as per Tauri docs
-- [ ] Open window full size
+- [x] Open window full size
 
 ## Contexts
 
