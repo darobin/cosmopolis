@@ -8,5 +8,5 @@ export function registerReload () {
 
 function reload () {
   console.warn('RELOAD');
-  window.reload();
+  window.location.reload();
 }
