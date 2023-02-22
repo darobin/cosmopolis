@@ -1,6 +1,6 @@
 
 import { customAlphabet } from "nanoid";
-import { lowercase } from "nanoid-dictionary";
+import lowercase from "nanoid-dictionary/lowercase";
 import { Store } from "./tauri/store.js";
 
 const CTX_LIST = '$ctx-list';

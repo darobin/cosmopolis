@@ -7,7 +7,9 @@
   "license": "MIT",
   "scripts": {
     "tauri": "tauri",
-    "start": "tauri dev"
+    "start": "tauri dev",
+    "watch": "concurrently --handle-input npm:watch-js npm:start",
+    "watch-js": "esbuild ui/cosmopolis.js --bundle --outfile=ui/cosmopolis.min.js --format=esm --watch"
   },
   "bin": {},
   "repository": {
@@ -30,10 +32,13 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.2.3",
+    "concurrently": "^7.6.0",
+    "esbuild": "^0.17.10",
     "eslint": "^8.26.0",
     "tauri-plugin-store-api": "github:tauri-apps/tauri-plugin-store"
   },
   "dependencies": {
+    "@shoelace-style/shoelace": "^2.1.0",
     "nanoid": "^4.0.1",
     "nanoid-dictionary": "^4.3.0"
   }

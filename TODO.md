@@ -12,9 +12,15 @@
 
 ## Contexts
 
-- [ ] Persistent store so that the context list is persistent
-- [ ] Shoelace and lit system set up
-- [ ] Background
+- [x] Persistent store so that the context list is persistent
+- [ ] set deps up right:
+  - [ ] tauri app
+  - [ ] store plugin
+  - [ ] shoelace
+  - [ ] lit (and rm vendor)
+- [ ] Shoelace style with cssn so we can call it a day
+- [x] use concurrently
+- [ ] Background & custom title
 - [ ] Sidebar, semitranslucent, list of contexts
 - [ ] Close/delete context
 - [ ] Rename context
