@@ -1,5 +1,4 @@
 
-
 import { invoke, appWindow } from '../tauri.js';
 
 // This is copied from https://github.com/tauri-apps/tauri-plugin-store/blob/dev/dist-js/index.mjs
