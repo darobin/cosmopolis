@@ -1,6 +1,7 @@
 
 import { invoke } from '@tauri-apps/api/tauri';
 import { appWindow } from '@tauri-apps/api/window';
+import "@shoelace-style/shoelace";
 import { registerReload } from "./lib/debug.js";
 import './lib/contexts.js';
 

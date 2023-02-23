@@ -9,7 +9,10 @@
     "tauri": "tauri",
     "start": "tauri dev",
     "watch": "concurrently --handle-input npm:watch-js npm:start",
-    "watch-js": "esbuild ui/cosmopolis.js --bundle --outfile=ui/cosmopolis.min.js --format=esm --watch"
+    "build": "npm run build-assets && npm run build-js",
+    "watch-js": "esbuild ui/cosmopolis.js --bundle --outfile=ui/cosmopolis.min.js --format=esm --watch",
+    "build-js": "esbuild ui/cosmopolis.js --bundle --outfile=ui/cosmopolis.min.js --format=esm",
+    "build-assets": "./copy-assets.sh"
   },
   "bin": {},
   "repository": {
@@ -35,6 +38,7 @@
     "concurrently": "^7.6.0",
     "esbuild": "^0.17.10",
     "eslint": "^8.26.0",
+    "lit": "^2.6.1",
     "tauri-plugin-store-api": "github:tauri-apps/tauri-plugin-store"
   },
   "dependencies": {
