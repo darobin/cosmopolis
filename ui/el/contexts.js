@@ -39,6 +39,12 @@ export class CosmoContexts extends LitElement {
         left: 1rem;
         right: 2rem;
       }
+      ul {
+        padding: 0;
+      }
+      li {
+        list-style-type: none;
+      }
     `,
     actionButton,
   ];
@@ -109,6 +115,9 @@ export class CosmoContexts extends LitElement {
       this.creating = false;
     }
   }
+  handleLoadContext (ev) {
+    console.warn(`Loading context for`, ev.target.id);
+  }
   async updated (changedProps) {
     if (changedProps.has('creating') && this.creating) {
       const input = this.shadowRoot.querySelector('#create-name');
@@ -129,7 +138,7 @@ export class CosmoContexts extends LitElement {
             ? html`
               <ul>
                 ${this.contexts.map(({ $id, name}) => html`<li>
-                  <cm-context-link id=${$id} ?editable=${this.editing}>${name}</cm-context-link>
+                  <cm-context-link id=${$id} name=${name} ?editable=${this.editing} @click=${this.handleLoadContext}></cm-context-link>
                 </li>`)}
               </ul>
               `
