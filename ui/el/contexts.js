@@ -125,30 +125,43 @@ export class CosmoContexts extends LitElement {
         </div>
         <sl-drawer placement="start" ?open=${!!this.open} @sl-request-close=${this.handleCloseRequest}>
           ${
+            (this.contexts && this.contexts.length)
+            ? html`
+              <ul>
+                ${this.contexts.map(({ $id, name}) => html`<li>
+                  <cm-context-link id=${$id} ?editable=${this.editing}>${name}</cm-context-link>
+                </li>`)}
+              </ul>
+              `
+            : nothing
+          }
+          ${
             this.showHint && !this.creating
             ? html`<p class="hint">You have no contexts. Use the create button below to add one.</p>`
             : nothing
           }
-          ${(this.cantEdit || this.editing || this.creating) ? nothing : html`<sl-icon-button slot="footer" name="pencil-square" label="Edit Context" @click=${this.handleEdit}></sl-icon-button>`}
-          ${(this.editing || this.creating) ? nothing : html`<sl-icon-button slot="footer" name="plus-square" label="Add Context" class="action" @click=${this.handleCreate}></sl-icon-button>`}
-          ${(this.editing) ? html`<sl-button slot="footer" size="small" class="action" @click=${this.handleDoneEditing}>Done</sl-button>` : nothing}
-          ${(this.creating)
-            ? html`
-              <form @submit=${this.handleCreateContext} slot="footer">
-                <sl-input type="text" name="name" id="create-name" placeholder="Context name" required autocorrect="on" enterkeyhint="done" spellcheck @keyup=${this.handlePotentialEsc}></sl-input>
-                <br>
-                <sl-button type="reset" @click=${this.handleResetCreation} size="small">
-                  <sl-icon name="x-circle"></sl-icon>
-                  Reset
-                </sl-button>
-                <sl-button type="submit" class="action" size="small">
-                  <sl-icon name="check-lg"></sl-icon>
-                  Ok
-                </sl-button>
-              </form>
-              `
-            : nothing
-          }
+          <div slot="footer">
+            ${(this.cantEdit || this.editing || this.creating) ? nothing : html`<sl-icon-button name="pencil-square" label="Edit Context" @click=${this.handleEdit}></sl-icon-button>`}
+            ${(this.editing || this.creating) ? nothing : html`<sl-icon-button name="plus-square" label="Add Context" class="action" @click=${this.handleCreate}></sl-icon-button>`}
+            ${(this.editing) ? html`<sl-button size="small" class="action" @click=${this.handleDoneEditing}>Done</sl-button>` : nothing}
+            ${(this.creating)
+              ? html`
+                <form @submit=${this.handleCreateContext}>
+                  <sl-input type="text" name="name" id="create-name" placeholder="Context name" required autocorrect="on" enterkeyhint="done" spellcheck @keyup=${this.handlePotentialEsc}></sl-input>
+                  <br>
+                  <sl-button type="reset" @click=${this.handleResetCreation} size="small">
+                    <sl-icon name="x-circle"></sl-icon>
+                    Reset
+                  </sl-button>
+                  <sl-button type="submit" class="action" size="small">
+                    <sl-icon name="check-lg"></sl-icon>
+                    Ok
+                  </sl-button>
+                </form>
+                `
+              : nothing
+            }
+          </div>
         </sl-drawer>
       </div>
     `;
