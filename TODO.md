@@ -20,8 +20,9 @@
   - [x] lit (and rm vendor)
 - [x] Shoelace style with cssn so we can call it a day
 - [x] use concurrently
-- [ ] Background & custom title
+- [x] Background & custom title
 - [ ] Sidebar, semitranslucent, list of contexts
+- [ ] New context (in a temp location)
 - [ ] Close/delete context
 - [ ] Rename context
 

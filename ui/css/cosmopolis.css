@@ -1,0 +1,54 @@
+
+@font-face {
+  font-family: "Catamaran";
+  src: url("Catamaran-VariableFont_wght.ttf");
+  font-style: normal;
+}
+@font-face {
+font-family: "Mulish";
+src: url("Mulish-VariableFont_wght.ttf");
+font-style: normal;
+}
+@font-face {
+font-family: "Mulish";
+src: url("Mulish-Italic-VariableFont_wght.ttf");
+font-style: italic;
+}
+
+:root {
+  /*  These colours are inspired by the work of Elyse Dodge, specifically
+      https://www.elysedodge.com/blogs/paintings/lemon-drop.
+  */
+  --cm-sky-dark: #fc6649;
+  --cm-sky-light: #e5c6a7;
+  --cm-street-dark: #243bb7;
+  --cm-street-medium: #394fc5;
+  --cm-street-light: #4a5bcd;
+  --cm-title-font: Catamaran;
+  --cm-body-font: Mulish;
+}
+
+html {
+  height: 100%;
+  background-attachment: fixed;
+  background-size: cover;
+  background: linear-gradient(
+    to top,
+    var(--cm-street-light) 0,
+    var(--cm-street-dark) 50px,
+    var(--cm-sky-light) 50px,
+    var(--cm-sky-dark) 100%
+  );
+}
+
+h1 {
+  position: absolute;
+  right: 1rem;
+  bottom: 0;
+  color: var(--cm-sky-light);
+  padding: 0;
+  margin: 0;
+  font-family: var(--cm-title-font);
+  font-weight: 100;
+  font-variation-settings: "wght" 100; /* Chrome doesn't apply font-weight correctly. */
+}
