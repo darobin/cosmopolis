@@ -14,8 +14,8 @@
 
 - [x] Persistent store so that the context list is persistent
 - [ ] set deps up right:
-  - [ ] tauri app
-  - [ ] store plugin
+  - [x] tauri app
+  - [x] store plugin
   - [ ] shoelace
   - [ ] lit (and rm vendor)
 - [ ] Shoelace style with cssn so we can call it a day
