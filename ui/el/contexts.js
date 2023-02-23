@@ -30,6 +30,14 @@ export class CosmoContexts extends LitElement {
       div.hidden {
         opacity: 0;
       }
+      p.hint {
+        color: var(--cm-street-dark);
+        font-size: 1.4rem;
+        position: absolute;
+        bottom: 3rem;
+        left: 1rem;
+        right: 2rem;
+      }
     `,
     actionButton,
   ];
@@ -113,6 +121,11 @@ export class CosmoContexts extends LitElement {
           <h2>${this.title || nothing}</h2>
         </div>
         <sl-drawer placement="start" ?open=${!!this.open} @sl-request-close=${this.handleCloseRequest}>
+          ${
+            this.showHint
+            ? html`<p class="hint">You have no contexts. Use the create button below to add one.</p>`
+            : nothing
+          }
           ${(this.cantEdit || this.editing || this.creating) ? nothing : html`<sl-icon-button slot="footer" name="pencil-square" label="Edit Context" @click=${this.handleEdit}></sl-icon-button>`}
           ${(this.editing || this.creating) ? nothing : html`<sl-icon-button slot="footer" name="plus-square" label="Add Context" class="action" @click=${this.handleCreate}></sl-icon-button>`}
           ${(this.editing) ? html`<sl-button slot="footer" size="small" class="action" @click=${this.handleDoneEditing}>Done</sl-button>` : nothing}

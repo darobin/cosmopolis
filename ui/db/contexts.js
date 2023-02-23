@@ -7,6 +7,8 @@ const store = writable(defaultValue);
 
 registerStore('contexts', store);
 
+// const
+
 // XXX use .update to merge
 // XXX export some actions
 
