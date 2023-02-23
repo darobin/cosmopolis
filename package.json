@@ -10,7 +10,7 @@
     "start": "tauri dev",
     "watch": "concurrently --handle-input npm:watch-js npm:start",
     "build": "npm run build-assets && npm run build-js",
-    "watch-js": "esbuild ui/cosmopolis.js --bundle --outfile=ui/cosmopolis.min.js --format=esm --watch",
+    "watch-js": "esbuild ui/cosmopolis.js --bundle --outfile=ui/cosmopolis.min.js --format=esm --watch --sourcemap",
     "build-js": "esbuild ui/cosmopolis.js --bundle --outfile=ui/cosmopolis.min.js --format=esm",
     "build-assets": "./copy-assets.sh"
   },

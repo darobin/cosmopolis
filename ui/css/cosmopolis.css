@@ -21,11 +21,16 @@ font-style: italic;
   */
   --cm-sky-dark: #fc6649;
   --cm-sky-light: #e5c6a7;
+  --cm-sky-fog: #e5c6a7cc;
   --cm-street-dark: #243bb7;
   --cm-street-medium: #394fc5;
   --cm-street-light: #4a5bcd;
+  --cm-street-size: 50px;
   --cm-title-font: Catamaran;
   --cm-body-font: Mulish;
+
+  /* managing Shoelace tokens */
+  --sl-input-font-family: var(--cm-body-font);
 }
 
 html {
@@ -35,10 +40,11 @@ html {
   background: linear-gradient(
     to top,
     var(--cm-street-light) 0,
-    var(--cm-street-dark) 50px,
-    var(--cm-sky-light) 50px,
+    var(--cm-street-dark) var(--cm-street-size),
+    var(--cm-sky-light) var(--cm-street-size),
     var(--cm-sky-dark) 100%
   );
+  font-family: var(--cm-body-font);
 }
 
 h1 {
