@@ -2,6 +2,7 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { serialize } from '@shoelace-style/shoelace/dist/utilities/form.js';
 import { getStore } from '../lib/model.js';
+import { saveContext } from '../db/contexts.js';
 import { actionButton } from './button-styles.js';
 
 export class CosmoContexts extends LitElement {
@@ -63,11 +64,12 @@ export class CosmoContexts extends LitElement {
     this.showHint = false
 
     store.subscribe(({ contexts, current }) => {
-      if (!this.contexts || !this.contexts.length) {
+      if (!contexts || !contexts.length) {
         this.open = true;
         this.cantEdit = true;
         this.showHint = true;
       }
+      if (!current) this.open = true;
       this.contexts = contexts;
       this.current = current;
       if (current) this.title = current.name;
@@ -86,13 +88,14 @@ export class CosmoContexts extends LitElement {
   handleResetCreation () {
     this.creating = false;
   }
-  handleCreateContext (ev) {
+  async handleCreateContext (ev) {
     ev.preventDefault();
     ev.stopPropagation();
     let { name = '' } = serialize(ev.target);
     name = name.trim();
     if (!name) return;
-    console.warn(ev.target, name);
+    await saveContext({ name });
+    this.creating = false;
   }
   handleEdit () {
     this.editing = true;
@@ -122,7 +125,7 @@ export class CosmoContexts extends LitElement {
         </div>
         <sl-drawer placement="start" ?open=${!!this.open} @sl-request-close=${this.handleCloseRequest}>
           ${
-            this.showHint
+            this.showHint && !this.creating
             ? html`<p class="hint">You have no contexts. Use the create button below to add one.</p>`
             : nothing
           }
