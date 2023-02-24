@@ -21,10 +21,10 @@
 - [x] Shoelace style with cssn so we can call it a day
 - [x] use concurrently
 - [x] Background & custom title
-- [ ] Sidebar, semitranslucent, list of contexts
-- [ ] New context (in a temp location)
-- [ ] Close/delete context
-- [ ] Rename context
+- [x] Sidebar, semitranslucent, list of contexts
+- [x] New context (in a temp location)
+- [x] Close/delete context
+- [x] Rename context
 
 ## Tiles
 

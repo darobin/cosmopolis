@@ -23,7 +23,7 @@ export async function listContexts () {
     else if (/^\$/.test(k)) return;
     else entryMap[k] = v;
   });
-  return list.map(k => entryMap[k]);
+  return list.map(k => entryMap[k]).filter(Boolean);
 }
 
 // this has a race condition
@@ -50,6 +50,9 @@ export async function updateContext (id, ctx) {
 
 export async function deleteContext (id) {
   await store.delete(id);
+  let list = await store.get(CTX_LIST);
+  list = list.filter(k => k !== id);
+  await store.set(CTX_LIST, list);
   await store.save();
 }
 
@@ -58,5 +61,5 @@ export async function registerContextChange (id, cb) {
 }
 
 export async function registerContextListChange (cb) {
-  await store.onKeyChange(CTX_LIST, async () => cb(await listContexts()));
+  await store.onChange(async () => cb(await listContexts()));
 }

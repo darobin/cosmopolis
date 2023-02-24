@@ -2,7 +2,7 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { serialize } from '@shoelace-style/shoelace/dist/utilities/form.js';
 import { getStore } from '../lib/model.js';
-import { saveContext } from '../db/contexts.js';
+import { saveContext, removeContext } from '../db/contexts.js';
 import { actionButton } from './button-styles.js';
 
 export class CosmoContexts extends LitElement {
@@ -115,8 +115,16 @@ export class CosmoContexts extends LitElement {
       this.creating = false;
     }
   }
+  // XXX
   handleLoadContext (ev) {
     console.warn(`Loading context for`, ev.target.id);
+  }
+  async handleChangeContext (ev) {
+    if (!ev.detail?.name) return;
+    await saveContext({ $id: ev.target.id, name: ev.detail.name });
+  }
+  async handleDeleteContext (ev) {
+    await removeContext({ $id: ev.target.id });
   }
   async updated (changedProps) {
     if (changedProps.has('creating') && this.creating) {
@@ -138,7 +146,8 @@ export class CosmoContexts extends LitElement {
             ? html`
               <ul>
                 ${this.contexts.map(({ $id, name}) => html`<li>
-                  <cm-context-link id=${$id} name=${name} ?editable=${this.editing} @click=${this.handleLoadContext}></cm-context-link>
+                <cm-context-link id=${$id} name=${name} ?editable=${this.editing} @click=${this.editing ? ()=>{} : this.handleLoadContext}
+                    @change-context=${this.handleChangeContext} @delete-context=${this.handleDeleteContext}></cm-context-link>
                 </li>`)}
               </ul>
               `

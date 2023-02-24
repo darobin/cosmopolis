@@ -16,15 +16,40 @@ export class CosmoContextLink extends LitElement {
       sl-button[variant="text"]:hover::part(label) {
         color: var(--cm-sky-dark);
       }
+      sl-button[variant="text"]::part(base) {
+        height: auto;
+        margin-bottom: var(--sl-spacing-medium);
+      }
       form,
       div {
         display: flex;
       }
-      sl-icon-button {
+      form,
+      sl-input {
+        flex-grow: 1;
+      }
+      form {
+        margin-bottom: var(--sl-spacing-small);
+      }
+      sl-input::part(base) {
+        background-color: #fff3;
+      }
+      sl-input::part(input) {
+        color: var(--sl-color-neutral-600);
+        background-color: transparent;
+        font-size: 1.4rem;
+        white-space: normal;
+        line-height: 1;
+      }
+      sl-icon-button.del {
+        margin-left: calc(-32px + var(--sl-spacing-small));
         color: var(--sl-color-danger-600);
       }
-      sl-icon-button:hover::part(base) {
+      sl-icon-button.del:hover::part(base) {
         color: var(--sl-color-danger-900);
+      }
+      sl-button.ok {
+        margin-left: var(--sl-spacing-2x-small);
       }
     `,
   ];
@@ -44,6 +69,7 @@ export class CosmoContextLink extends LitElement {
   eventChange (ev) {
     ev.preventDefault();
     ev.stopPropagation();
+    if (!this.dirty) return;
     let { name = '' } = serialize(ev.target);
     name = name.trim();
     if (!name) return;
@@ -51,17 +77,21 @@ export class CosmoContextLink extends LitElement {
   }
   handleNameChange (ev) {
     const value = ev.target.value;
-    console.warn(`val`, value);
     this.dirty = (value !== this.name);
+  }
+  willUpdate (changedProps) {
+    if (changedProps.has('name')) this.dirty = false;
   }
   render () {
     if (!this.editable) return html`<sl-button variant="text" size="large">${this.name}</sl-button>`;
     return html`
       <div>
-        <sl-icon-button name="x-circle" label="Delete Context" @click=${this.eventDelete}></sl-icon-button>
+        <sl-icon-button class="del" name="x-circle" label="Delete Context" @click=${this.eventDelete}></sl-icon-button>
         <form @submit=${this.eventChange}>
-          <sl-input type="text" name="name" value=${this.name} placeholder="Context name" required autocorrect="on" enterkeyhint="done" spellcheck @change=${this.handleNameChange}></sl-input>
-          <sl-icon-button type="submit" name="check-lg" label="Ok" ?disabled=${!this.dirty}></sl-icon-button>
+          <sl-input type="text" name="name" value=${this.name} placeholder="Context name" required autocorrect="on" enterkeyhint="done" spellcheck @sl-input=${this.handleNameChange}></sl-input>
+          <sl-button type="submit" class="ok" ?disabled=${!this.dirty} variant=${this.dirty ? 'success' : 'default'}>
+            <sl-icon name="check-lg"></sl-icon>
+          </sl-button>
         </form>
       </div>
     `;
@@ -69,9 +99,6 @@ export class CosmoContextLink extends LitElement {
 }
 
 // STATUS:
-//  - change of the input doesn't update dirty correctly
-//  - style inputs to look like the context links
-//  - the buttons don't have enough contrast
 //  - handle the events in the parent
 
 customElements.define('cm-context-link', CosmoContextLink);
