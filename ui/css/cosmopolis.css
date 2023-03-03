@@ -39,10 +39,8 @@ html {
   background-size: cover;
   background: linear-gradient(
     to top,
-    var(--cm-street-light) 0,
-    var(--cm-street-dark) var(--cm-street-size),
-    var(--cm-sky-light) var(--cm-street-size),
-    var(--cm-sky-dark) 100%
+    var(--cm-sky-light),
+    var(--cm-sky-dark)
   );
   font-family: var(--cm-body-font);
 }
@@ -52,14 +50,30 @@ html, body {
   padding: 0;
 }
 
+body {
+  display: grid;
+  grid-template-rows: min-content 1fr min-content;
+  grid-template-areas:
+    "a"
+    "b"
+    "c"
+  ;
+  height: 100%;
+}
+
 h1 {
-  position: absolute;
-  right: 1rem;
+  grid-area: c;
   bottom: 0;
   color: var(--cm-sky-light);
-  padding: 0;
+  padding: 0 1rem 0 0;
   margin: 0;
+  text-align: right;
   font-family: var(--cm-title-font);
   font-weight: 100;
   font-variation-settings: "wght" 100; /* Chrome doesn't apply font-weight correctly. */
+  background: linear-gradient(
+    to top,
+    var(--cm-street-light),
+    var(--cm-street-dark)
+  );
 }

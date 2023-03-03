@@ -27,10 +27,6 @@ export class CosmoContexts extends LitElement {
       #root {
         opacity: 1;
         transition: 0.5s opacity;
-        /* position: absolute;
-        top: 0;
-        left: 0;
-        right: 0; */
         padding: 1rem;
       }
       div.hidden {
