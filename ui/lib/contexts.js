@@ -4,6 +4,7 @@ import lowercase from "nanoid-dictionary/lowercase";
 import { Store } from "tauri-plugin-store-api";
 
 const CTX_LIST = '$ctx-list';
+const CTX_CURRENT = '$ctx-current';
 
 const nanoid = customAlphabet(lowercase);
 
@@ -62,4 +63,17 @@ export async function registerContextChange (id, cb) {
 
 export async function registerContextListChange (cb) {
   await store.onChange(async () => cb(await listContexts()));
+}
+
+export async function getCurrent () {
+  return store.get(CTX_CURRENT);
+}
+
+export async function setCurrent (id) {
+  await store.set(CTX_CURRENT, id);
+  await store.save();
+}
+
+export async function registerCurrentChange (cb) {
+  await store.onKeyChange(CTX_CURRENT, cb);
 }

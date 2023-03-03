@@ -26,6 +26,13 @@
 - [x] Close/delete context
 - [x] Rename context
 
+## Columns
+
+- [ ] Create component for columns
+- [ ] Add columns: context background when empty or floating to the right
+- [ ] Autoresize to content
+
+
 ## Tiles
 
 - [ ] Define the tile format by trying to create the right kind of content and pushing/retrieving it over Web3.Storage
@@ -36,15 +43,10 @@
 - [ ] Implement protocol handler for tile:
   - [ ] just map the getting with pathing all that
   - [ ] also have a way of retrieving the metadata
-- [ ] Build the ua-tile component that render and test it
+  - [ ] set CSP correctly
+- [ ] Build the ua-tile component to render and test it
   - [ ] Render just the metadata
   - [ ] Render the content, with various chrome options
-
-## Columns
-
-- [ ] Create component for columns
-- [ ] Add columns: context background when empty or floating to the right
-- [ ] Autoresize to content
 
 ## ActivityPub
 

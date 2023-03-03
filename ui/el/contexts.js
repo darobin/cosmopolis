@@ -2,7 +2,7 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { serialize } from '@shoelace-style/shoelace/dist/utilities/form.js';
 import { getStore } from '../lib/model.js';
-import { saveContext, removeContext } from '../db/contexts.js';
+import { saveContext, removeContext, selectContext } from '../db/contexts.js';
 import { actionButton } from './button-styles.js';
 
 export class CosmoContexts extends LitElement {
@@ -24,9 +24,14 @@ export class CosmoContexts extends LitElement {
       sl-icon-button.action {
         color: var(--cm-street-dark);
       }
-      div {
+      #root {
         opacity: 1;
         transition: 0.5s opacity;
+        /* position: absolute;
+        top: 0;
+        left: 0;
+        right: 0; */
+        padding: 1rem;
       }
       div.hidden {
         opacity: 0;
@@ -44,6 +49,20 @@ export class CosmoContexts extends LitElement {
       }
       li {
         list-style-type: none;
+      }
+      #open-contexts::part(label) {
+        font-size: 2rem;
+        color: #fff;
+        padding-left: 0;
+      }
+      #controls {
+        display: flex;
+      }
+      h2 {
+        margin: 0;
+        font-family: var(--cm-title-font);
+        font-weight: 500;
+        color: var(--sl-color-neutral-600);
       }
     `,
     actionButton,
@@ -78,7 +97,7 @@ export class CosmoContexts extends LitElement {
       if (!current) this.open = true;
       this.contexts = contexts;
       this.current = current;
-      if (current) this.title = current.name;
+      if (current) this.title = (this.contexts || []).find(ctx => ctx.$id === current)?.name;
     });
   }
   handleOpen () {
@@ -115,9 +134,9 @@ export class CosmoContexts extends LitElement {
       this.creating = false;
     }
   }
-  // XXX
   handleLoadContext (ev) {
-    console.warn(`Loading context for`, ev.target.id);
+    selectContext(ev.target.id);
+    this.open = false;
   }
   async handleChangeContext (ev) {
     if (!ev.detail?.name) return;
@@ -135,9 +154,9 @@ export class CosmoContexts extends LitElement {
   }
   render () {
     return html`
-      <div>
-        <div class=${this.open ? 'hidden' : ''}>
-          <sl-button @click=${this.handleOpen}><sl-icon name="list-ul"></sl-icon></sl-button>
+      <div id="root">
+        <div class=${this.open ? 'hidden' : ''} id="controls">
+          <sl-button @click=${this.handleOpen} variant="text" id="open-contexts"><sl-icon name="list-ul"></sl-icon></sl-button>
           <h2>${this.title || nothing}</h2>
         </div>
         <sl-drawer placement="start" ?open=${!!this.open} @sl-request-close=${this.handleCloseRequest}>
