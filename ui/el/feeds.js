@@ -1,17 +1,21 @@
 
-import { LitElement, html, css, nothing } from 'lit';
+import { LitElement, html, css } from 'lit';
 // import { serialize } from '@shoelace-style/shoelace/dist/utilities/form.js';
 import { getStore } from '../lib/model.js';
 // import { saveContext, removeContext, selectContext } from '../db/contexts.js';
-// import { actionButton } from './button-styles.js';
+import { actionButton } from './button-styles.js';
 
 export class CosmoFeeds extends LitElement {
   static styles = [
     css`
-    :host {
-      border: 1px solid white;
+    #hint-root {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     `,
+    actionButton,
   ];
   static properties = {
     feeds: { attribute: false },
@@ -33,7 +37,7 @@ export class CosmoFeeds extends LitElement {
       }
       if (!current) return;
       this.feeds = (this.contexts || []).find(ctx => ctx.$id === current)?.feeds || [];
-      this.showHint = !!this.feeds.length;
+      this.showHint = !this.feeds.length;
     });
     ftStore.subscribe(({ feedTypes }) => {
       if (!feedTypes || !feedTypes.length) {
@@ -42,6 +46,16 @@ export class CosmoFeeds extends LitElement {
       }
       this.feedTypes = feedTypes;
     });
+  }
+  handleAddFeed (ev) {
+    const id = ev.detail.item.value;
+    const type = this.feedTypes.find(({ id }) => id === id)?.type
+    if (!type) return console.warn(`No feed constructor found for ${id}.`);
+    // XXX
+    // - type.create()
+    // - add to feed
+    // - save feed configuration to disk
+    // this should all trigger the right stores and update the rendering
   }
   // XXX
   //  - if empty, just put a hint with "add feed" in the middle, no plus column
@@ -52,9 +66,27 @@ export class CosmoFeeds extends LitElement {
   //  - feed settings editor in the top bar
   //  - when that's done, play with w3.storage
   render () {
+    if (this.showHint) return this.renderAddFeed();
     return html`
       <div id="root">
         x
+      </div>
+    `;
+  }
+  renderAddFeed (small = false) {
+    return html`
+      <div id="hint-root">
+        <sl-dropdown @sl-select=${this.handleAddFeed}>
+          <sl-button slot="trigger" ?caret=${!small} class="action" size=${small ? 'small' : 'large'}>
+            <sl-icon name="view-list"></sl-icon>
+            ${small ? html`<sl-icon name="plus-lg"></sl-icon>` : 'Add Feed'}
+          </sl-button>
+          <sl-menu>
+            ${
+              this.feedTypes.map(({ id, label }) => html`<sl-menu-item value=${id}>${label}</sl-menu-item>`)
+            }
+          </sl-menu>
+        </sl-dropdown>
       </div>
     `;
   }

@@ -2,7 +2,7 @@
 import { registerFeedType } from '../../db/feed-types.js'
 
 class CuratedFeed {
-  constructor (id) {
+  constructor () {
     // XXX
   }
   static create () {
