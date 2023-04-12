@@ -48,7 +48,7 @@
     "multiformats": "^11.0.2",
     "nanoid": "^4.0.1",
     "nanoid-dictionary": "^4.3.0",
-    "tempy": "^3.0.0",
+    "w3name": "^1.0.8",
     "web3.storage": "^4.5.4"
   }
 }

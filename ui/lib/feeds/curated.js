@@ -1,30 +1,26 @@
 
-import { Readable } from 'node:stream';
-import { createReadStream, createWriteStream } from 'node:fs';
 import { getClient } from '../w3.storage.js';
 import { registerFeedType } from '../../db/feed-types.js'
 import { encode } from 'multiformats/block'
 import * as cbor from '@ipld/dag-cbor'
 import { sha256 } from 'multiformats/hashes/sha2'
 import { CarReader, CarWriter } from '@ipld/car';
-import { temporaryFile } from 'tempy';
 
 function encodeCBOR (value) {
   return encode({ value, codec: cbor, hasher: sha256 });
 }
 
-// This is a bit of a mess, Readable.from(out) is prone to failing silently in some cases.
-// We totally shouldn't need to be relying on a tmpfile here, but the only example that worked
-// went through a file and so file it is.
+// XXX
+// No idea if this works
 async function makeCar (rootCID, ipldBlocks) {
   const { writer, out } = CarWriter.create([rootCID]);
-  const fn = temporaryFile();
-  Readable.from(out).pipe(createWriteStream(fn));
+  const chunks = []; // XXX maybe make this more of a Uint8Array that we append to
   for (const b of ipldBlocks) {
     await writer.put(b);
   }
   await writer.close();
-  return await CarReader.fromIterable(createReadStream(fn));
+  for await (const c of out) chunks.push(c);
+  return await CarReader.fromIterable(chunks);
 }
 
 class CuratedFeed {
@@ -46,8 +42,10 @@ class CuratedFeed {
     const cid = await w3.putCar(car);
     console.warn(`car cid`, cid);
     // XXX
-    //  - store it
     //  - name it
+    //    - create new name
+    //    - SAVE ITS BYTES IN LOCAL STORAGE (noting that this isn't great for security)
+    //    - publish the name/value
     //  - return it, and keep the name
   }
 }
