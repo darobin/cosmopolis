@@ -6,11 +6,15 @@ import './lib/contexts.js';
 
 // models
 import './db/contexts.js';
+import './db/feed-types.js';
 
 // elements
 import './el/contexts.js';
 import './el/context-link.js';
 import './el/feeds.js';
+
+// feed types
+import './lib/feeds/curated.js';
 
 // this will need to move to its own thing so we can remember previous sizes
 appWindow.maximize();

@@ -15,13 +15,17 @@ export class CosmoFeeds extends LitElement {
   ];
   static properties = {
     feeds: { attribute: false },
+    feedTypes: { attribute: false },
+    showHint: { attribute: false },
   };
   constructor () {
     super();
-    const store = getStore('contexts');
+    const ctxStore = getStore('contexts');
+    const ftStore = getStore('feed-types');
     this.showHint = false;
     this.feeds = [];
-    store.subscribe(({ contexts, current }) => {
+    this.feedTypes = [];
+    ctxStore.subscribe(({ contexts, current }) => {
       if (!contexts || !contexts.length) {
         this.feeds = [];
         this.showHint = false;
@@ -30,6 +34,13 @@ export class CosmoFeeds extends LitElement {
       if (!current) return;
       this.feeds = (this.contexts || []).find(ctx => ctx.$id === current)?.feeds || [];
       this.showHint = !!this.feeds.length;
+    });
+    ftStore.subscribe(({ feedTypes }) => {
+      if (!feedTypes || !feedTypes.length) {
+        this.feedTypes = [];
+        return;
+      }
+      this.feedTypes = feedTypes;
     });
   }
   // XXX
