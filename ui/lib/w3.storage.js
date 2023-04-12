@@ -5,6 +5,8 @@ import { Store } from "tauri-plugin-store-api";
 const TOKEN = '$token';
 const store = new Store("w3.storage.store");
 
+let client;
+
 export async function getToken () {
   return await store.get(TOKEN);
 }
@@ -25,12 +27,20 @@ export async function registerTokenChange (cb) {
 
 export async function checkToken (token) {
   try {
-    const client = new Web3Storage({ token });
-    const res = await client.list({ maxResults: 1 });
+    const c = new Web3Storage({ token });
+    const res = await c.list({ maxResults: 1 });
     await res[Symbol.asyncIterator]().next()
     return true;
   }
   catch (err) {
     return false;
   }
+}
+
+export async function getClient () {
+  if (client) return client;
+  const token = await getToken();
+  if (!token) return;
+  client = new Web3Storage({ token });
+  return client;
 }

@@ -42,9 +42,13 @@
     "tauri-plugin-store-api": "github:tauri-apps/tauri-plugin-store"
   },
   "dependencies": {
+    "@ipld/car": "^5.1.1",
+    "@ipld/dag-cbor": "^9.0.0",
     "@shoelace-style/shoelace": "^2.1.0",
+    "multiformats": "^11.0.2",
     "nanoid": "^4.0.1",
     "nanoid-dictionary": "^4.3.0",
+    "tempy": "^3.0.0",
     "web3.storage": "^4.5.4"
   }
 }
