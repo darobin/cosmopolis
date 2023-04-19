@@ -20,6 +20,7 @@ fn main() {
         app.emit_all("single-instance", Payload { args: argv, cwd }).unwrap();
     }))
     .plugin(tauri_plugin_store::Builder::default().build())
+    .plugin(tauri_plugin_fs_watch::init())
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }

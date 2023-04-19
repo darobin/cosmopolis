@@ -16,7 +16,9 @@
       "fs": {
         "all": true,
         "scope": [
-          "$APPDATA/ipfs/*"
+          "$APPDATA/*",
+          "$APPDATA/ipfs/*",
+          "$APPDATA/ipfs/feeds/*"
         ]
       },
       "window": {

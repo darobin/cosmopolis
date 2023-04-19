@@ -30,3 +30,14 @@ export async function selectContext (ctx) {
   const id = ctx?.$id || ctx;
   return setCurrent(id);
 }
+
+export async function addFeedToContext (feedID, ctxID) {
+  if (!ctxID) ctxID = store.current;
+  console.warn(`finding in`, store.contexts);
+  const ctx = store.contexts.find(c => c.$id === ctxID);
+  console.warn(`found`, ctx);
+  if (!ctx) throw new Error(`Can't find context ${ctxID}`);
+  if (!ctx.feeds) ctx.feeds = [];
+  ctx.feeds.push(feedID);
+  return saveContext(ctx);
+}

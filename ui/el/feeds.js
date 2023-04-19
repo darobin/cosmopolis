@@ -2,7 +2,7 @@
 import { LitElement, html, css } from 'lit';
 // import { serialize } from '@shoelace-style/shoelace/dist/utilities/form.js';
 import { getStore } from '../lib/model.js';
-// import { saveContext, removeContext, selectContext } from '../db/contexts.js';
+import { addFeedToContext } from '../db/contexts.js';
 import { actionButton } from './button-styles.js';
 
 export class CosmoFeeds extends LitElement {
@@ -47,19 +47,21 @@ export class CosmoFeeds extends LitElement {
       this.feedTypes = feedTypes;
     });
   }
-  handleAddFeed (ev) {
+  async handleAddFeed (ev) {
     const id = ev.detail.item.value;
     const type = this.feedTypes.find(({ id }) => id === id)?.type
     if (!type) return console.warn(`No feed constructor found for ${id}.`);
     const feed = await type.create();
+    await addFeedToContext(feed);
     // XXX
-    // - add to feed store
-    // - save feed configuration to disk
-    // this should all trigger the right stores and update the rendering
+    // when the context refreshes:
+    //  . we should see that we have a new feed ID
+    //  . then we attach a feed store to that somehow
+    //  . then we load/watch that feedstore and can refresh UI from that
+    //  . we probably want to use fs-watch for that
   }
   // XXX
-  //  - if empty, just put a hint with "add feed" in the middle, no plus column
-  //  - make a special button-select component that offers a menu to select from when clicked (here of feed types)
+  //  - we need some sort of feedstore that could provide a subscription source ()
   //  - horizontal feeds flex, with fixed sizes except the last one (also fixed but just plus)
   //  - horizontal scrolling, no vertical scrolling
   //  - each feed is a panel, can request resize from parent (we can just force the sizes of child, no need to communicate)
