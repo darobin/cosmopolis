@@ -14,7 +14,10 @@
   "tauri": {
     "allowlist": {
       "fs": {
-        "scope": [""]
+        "all": true,
+        "scope": [
+          "$APPDATA/ipfs/*"
+        ]
       },
       "window": {
         "maximize": true,

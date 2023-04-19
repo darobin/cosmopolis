@@ -1,12 +1,9 @@
 
-import { customAlphabet } from "nanoid";
-import lowercase from "nanoid-dictionary/lowercase";
 import { Store } from "tauri-plugin-store-api";
+import nanoid from "./smallid.js";
 
 const CTX_LIST = '$ctx-list';
 const CTX_CURRENT = '$ctx-current';
-
-const nanoid = customAlphabet(lowercase);
 
 const store = new Store("contexts.store");
 let contexts = await store.get(CTX_LIST);

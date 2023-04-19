@@ -51,9 +51,9 @@ export class CosmoFeeds extends LitElement {
     const id = ev.detail.item.value;
     const type = this.feedTypes.find(({ id }) => id === id)?.type
     if (!type) return console.warn(`No feed constructor found for ${id}.`);
+    const feed = await type.create();
     // XXX
-    // - type.create()
-    // - add to feed
+    // - add to feed store
     // - save feed configuration to disk
     // this should all trigger the right stores and update the rendering
   }
