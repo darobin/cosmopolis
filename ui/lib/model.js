@@ -103,8 +103,7 @@ export function writable (value, start = () => {}) {
 export function get (store) {
   if (!store) return;
   let value;
-  const unsub = store.subscribe(v => value = v)();
-  unsub();
+  store.subscribe(v => value = v)();
   return value;
 }
 

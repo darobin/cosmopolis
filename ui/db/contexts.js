@@ -1,6 +1,6 @@
 
 
-import { registerStore, writable } from '../lib/model.js';
+import { registerStore, writable, get } from '../lib/model.js';
 import { listContexts, registerContextListChange, registerCurrentChange, addContext, updateContext, deleteContext, getCurrent, setCurrent } from '../lib/contexts.js';
 
 const defaultValue = { contexts: await listContexts(), current: await getCurrent() };
@@ -32,9 +32,10 @@ export async function selectContext (ctx) {
 }
 
 export async function addFeedToContext (feedID, ctxID) {
-  if (!ctxID) ctxID = store.current;
-  console.warn(`finding in`, store.contexts);
-  const ctx = store.contexts.find(c => c.$id === ctxID);
+  const value = get(store);
+  if (!ctxID) ctxID = value.current;
+  console.warn(`finding in`, value.contexts);
+  const ctx = value.contexts.find(c => c.$id === ctxID);
   console.warn(`found`, ctx);
   if (!ctx) throw new Error(`Can't find context ${ctxID}`);
   if (!ctx.feeds) ctx.feeds = [];
