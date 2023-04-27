@@ -10,6 +10,13 @@ export class CosmoLabSidebar extends LitElement {
       ::part(base) {
         border-radius: initial;
       }
+      ::part(summary) {
+        font-variation-settings: "wght" 700;
+      }
+      .actions {
+        margin-top: var(--sl-spacing-medium);
+        text-align: right;
+      }
     `
   ];
   static properties = {
@@ -17,13 +24,37 @@ export class CosmoLabSidebar extends LitElement {
   };
   constructor () {
     super();
+    window.cosmopolis
+      .getSetting('developer.tiles.loadHistory')
+      .then(hist => this.previousDevTiles = hist || [])
+    ;
+  }
+  handleOpenDevModeTile () {
+    // - file picker set for directory (dialog.showOpenDialogSync)
+    // - the backend needs to map that to a nanoid and keep track of that
+    // - add to previous tiles, cap the size of the list
+    // - select previous dev mode tile (set selected, causes sl-select to show, trigger load)
+  }
+  handleSelectDevModeTile () {
+    // - loading tile://nanoid/ should DTRT
   }
   render () {
+    const noPrevious = !this.previousDevTiles?.length;
     return html`
       <div id="root">
         <sl-details summary="Dev Mode Tiles" open>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-    aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+          <sl-select label="Load previously-loaded tile" ?disabled=${noPrevious}
+          placeholder=${noPrevious ? 'No previous tiles' : ''} @sl-select=${this.handleSelectDevModeTile}>
+            ${
+              (this.previousDevTiles || []).map(tile => html`<sl-option value=${tile.id}>${tile.path}</sl-option>`)
+            }
+          </sl-select>
+          <div class="actions">
+            <sl-button variant="primary" @click=${this.handleOpenDevModeTile}>
+              <sl-icon slot="prefix" name="folder2-open"></sl-icon>
+              Load Dev Mode Tile
+            </sl-button>
+          </div>
         </sl-details>
       </div>
     `;
@@ -31,12 +62,3 @@ export class CosmoLabSidebar extends LitElement {
 }
 
 customElements.define('cm-lab-sidebar', CosmoLabSidebar);
-
-// XXX
-//  - expose prefs backend/frontend
-//  - get list of previous tiles
-//  - populate menu from it, shows "none" otherwise
-//  - button to pick one
-//    - file picker set for directory
-//    - the backend needs to map that to a nanoid and keep track of that
-//    - loading tile://nanoid/ should DTRT

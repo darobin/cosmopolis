@@ -1,11 +1,15 @@
 
-import { app, /*protocol,*/ BrowserWindow }  from 'electron';
+import { app, /*protocol,*/ BrowserWindow, ipcMain }  from 'electron';
+import { get as getSetting, set as setSetting } from 'electron-settings';
 // import { ipfsProtocolHandler } from './ipfs-handler.js';
 // import { initIPNSCache, shutdown } from './ipfs-node.js';
 // import { initDataSource } from './data-source.js';
 // import { initIntents } from './intents.js';
 import { manageWindowPosition } from './lib/window-manager.js';
 import makeRel from './lib/rel.js';
+import { get } from 'http';
+
+const { handle } = ipcMain;
 
 let mainWindow;
 const rel = makeRel(import.meta.url);
@@ -31,7 +35,8 @@ app.whenReady().then(async () => {
   // protocol.registerStreamProtocol('ipfs', ipfsProtocolHandler);
   // protocol.registerStreamProtocol('ipns', ipfsProtocolHandler);
   // await initIPNSCache();
-  // await initDataSource();
+  handle('settings:get', handleSettingsGet);
+  handle('settings:set', handleSettingsSet);
   // await initIntents();
   mainWindow = new BrowserWindow({
     show: false,
@@ -102,4 +107,11 @@ function makeKeyMatcher (type, sc, cb) {
     if (badMod) return;
     cb();
   };
+}
+
+async function handleSettingsGet (ev, keyPath) {
+  return getSetting(keyPath);
+}
+async function handleSettingsSet (ev, keyPath, data) {
+  return setSetting(keyPath, data);
 }
