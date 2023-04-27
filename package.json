@@ -7,12 +7,11 @@
   "license": "MIT",
   "scripts": {
     "start": "electron --trace-warnings .",
-    "watch": "XXX concurrently --handle-input npm:watch-js npm:start",
+    "watch": "concurrently --handle-input npm:watch-js npm:monitor",
     "monitor": "electronmon --trace-warnings .",
-    "XXXbuild": "XXX npm run build-assets && npm run build-js && npm run build-electron",
-    "build": "npm run build-assets && npm run build-electron",
-    "watch-js": "XXX esbuild ui/cosmopolis.js --bundle --outfile=ui/cosmopolis.min.js --format=esm --watch --sourcemap",
-    "build-js": "XXX esbuild ui/cosmopolis.js --bundle --outfile=ui/cosmopolis.min.js --format=esm",
+    "build": "npm run build-assets && npm run build-js && npm run build-electron",
+    "watch-js": "esbuild ui/cosmopolis.js --bundle --outfile=ui/cosmopolis.min.js --format=esm --watch --sourcemap",
+    "build-js": "esbuild ui/cosmopolis.js --bundle --outfile=ui/cosmopolis.min.js --format=esm",
     "build-electron": "npm exec electron-builder --mac",
     "build-assets": "./copy-assets.sh"
   },

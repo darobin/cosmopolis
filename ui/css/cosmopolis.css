@@ -53,16 +53,17 @@ html, body {
 body {
   display: grid;
   grid-template-rows: min-content 1fr min-content;
+  grid-template-columns: 1fr 400px;
   grid-template-areas:
-    "a"
-    "b"
-    "c"
+    "a a"
+    "b c"
+    "d d"
   ;
   height: 100%;
 }
 
 h1 {
-  grid-area: c;
+  grid-area: d;
   bottom: 0;
   color: var(--cm-sky-light);
   padding: 0 1rem 0 0;
@@ -76,6 +77,13 @@ h1 {
     var(--cm-street-light),
     var(--cm-street-dark)
   );
+}
+
+cm-lab-workshop {
+  grid-area: b;
+}
+cm-lab-sidebar {
+  grid-area: c;
 }
 
 html.lab {
