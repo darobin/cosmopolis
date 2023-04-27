@@ -1,0 +1,95 @@
+
+@font-face {
+  font-family: "Catamaran";
+  src: url("Catamaran-VariableFont_wght.ttf");
+  font-style: normal;
+}
+@font-face {
+font-family: "Mulish";
+src: url("Mulish-VariableFont_wght.ttf");
+font-style: normal;
+}
+@font-face {
+font-family: "Mulish";
+src: url("Mulish-Italic-VariableFont_wght.ttf");
+font-style: italic;
+}
+
+:root {
+  /*  These colours are inspired by the work of Elyse Dodge, specifically
+      https://www.elysedodge.com/blogs/paintings/lemon-drop.
+  */
+  --cm-sky-dark: #fc6649;
+  --cm-sky-light: #e5c6a7;
+  --cm-sky-fog: #e5c6a7cc;
+  --cm-street-dark: #243bb7;
+  --cm-street-medium: #394fc5;
+  --cm-street-light: #4a5bcd;
+  --cm-street-size: 50px;
+  --cm-title-font: Catamaran;
+  --cm-body-font: Mulish;
+
+  /* managing Shoelace tokens */
+  --sl-input-font-family: var(--cm-body-font);
+}
+
+html {
+  height: 100%;
+  background-attachment: fixed;
+  background-size: cover;
+  background: linear-gradient(
+    to top,
+    var(--cm-sky-light),
+    var(--cm-sky-dark)
+  );
+  font-family: var(--cm-body-font);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: grid;
+  grid-template-rows: min-content 1fr min-content;
+  grid-template-areas:
+    "a"
+    "b"
+    "c"
+  ;
+  height: 100%;
+}
+
+h1 {
+  grid-area: c;
+  bottom: 0;
+  color: var(--cm-sky-light);
+  padding: 0 1rem 0 0;
+  margin: 0;
+  text-align: right;
+  font-family: var(--cm-title-font);
+  font-weight: 100;
+  font-variation-settings: "wght" 100; /* Chrome doesn't apply font-weight correctly. */
+  background: linear-gradient(
+    to top,
+    var(--cm-street-light),
+    var(--cm-street-dark)
+  );
+}
+
+html.lab {
+  background-color: var(--cm-street-dark);
+  background-image:
+    linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.3) 1px, transparent 1px);
+  background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+  background-position:-2px -2px, -2px -2px, -1px -1px, -1px -1px;
+}
+
+html.lab h1 {
+  border-top: 1px solid var(--cm-sky-dark);
+  color: var(--cm-sky-dark);
+}
