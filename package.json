@@ -1,0 +1,59 @@
+{
+  "name": "cosmopolis",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "you'd forgotten why you loved the web",
+  "author": "Robin Berjon <robin@berjon.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron --trace-warnings .",
+    "watch": "XXX concurrently --handle-input npm:watch-js npm:start",
+    "build": "XXX npm run build-assets && npm run build-js && npm run build-electron",
+    "watch-js": "XXX esbuild ui/cosmopolis.js --bundle --outfile=ui/cosmopolis.min.js --format=esm --watch --sourcemap",
+    "build-js": "XXX esbuild ui/cosmopolis.js --bundle --outfile=ui/cosmopolis.min.js --format=esm",
+    "build-electron": "npm exec electron-builder --mac",
+    "build-assets": "XXX ./copy-assets.sh"
+  },
+  "bin": {},
+  "main": "src/index-wrapper.cjs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/darobin/cosmopolis.git"
+  },
+  "esm": {
+    "await": true
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "mocha": true,
+      "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "overrides": [],
+    "parserOptions": {
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
+    "rules": {}
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0",
+    "esbuild": "^0.17.10",
+    "eslint": "^8.26.0",
+    "lit": "^2.6.1"
+  },
+  "dependencies": {
+    "@shoelace-style/shoelace": "^2.1.0",
+    "bufferutil": "^4.0.7",
+    "electron": "^21.2.3",
+    "esm": "^3.2.25",
+    "ipfs-core": "^0.17.0",
+    "mime-types": "^2.1.35",
+    "nanoid": "^4.0.1",
+    "nanoid-dictionary": "^4.3.0",
+    "sanitize-filename": "^1.6.3",
+    "utf-8-validate": "^5.0.10",
+    "wasmagic": "^0.0.23"
+  }
+}
