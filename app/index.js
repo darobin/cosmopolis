@@ -1,9 +1,10 @@
 
-import { app, /*protocol,*/ BrowserWindow, screen }  from 'electron';
+import { app, /*protocol,*/ BrowserWindow }  from 'electron';
 // import { ipfsProtocolHandler } from './ipfs-handler.js';
 // import { initIPNSCache, shutdown } from './ipfs-node.js';
 // import { initDataSource } from './data-source.js';
 // import { initIntents } from './intents.js';
+import { manageWindowPosition } from './lib/window-manager.js';
 import makeRel from './lib/rel.js';
 
 let mainWindow;
@@ -32,10 +33,7 @@ app.whenReady().then(async () => {
   // await initIPNSCache();
   // await initDataSource();
   // await initIntents();
-  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   mainWindow = new BrowserWindow({
-    width,
-    height,
     show: false,
     backgroundColor: '#fff',
     title: 'cosmopolis',
@@ -46,6 +44,7 @@ app.whenReady().then(async () => {
       preload: rel('./preload.js'),
     },
   });
+  await manageWindowPosition(mainWindow);
   // mainWindow.loadFile('index.html');
   mainWindow.loadFile('lab.html');
   mainWindow.once('ready-to-show', () => mainWindow.show());
