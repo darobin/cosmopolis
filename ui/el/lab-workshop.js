@@ -1,5 +1,5 @@
 
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css, nothing } from 'lit';
 
 export class CosmoLabWorkshop extends LitElement {
   static styles = [
@@ -7,14 +7,28 @@ export class CosmoLabWorkshop extends LitElement {
       #root {
         padding: 1rem;
       }
+      sl-card {
+        display: block;
+        width: 600px;
+        margin: 0 auto;
+      }
+      webview {
+        width: 100%;
+        min-height: 450px;
+      }
+      h3 img {
+        vertical-align: middle;
+      }
     `
   ];
   static properties = {
     currentTileURL: { attribute: false },
+    currentTileMeta: { attribute: false },
   };
   constructor () {
     super();
     this.currentTileURL = null;
+    this.currentTileMeta = null;
     this.handleWorkshopSourceChange = (ev) => {
       const { detail: { url }} = ev;
       this.loadURL(url);
@@ -30,21 +44,27 @@ export class CosmoLabWorkshop extends LitElement {
   }
   async loadURL (url) {
     console.warn(`loadURL`, url);
-    // XXX
-    //  - fetch the URL's metadata
-    //  - make it available locally
+    const res = await fetch(new URL('manifest.json', url));
+    const meta = await res.json();
+    console.warn(`meta`, meta);
+    this.currentTileMeta = meta;
     this.currentTileURL = url;
   }
   render () {
-    console.warn(`rendering`, this.currentTileURL);
-    // XXX
-    //  - create a pane
-    //  - center it
-    //  - use the metadata to populate it
-    //  - use a <webview> to render it
+    if (!this.currentTileURL) return html`<div id="root"></div>`;
     return html`
       <div id="root">
-        URL: ${this.currentTileURL}
+        <sl-card>
+          <div slot="header">
+            <h3>
+              ${this.currentTileMeta.icons?.[0]?.src
+                ? html`<img src=${new URL(this.currentTileMeta.icons[0].src, this.currentTileURL).href} width="32" height="32" class='tile-icon'>`
+                : nothing}
+                ${this.currentTileMeta.name || this.currentTileMeta.short_name || 'Untitled'}
+            </h3>
+          </div>
+          <webview src=${this.currentTileURL}></webview>
+        </sl-card>
       </div>
     `;
   }

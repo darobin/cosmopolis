@@ -38,7 +38,6 @@ export class CosmoLabSidebar extends LitElement {
   }
   // the workshop listens for these
   loadSingleTile (url) {
-    console.warn(`dispatching event for`, url);
     const ev = new CustomEvent('cm-lab-workshop-source', { detail: { url }});
     window.dispatchEvent(ev);
   }
@@ -55,9 +54,7 @@ export class CosmoLabSidebar extends LitElement {
     this.loadSingleTile(tile.url);
   }
   handleSelectDevModeTile (ev) {
-    console.warn(`sl-select`, ev.currentTarget.value);
     const id = ev.currentTarget.value;
-    console.warn(`loading`, id);
     this.loadSingleTile(`tile://${id}/`);
   }
   // XXX
@@ -75,7 +72,7 @@ export class CosmoLabSidebar extends LitElement {
                 .map(tile => html`
                   <sl-option value=${tile.id}>
                     ${tile.manifest?.icons?.[0]?.src
-                      ? html`<img src=${tile.manifest?.icons?.[0]?.src} width="24" height="24" class='tile-icon'>`
+                      ? html`<img src=${tile.manifest.icons[0].src} width="24" height="24" class='tile-icon'>`
                       : nothing}
                     ${tile.manifest?.name || tile.manifest?.short_name || tile.dir}
                   </sl-option>

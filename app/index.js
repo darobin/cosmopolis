@@ -201,17 +201,12 @@ export async function tileProtocolHandler (req, cb) {
     });
   }
   const meta = await getSetting(`developer.tiles.localMap.${cid}`);
-  console.warn(`meta`, meta);
   if (!meta) return send404();
   const pathname = (url.pathname === '/' || !url.pathname) ? '/index.html' : url.pathname;
-  console.warn(`pathname`, pathname);
   const path = join(meta.dir, pathname);
-  console.warn(`path`, path);
   const mimeType = mime.lookup(path);
-  console.warn(`mime`, mimeType);
   try {
     await access(path, constants.R_OK);
-    console.warn(`accessible`);
     cb({
       statusCode: 200,
       mimeType,
