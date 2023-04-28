@@ -17,6 +17,9 @@ export class CosmoLabSidebar extends LitElement {
         margin-top: var(--sl-spacing-medium);
         text-align: right;
       }
+      img.tile-icon {
+        vertical-align: bottom;
+      }
     `
   ];
   static properties = {
@@ -35,6 +38,7 @@ export class CosmoLabSidebar extends LitElement {
   }
   // the workshop listens for these
   loadSingleTile (url) {
+    console.warn(`dispatching event for`, url);
     const ev = new CustomEvent('cm-lab-workshop-source', { detail: { url }});
     window.dispatchEvent(ev);
   }
@@ -51,9 +55,13 @@ export class CosmoLabSidebar extends LitElement {
     this.loadSingleTile(tile.url);
   }
   handleSelectDevModeTile (ev) {
-    const id = ev.detail.item.value;
+    console.warn(`sl-select`, ev.currentTarget.value);
+    const id = ev.currentTarget.value;
+    console.warn(`loading`, id);
     this.loadSingleTile(`tile://${id}/`);
   }
+  // XXX
+  //  - this badly needs a way to refresh previously loaded tiles, and to delete some
   render () {
     const noPrevious = !this.previousDevTiles?.length;
     const current = this.currentDevTile;
@@ -61,13 +69,13 @@ export class CosmoLabSidebar extends LitElement {
       <div id="root">
         <sl-details summary="Dev Mode Tiles" open>
           <sl-select label="Load previously-loaded tile" ?disabled=${noPrevious} value=${current || ''}
-          placeholder=${noPrevious ? 'No previous tiles' : ''} @sl-select=${this.handleSelectDevModeTile}>
+          placeholder=${noPrevious ? 'No previous tiles' : ''} @sl-change=${this.handleSelectDevModeTile}>
             ${
               (this.previousDevTiles || [])
                 .map(tile => html`
                   <sl-option value=${tile.id}>
                     ${tile.manifest?.icons?.[0]?.src
-                      ? html`<img src=${tile.manifest?.icons?.[0]?.src} width="16" height="16">`
+                      ? html`<img src=${tile.manifest?.icons?.[0]?.src} width="24" height="24" class='tile-icon'>`
                       : nothing}
                     ${tile.manifest?.name || tile.manifest?.short_name || tile.dir}
                   </sl-option>

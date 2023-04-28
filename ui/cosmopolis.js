@@ -15,3 +15,4 @@ setDefaultAnimation('details.hide', { ...detailsHideAnim, ...animOptions });
 
 // elements
 import './el/lab-sidebar.js';
+import './el/lab-workshop.js';

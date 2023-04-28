@@ -1,7 +1,11 @@
 
-import { app, BrowserWindow, ipcMain, dialog }  from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, protocol }  from 'electron';
 import { get as getSetting, set as setSetting } from 'electron-settings';
 import { join } from 'node:path';
+import { access } from 'node:fs/promises';
+import { createReadStream, constants } from 'node:fs';
+import { PassThrough } from 'node:stream';
+import mime from 'mime-types';
 import { manageWindowPosition } from './lib/window-manager.js';
 import makeRel from './lib/rel.js';
 import loadJSON from './lib/load-json.js';
@@ -27,9 +31,7 @@ else {
 }
 
 app.whenReady().then(async () => {
-  // protocol.registerStreamProtocol('ipfs', ipfsProtocolHandler);
-  // protocol.registerStreamProtocol('ipns', ipfsProtocolHandler);
-  // await initIPNSCache();
+  protocol.registerStreamProtocol('tile', tileProtocolHandler);
   handle('settings:get', handleSettingsGet);
   handle('settings:set', handleSettingsSet);
   handle('pick:tile-dev', handlePickDevTile);
@@ -152,5 +154,72 @@ async function handlePickDevTile () {
         message: `Failed to load manifest.json from dev tile: ${err.message}`,
       };
     }
+  }
+}
+
+// this is so that we can send strings as streams
+function createStream (text) {
+  const rv = new PassThrough();
+  rv.push(text);
+  rv.push(null);
+  return rv;
+}
+
+export async function tileProtocolHandler (req, cb) {
+  const url = new URL(req.url);
+  let cid;
+  if (url.protocol === 'tile:') {
+    cid = url.hostname;
+  }
+  else {
+    return cb({
+      statusCode: 421, // Misdirected Request
+      mimeType: 'application/json',
+      data: createStream(JSON.stringify({
+        err: true,
+        msg: `Backend does not support requests for scheme "${url.scheme}".`,
+      }, null, 2)),
+    });
+  }
+  console.warn(`url to cid`, req.url, cid);
+  if (req.method !== 'GET') return cb({
+    statusCode: 405, // Method Not Allowed
+    mimeType: 'application/json',
+    data: createStream(JSON.stringify({
+      err: true,
+      msg: `Request method "${req.method}" is not supported.`,
+    }, null, 2)),
+  });
+  const send404 = () => {
+    cb({
+      statusCode: 404,
+      mimeType: 'application/json',
+      data: createStream(JSON.stringify({
+        err: true,
+        msg: `URL ${req.url} not found.`,
+      }, null, 2)),
+    });
+  }
+  const meta = await getSetting(`developer.tiles.localMap.${cid}`);
+  console.warn(`meta`, meta);
+  if (!meta) return send404();
+  const pathname = (url.pathname === '/' || !url.pathname) ? '/index.html' : url.pathname;
+  console.warn(`pathname`, pathname);
+  const path = join(meta.dir, pathname);
+  console.warn(`path`, path);
+  const mimeType = mime.lookup(path);
+  console.warn(`mime`, mimeType);
+  try {
+    await access(path, constants.R_OK);
+    console.warn(`accessible`);
+    cb({
+      statusCode: 200,
+      mimeType,
+      data: createReadStream(path),
+    });
+  }
+  catch (err) {
+    console.warn(`nope`, err);
+    send404();
   }
 }

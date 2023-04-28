@@ -8,20 +8,18 @@ const { protocol, app } = require('electron');
 // https://www.electronjs.org/docs/latest/api/structures/custom-scheme but that is harldy
 // informative. https://www.electronjs.org/docs/latest/api/protocol#protocolregisterschemesasprivilegedcustomschemes
 // is pretty clear that the behaviour we want requires at least `standard`.
-// const privileges = {
-//   standard: true,
-//   secure: false,
-//   bypassCSP: false,
-//   allowServiceWorkers: false,
-//   supportFetchAPI: true,
-//   corsEnabled: false,
-//   stream: true,
-// };
-// protocol.registerSchemesAsPrivileged([
-//   { scheme: 'ipfs', privileges },
-//   { scheme: 'ipns', privileges },
-// ]);
-// XXX RE-ENABLE THE ABOVE FOR SCHEMES
+const privileges = {
+  standard: true,
+  secure: false,
+  bypassCSP: false,
+  allowServiceWorkers: false,
+  supportFetchAPI: true,
+  corsEnabled: false,
+  stream: true,
+};
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'tile', privileges },
+]);
 app.enableSandbox();
 
 
