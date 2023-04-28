@@ -1,0 +1,9 @@
+{
+  "name": "Basic Tile",
+  "short_name": "Basic",
+  "icons": [
+    {
+      "src": "cat.svg"
+    }
+  ]
+}
