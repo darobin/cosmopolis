@@ -7,7 +7,6 @@ import { get as getSetting, set as setSetting } from 'electron-settings';
 // import { initIntents } from './intents.js';
 import { manageWindowPosition } from './lib/window-manager.js';
 import makeRel from './lib/rel.js';
-import { get } from 'http';
 
 const { handle } = ipcMain;
 
