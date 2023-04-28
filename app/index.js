@@ -1,12 +1,11 @@
 
-import { app, /*protocol,*/ BrowserWindow, ipcMain }  from 'electron';
+import { app, BrowserWindow, ipcMain, dialog }  from 'electron';
 import { get as getSetting, set as setSetting } from 'electron-settings';
-// import { ipfsProtocolHandler } from './ipfs-handler.js';
-// import { initIPNSCache, shutdown } from './ipfs-node.js';
-// import { initDataSource } from './data-source.js';
-// import { initIntents } from './intents.js';
+import { join } from 'node:path';
 import { manageWindowPosition } from './lib/window-manager.js';
 import makeRel from './lib/rel.js';
+import loadJSON from './lib/load-json.js';
+import nanoid from './lib/smallid.js';
 
 const { handle } = ipcMain;
 
@@ -27,15 +26,13 @@ else {
   });
 }
 
-// XXX can we save screen & position?
-// XXX also autoreload
-
 app.whenReady().then(async () => {
   // protocol.registerStreamProtocol('ipfs', ipfsProtocolHandler);
   // protocol.registerStreamProtocol('ipns', ipfsProtocolHandler);
   // await initIPNSCache();
   handle('settings:get', handleSettingsGet);
   handle('settings:set', handleSettingsSet);
+  handle('pick:tile-dev', handlePickDevTile);
   // await initIntents();
   mainWindow = new BrowserWindow({
     show: false,
@@ -113,4 +110,47 @@ async function handleSettingsGet (ev, keyPath) {
 }
 async function handleSettingsSet (ev, keyPath, data) {
   return setSetting(keyPath, data);
+}
+async function handlePickDevTile () {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    title: 'Pick Dev Title',
+    buttonLabel: 'Pick Tile Directory',
+    properties: ['dontAddToRecent', 'openDirectory', 'treatPackageAsDirectory'],
+    message: 'Pick a directory with the content of a tile and manifest.json for the metadata.'
+  });
+  if (canceled) return;
+  if (filePaths && filePaths.length) {
+    const dir = filePaths[0];
+    const devTileMap = await getSetting('developer.tiles.localMap');
+    const found = Object.values(devTileMap || {}).find(info => info.dir === dir);
+    if (found) return found;
+    try {
+      const manifest = await loadJSON(join(dir, 'manifest.json'));
+      const id = nanoid();
+      const url = `tile://${id}/`;
+      manifest.icons?.forEach(icon => {
+        if (!icon.src) return;
+        if (/^data:/i.test(icon.src)) return;
+        icon.src = new URL(icon.src, url).href;
+      });
+      const meta = {
+        id,
+        url,
+        dir,
+        manifest,
+      };
+      await setSetting(`developer.tiles.localMap.${id}`, meta);
+      const hist = await getSetting('developer.tiles.loadHistory') || [];
+      hist.unshift(meta);
+      if (hist.length > 20) hist.length = 20;
+      await setSetting(`developer.tiles.loadHistory`, hist);
+      return meta;
+    }
+    catch (err) {
+      return {
+        error: true,
+        message: `Failed to load manifest.json from dev tile: ${err.message}`,
+      };
+    }
+  }
 }
