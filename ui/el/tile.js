@@ -19,10 +19,17 @@ export class CosmoTile extends LitElement {
       h3 img {
         vertical-align: middle;
       }
-      [slot='header'] {
+      [slot='header'], [slot='footer'] {
         display: flex;
         align-items: center;
         justify-content: space-between;
+      }
+      [slot='footer'] sl-icon-button {
+        font-size: 1.4rem;
+      }
+      sl-card::part(footer) {
+        padding-top: var(--sl-spacing-small);
+        padding-bottom: var(--sl-spacing-small);
       }
       sl-dialog.about::part(body) {
         text-align: center;
@@ -53,11 +60,12 @@ export class CosmoTile extends LitElement {
       this.shadowRoot.querySelector('sl-dialog.about').show();
     }
   }
+  handleLike () {
+    alert('Not supported yet!');
+  }
   render () {
     if (!this.src) return nothing;
     // XXX
-    //  - about menu
-    //  - footer
     //  - webview params
     //    - CSP
     //  - autoresize based on content
@@ -85,6 +93,9 @@ export class CosmoTile extends LitElement {
           </sl-dropdown>
         </div>
         <webview src=${this.src}></webview>
+        <div slot="footer">
+          <sl-icon-button name="arrow-through-heart" label="Like" @click=${this.handleLike}></sl-icon-button>
+        </div>
         <sl-dialog label="About" class="about">
           ${icon
             ? html`<img src=${icon} width="64" height="64"><br>`
