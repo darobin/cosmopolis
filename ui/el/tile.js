@@ -11,7 +11,8 @@ export class CosmoTile extends LitElement {
       }
       webview {
         width: 100%;
-        min-height: 450px;
+        min-height: 200px;
+        max-height: 800px;
       }
       h3 {
         margin: 0;
@@ -26,6 +27,9 @@ export class CosmoTile extends LitElement {
       }
       [slot='footer'] sl-icon-button {
         font-size: 1.4rem;
+      }
+      sl-card::part(body) {
+        padding: 0;
       }
       sl-card::part(footer) {
         padding-top: var(--sl-spacing-small);
@@ -65,14 +69,15 @@ export class CosmoTile extends LitElement {
   }
   render () {
     if (!this.src) return nothing;
+    // TODO:
+    // I would like to set partition=${`persist:${authority}`} on the webview but it fails silently. Need to investigate.
     // XXX
-    //  - webview params
-    //    - CSP
     //  - autoresize based on content
     //  - layout to be flush
-    //  - notes on a better monitor somewhere, too
     const icon = this.meta.icons?.[0]?.src ? new URL(this.meta.icons[0].src, this.src).href : null;
     const name = this.meta.name || this.meta.short_name || 'Untitled';
+    const authority = new URL(this.src).hostname;
+    console.warn(authority);
     return html`
       <sl-card>
         <div slot="header">
@@ -92,7 +97,7 @@ export class CosmoTile extends LitElement {
             </sl-menu>
           </sl-dropdown>
         </div>
-        <webview src=${this.src}></webview>
+        <webview src=${this.src} preload="./app/preload-webview.js" autosize></webview>
         <div slot="footer">
           <sl-icon-button name="arrow-through-heart" label="Like" @click=${this.handleLike}></sl-icon-button>
         </div>

@@ -16,6 +16,11 @@ const { handle } = ipcMain;
 let mainWindow;
 const rel = makeRel(import.meta.url);
 
+// XXX
+// It would be helpful to have better monitoring than what electronmon gives us (and same for the others
+// they all fail because of ESM). I think that taking the electronmon code and simply watching for changes
+// under `app/` instead of trying to do magic would be great.
+
 // there can be only one
 const singleInstanceLock = app.requestSingleInstanceLock();
 if (!singleInstanceLock) {
@@ -205,11 +210,15 @@ export async function tileProtocolHandler (req, cb) {
   const pathname = (url.pathname === '/' || !url.pathname) ? '/index.html' : url.pathname;
   const path = join(meta.dir, pathname);
   const mimeType = mime.lookup(path);
+  const cspBase = `tile://${url.hostname}`;
   try {
     await access(path, constants.R_OK);
     cb({
       statusCode: 200,
       mimeType,
+      headers: {
+        'Content-Security-Policy': `default-src 'self' ${cspBase} data:; style-src 'self' 'unsafe-inline' ${cspBase}; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; img-src 'self' ${cspBase} blob: data:; media-src 'self' ${cspBase} blob: data:`,
+      },
       data: createReadStream(path),
     });
   }
