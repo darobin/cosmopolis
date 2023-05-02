@@ -107,7 +107,9 @@ export class CosmoTile extends LitElement {
             ${name}
           </h3>
           <div>
-            <sl-icon-button name=${`bookmark-star${this.meta.installed ? '-fill' : ''}`} label=${this.meta.installed ? 'Uninstall' : 'Install'} @click=${this.handleInstall}></sl-icon-button>
+            <sl-tooltip content="Install Tile">
+              <sl-icon-button name=${`bookmark-star${this.meta.installed ? '-fill' : ''}`} label=${this.meta.installed ? 'Uninstall' : 'Install'} @click=${this.handleInstall}></sl-icon-button>
+            </sl-tooltip>
             <sl-dropdown hoist>
               <sl-icon-button name="three-dots-vertical" label="Actions" slot="trigger"></sl-icon-button>
               <sl-menu @sl-select=${this.handleMenu}>
@@ -121,7 +123,9 @@ export class CosmoTile extends LitElement {
         </div>
         <webview src=${this.src} preload="./app/preload-webview.js" autosize></webview>
         <div slot="footer">
-          <sl-icon-button name=${`arrow-through-heart${this.meta.liked ? '-fill' : ''}`} label=${this.meta.liked ? 'Unlike' : 'Like'} @click=${this.handleLike}></sl-icon-button>
+          <sl-tooltip content="Like Tile">
+            <sl-icon-button name=${`arrow-through-heart${this.meta.liked ? '-fill' : ''}`} label=${this.meta.liked ? 'Unlike' : 'Like'} @click=${this.handleLike}></sl-icon-button>
+          </sl-tooltip>
         </div>
         <sl-dialog label="About" class="about">
           ${icon

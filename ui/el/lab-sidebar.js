@@ -19,8 +19,18 @@ export class CosmoLabSidebar extends LitElement {
         margin-top: var(--sl-spacing-medium);
         text-align: right;
       }
-      img.tile-icon {
-        vertical-align: bottom;
+      table.local-tiles {
+        width: 100%;
+      }
+      td.icon {
+        width: 32px;
+      }
+      tr.selected sl-button::part(label) {
+        font-variation-settings: "wght" 700;
+        padding-left: var(--sl-spacing-2x-small);
+      }
+      table.local-tiles sl-button::part(base) {
+        border: none;
       }
     `
   ];
@@ -30,7 +40,6 @@ export class CosmoLabSidebar extends LitElement {
   };
   constructor () {
     super();
-
     const store = getStore('local-tiles');
     this.localTiles = [];
     store.subscribe(({ tiles }) => {
@@ -62,28 +71,47 @@ export class CosmoLabSidebar extends LitElement {
     const id = ev.currentTarget.value;
     this.loadSingleTile(`tile://${id}/`);
   }
-  // XXX
-  //  - this badly needs a way to refresh previously loaded tiles, and to delete some
   render () {
-    const noPrevious = !this.previousDevTiles?.length;
     const current = this.currentDevTile;
     return html`
       <div id="root">
         <sl-details summary="Dev Mode Tiles" open>
-          <sl-select label="Load previously-loaded tile" ?disabled=${noPrevious} value=${current || ''}
-          placeholder=${noPrevious ? 'No previous tiles' : ''} @sl-change=${this.handleSelectDevModeTile}>
+          <table class='local-tiles'>
             ${
-              (this.previousDevTiles || [])
-                .map(tile => html`
-                  <sl-option value=${tile.id}>
+              Object.values(this.localTiles)
+              .sort((a, b) => tileName(a).localeCompare(tileName(b)))
+              .map(tile => html`<tr class=${current === tile.id ? 'selected' : ''} data-tile-id=${tile.id} @click=${this.handleSelectDevModeTile}>
+                <td>
+                  <sl-button>
                     ${tile.manifest?.icons?.[0]?.src
-                      ? html`<img src=${tile.manifest.icons[0].src} width="24" height="24" class='tile-icon'>`
-                      : nothing}
-                    ${tile.manifest?.name || tile.manifest?.short_name || tile.dir}
-                  </sl-option>
-                `)
+                          ? html`<img src=${tile.manifest.icons[0].src} width="24" height="24" slot="prefix">`
+                          : nothing}
+                    ${tileName(tile)}
+                  </sl-button>
+                </td>
+                <td class="icon">
+                  ${tile.liked
+                        ? html`<sl-icon name="heart-fill" label="Liked"></sl-icon>`
+                        : nothing}
+                </td>
+                <td class="icon">
+                  ${tile.installed
+                        ? html`<sl-icon name="bookmark-star-fill" label="Installed"></sl-icon>`
+                        : nothing}
+                </td>
+                <td class="icon">
+                  <sl-tooltip content="Refresh">
+                    <sl-icon-button name="arrow-clockwise" label="Refresh" @click=${this.handleRefresh}></sl-icon-button>
+                  </sl-tooltip>
+                </td>
+                <td class="icon">
+                  <sl-tooltip content="Remove">
+                    <sl-icon-button name="x-circle-fill" label="Remove" @click=${this.handleRemove}></sl-icon-button>
+                  </sl-tooltip>
+                </td>
+              </tr>`)
             }
-          </sl-select>
+          </table>
           <div class="actions">
             <sl-button variant="primary" @click=${this.handleOpenDevModeTile}>
               <sl-icon slot="prefix" name="folder2-open"></sl-icon>
@@ -94,6 +122,10 @@ export class CosmoLabSidebar extends LitElement {
       </div>
     `;
   }
+}
+
+function tileName (tile = {}) {
+  return tile.manifest?.name || tile.manifest?.short_name || tile.dir;
 }
 
 customElements.define('cm-lab-sidebar', CosmoLabSidebar);
