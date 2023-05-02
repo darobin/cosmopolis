@@ -16,30 +16,21 @@ contextBridge.exposeInMainWorld('cosmopolis',{
   // },
 });
 
-// export function warn (str) {
-//   invoke('dbg:warn', str);
-// }
+// WOW
+// A function that triggers an IPC invoke() works if it's local; if you `export` it then it
+// will trigger a bizare `Message 3 rejected by interface blink.mojom.Widget` error.
+// eslint-disable-next-line
+function warn (str) {
+  invoke('dbg:warn', str);
+}
 
-// setTimeout(() => {
-//   warn(`But why…`);
-// }, 3000);
-
-// window.addEventListener('message', (ev) => {
-//   const { source } = ev;
-//   warn(`Goooo`);
-//   if (ev.data.type === 'cm-tile-resize-init') {
-//     const rob = new ResizeObserver((entries) => {
-//       const height = entries[0]?.contentRect?.height;
-//       warn(`HEIGHT ${height}`);
-//       source.postMessage({ type: 'cm-tile-resize', height, source: 'observer' }, '*');
-//     });
-//     rob.observe(document.documentElement);
-//     // XXX
-//     // - get size and send
-//     // - set up ResizeObserver and wire that too
-//     //  - remove setTimeout if we can
-//     setTimeout(() => {
-//       source.postMessage({ type: 'cm-tile-resize', height: document.documentElement.offsetHeight, src: 'initial load' }, '*');
-//     }, 200);
-//   }
-// });
+window.addEventListener('message', (ev) => {
+  const { source } = ev;
+  if (ev.data.type === 'cm-tile-resize-init') {
+    const rob = new ResizeObserver((entries) => {
+      const height = entries[0]?.contentRect?.height;
+      source.postMessage({ type: 'cm-tile-resize', height, source: 'observer' }, '*');
+    });
+    rob.observe(document.documentElement);
+  }
+});

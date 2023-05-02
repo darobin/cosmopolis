@@ -52,23 +52,15 @@ export class CosmoTile extends LitElement {
     if (this.src) this.loadURL(this.src);
   }
   firstUpdated () {
-    // XXX THIS IS PROBABLY WRONG
-    // WE DON'T WANT A NEW LISTENER EVERY TIME
-    // const ifr = this.shadowRoot.querySelector('webview').shadowRoot.querySelector('iframe');
-    // if (!ifr) console.warn('No iframe in webview');
     const wv = this.shadowRoot.querySelector('webview');
     const ifr = wv.shadowRoot.querySelector('iframe');
-    // ifr.addEventListener('cm-tile-resize', (ev) => console.warn(`RESIZE`, ev));
     window.addEventListener('message', (ev) => {
       const origin = `tile://${new URL(this.src).hostname}`;
       if (origin === ev.origin && ev.data.type === 'cm-tile-resize') {
-        console.warn(`resizing to`, ev.data.height);
-        console.warn(ev.data);
-        // let h = ev.data.height;
-        // if (h < this.minheight) h = this.minheight;
-        // else if (h > this.maxheight) h = this.maxheight;
-        // wv.style.height = `${h}px`;
-        // console.warn(`wvheight`, wv.style.height);
+        let h = ev.data.height;
+        if (h < this.minheight) h = this.minheight;
+        else if (h > this.maxheight) h = this.maxheight;
+        wv.style.height = `${h}px`;
       }
     });
     wv.addEventListener('dom-ready', async () => {
