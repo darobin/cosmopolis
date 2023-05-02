@@ -24,6 +24,7 @@ export class CosmoLabSidebar extends LitElement {
       }
       td.icon {
         width: 32px;
+        text-align: center;
       }
       tr.selected sl-button::part(label) {
         font-variation-settings: "wght" 700;

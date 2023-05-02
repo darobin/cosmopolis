@@ -1,6 +1,6 @@
 
 import { LitElement, html, css, nothing } from 'lit';
-import { localMeta } from '../db/local-tiles.js';
+import { localMeta, likeTile, unlikeTile, installTile, uninstallTile } from '../db/local-tiles.js';
 
 export class CosmoTile extends LitElement {
   static styles = [
@@ -79,8 +79,12 @@ export class CosmoTile extends LitElement {
     console.warn(`loadURL`, src);
     const res = await fetch(new URL('manifest.json', src));
     this.meta = await res.json();
-    Object.assign(this.meta, localMeta(src));
+    this.refreshLocalMeta();
     console.warn(`meta`, this.meta);
+  }
+  refreshLocalMeta () {
+    this.meta = { ...this.meta, ...localMeta(this.src) };
+    console.warn(`refresh`, this.meta);
   }
   handleMenu (ev) {
     const menu = ev.detail?.item?.value;
@@ -88,8 +92,17 @@ export class CosmoTile extends LitElement {
       this.shadowRoot.querySelector('sl-dialog.about').show();
     }
   }
-  handleLike () {
-    alert('Not supported yet!');
+  async handleLike () {
+    if (!this.meta) return;
+    if (this.meta.liked) await unlikeTile(this.src);
+    else await likeTile(this.src);
+    this.refreshLocalMeta();
+  }
+  async handleInstall () {
+    if (!this.meta) return;
+    if (this.meta.installed) await uninstallTile(this.src);
+    else await installTile(this.src);
+    this.refreshLocalMeta();
   }
   render () {
     if (!this.src) return nothing;
@@ -97,6 +110,8 @@ export class CosmoTile extends LitElement {
     // I would like to set partition=${`persist:${authority}`} on the webview but it fails silently. Need to investigate.
     const icon = this.meta.icons?.[0]?.src ? new URL(this.meta.icons[0].src, this.src).href : null;
     const name = this.meta.name || this.meta.short_name || 'Untitled';
+    const likeLabel = this.meta.liked ? 'Unlike' : 'Like';
+    const installLabel = this.meta.installed ? 'Uninstall' : 'Install';
     return html`
       <sl-card>
         <div slot="header">
@@ -107,8 +122,8 @@ export class CosmoTile extends LitElement {
             ${name}
           </h3>
           <div>
-            <sl-tooltip content="Install Tile">
-              <sl-icon-button name=${`bookmark-star${this.meta.installed ? '-fill' : ''}`} label=${this.meta.installed ? 'Uninstall' : 'Install'} @click=${this.handleInstall}></sl-icon-button>
+            <sl-tooltip content=${`${installLabel} Tile`}>
+              <sl-icon-button name=${`bookmark-star${this.meta.installed ? '-fill' : ''}`} label=${installLabel} @click=${this.handleInstall}></sl-icon-button>
             </sl-tooltip>
             <sl-dropdown hoist>
               <sl-icon-button name="three-dots-vertical" label="Actions" slot="trigger"></sl-icon-button>
@@ -123,8 +138,8 @@ export class CosmoTile extends LitElement {
         </div>
         <webview src=${this.src} preload="./app/preload-webview.js" autosize></webview>
         <div slot="footer">
-          <sl-tooltip content="Like Tile">
-            <sl-icon-button name=${`arrow-through-heart${this.meta.liked ? '-fill' : ''}`} label=${this.meta.liked ? 'Unlike' : 'Like'} @click=${this.handleLike}></sl-icon-button>
+          <sl-tooltip content=${`${likeLabel} Tile`}>
+            <sl-icon-button name=${`arrow-through-heart${this.meta.liked ? '-fill' : ''}`} label=${likeLabel} @click=${this.handleLike}></sl-icon-button>
           </sl-tooltip>
         </div>
         <sl-dialog label="About" class="about">
