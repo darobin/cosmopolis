@@ -9,6 +9,8 @@ contextBridge.exposeInMainWorld('cosmopolis',{
   setSetting: (keyPath, data) => invoke('settings:set', keyPath, data),
   // picking stuff
   pickDevTile: () => invoke('pick:tile-dev'),
-  // dev tiles
-  devTileHistory: () => invoke('dev:tile-history'),
+  // stored tiles
+  localTiles: () => invoke('tiles:list-local'),
+  installTile: (url, installed) => invoke('tiles:install', url, installed),
+  likeTile: (url, liked) => invoke('tiles:like', url, liked),
 });

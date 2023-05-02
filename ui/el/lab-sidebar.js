@@ -1,5 +1,7 @@
 
 import { LitElement, html, css, nothing } from 'lit';
+import { getStore } from '../lib/model.js';
+import { refreshLocalTiles } from '../db/local-tiles.js';
 
 export class CosmoLabSidebar extends LitElement {
   static styles = [
@@ -23,24 +25,21 @@ export class CosmoLabSidebar extends LitElement {
     `
   ];
   static properties = {
-    previousDevTiles: { attribute: false },
+    localTiles: { attribute: false },
     currentDevTile: { attribute: false },
   };
   constructor () {
     super();
-    this.refreshHistory();
-  }
-  async refreshHistory () {
-    window.cosmopolis
-      .devTileHistory()
-      .then(hist => {
-        this.previousDevTiles = hist || [];
-        const hash = location.hash.replace(/^#/, '');
-        if (!hash) return;
-        if (!/^tile=/.test(hash)) return;
-        this.currentDevTile = hash.replace(/^tile=tile:\/\//, '').replace(/\/$/, '');
-      })
-    ;
+
+    const store = getStore('local-tiles');
+    this.localTiles = [];
+    store.subscribe(({ tiles }) => {
+      this.localTiles = tiles;
+    });
+    const hash = location.hash.replace(/^#/, '');
+    if (!hash) return;
+    if (!/^tile=/.test(hash)) return;
+    this.currentDevTile = hash.replace(/^tile=tile:\/\//, '').replace(/\/$/, '');
   }
   // the workshop listens for these
   loadSingleTile (url) {
@@ -57,7 +56,7 @@ export class CosmoLabSidebar extends LitElement {
     }
     this.currentDevTile = tile.id;
     this.loadSingleTile(tile.url);
-    await this.refreshHistory();
+    await refreshLocalTiles();
   }
   handleSelectDevModeTile (ev) {
     const id = ev.currentTarget.value;

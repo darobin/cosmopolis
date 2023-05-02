@@ -38,12 +38,13 @@ else {
 
 app.whenReady().then(async () => {
   protocol.registerStreamProtocol('tile', tileProtocolHandler);
+  handle('dbg:warn', handleDebugWarn);
   handle('settings:get', handleSettingsGet);
   handle('settings:set', handleSettingsSet);
   handle('pick:tile-dev', handlePickDevTile);
-  handle('dev:tile-history', loadDevTileHistory);
-  handle('dbg:warn', handleDebugWarn);
-  // await initIntents();
+  handle('tiles:list-local', handleListLocalTiles);
+  handle('tiles:install', handleInstallTile);
+  handle('tiles:like', handleLikeTile);
   mainWindow = new BrowserWindow({
     show: false,
     backgroundColor: '#fff',
@@ -132,38 +133,32 @@ async function handlePickDevTile () {
   if (filePaths && filePaths.length) {
     const dir = filePaths[0];
     const devTileMap = await getSetting('developer.tiles.localMap');
-    let found = Object.values(devTileMap || {}).find(info => info.dir === dir);
-    if (!found) {
-      try {
-        const manifest = await loadJSON(join(dir, 'manifest.json'));
-        const id = nanoid();
-        const url = `tile://${id}/`;
-        manifest.icons?.forEach(icon => {
-          if (!icon.src) return;
-          if (/^data:/i.test(icon.src)) return;
-          icon.src = new URL(icon.src, url).href;
-        });
-        found = {
-          id,
-          url,
-          dir,
-          manifest,
-        };
-        await setSetting(`developer.tiles.localMap.${id}`, found);
-      }
-      catch (err) {
-        return {
-          error: true,
-          message: `Failed to load manifest.json from dev tile: ${err.message}`,
-        };
-      }
+    const found = Object.values(devTileMap || {}).find(info => info.dir === dir);
+    if (found) return found;
+    try {
+      const manifest = await loadJSON(join(dir, 'manifest.json'));
+      const id = nanoid();
+      const url = `tile://${id}/`;
+      manifest.icons?.forEach(icon => {
+        if (!icon.src) return;
+        if (/^data:/i.test(icon.src)) return;
+        icon.src = new URL(icon.src, url).href;
+      });
+      const meta = {
+        id,
+        url,
+        dir,
+        manifest,
+      };
+      await setSetting(`developer.tiles.localMap.${id}`, found);
+      return meta;
     }
-    let hist = await loadDevTileHistory();
-    hist = hist.filter(it => it.id !== found.id);
-    hist.unshift(found);
-    if (hist.length > 20) hist.length = 20;
-    await saveDevTileHistory(hist);
-    return found;
+    catch (err) {
+      return {
+        error: true,
+        message: `Failed to load manifest.json from dev tile: ${err.message}`,
+      };
+    }
   }
 }
 
@@ -237,12 +232,18 @@ function handleDebugWarn (ev, str) {
   console.warn(chalk.magenta(str));
 }
 
-async function loadDevTileHistory () {
-  const hist = await getSetting('developer.tiles.loadHistory') || [];
-  const devTileMap = await getSetting('developer.tiles.localMap');
-  return hist.map(id => devTileMap[id]);
+async function handleListLocalTiles () {
+  return getSetting('developer.tiles.localMap');
 }
 
-async function saveDevTileHistory (hist) {
-  await setSetting(`developer.tiles.loadHistory`, hist.map(it => it.id));
+async function setLocalTileField (url, key, value) {
+  const id = new URL(url).hostname;
+  await setSetting(`developer.tiles.localMap.${id}.${key}`, value);
+}
+
+async function handleInstallTile (ev, url, installed = true) {
+  await setLocalTileField(url, 'installed', installed)
+}
+async function handleLikeTile (ev, url, liked = true) {
+  await setLocalTileField(url, 'liked', liked)
 }
