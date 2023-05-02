@@ -84,7 +84,6 @@ export class CosmoTile extends LitElement {
   }
   refreshLocalMeta () {
     this.meta = { ...this.meta, ...localMeta(this.src) };
-    console.warn(`refresh`, this.meta);
   }
   handleMenu (ev) {
     const menu = ev.detail?.item?.value;

@@ -13,4 +13,6 @@ contextBridge.exposeInMainWorld('cosmopolis',{
   localTiles: () => invoke('tiles:list-local'),
   installTile: (url, installed) => invoke('tiles:install', url, installed),
   likeTile: (url, liked) => invoke('tiles:like', url, liked),
+  refreshTile: (url) => invoke('tiles:refresh', url),
+  removeTile: (url) => invoke('tiles:remove', url),
 });

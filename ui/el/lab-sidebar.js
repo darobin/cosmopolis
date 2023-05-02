@@ -1,7 +1,7 @@
 
 import { LitElement, html, css, nothing } from 'lit';
 import { getStore } from '../lib/model.js';
-import { refreshLocalTiles } from '../db/local-tiles.js';
+import { refreshLocalTiles, refreshTile, removeTile } from '../db/local-tiles.js';
 
 export class CosmoLabSidebar extends LitElement {
   static styles = [
@@ -69,8 +69,16 @@ export class CosmoLabSidebar extends LitElement {
     await refreshLocalTiles();
   }
   handleSelectDevModeTile (ev) {
-    const id = ev.currentTarget.value;
+    const id = ev.currentTarget.getAttribute('data-tile-id');
     this.loadSingleTile(`tile://${id}/`);
+  }
+  async handleRefresh (ev) {
+    const id = ev.currentTarget.getAttribute('data-tile-id');
+    await refreshTile(`tile://${id}/`);
+  }
+  async handleRemove (ev) {
+    const id = ev.currentTarget.getAttribute('data-tile-id');
+    await removeTile(`tile://${id}/`);
   }
   render () {
     const current = this.currentDevTile;
@@ -81,11 +89,11 @@ export class CosmoLabSidebar extends LitElement {
             ${
               Object.values(this.localTiles)
               .sort((a, b) => tileName(a).localeCompare(tileName(b)))
-              .map(tile => html`<tr class=${current === tile.id ? 'selected' : ''} data-tile-id=${tile.id} @click=${this.handleSelectDevModeTile}>
+              .map(tile => html`<tr class=${current === tile.id ? 'selected' : ''}>
                 <td>
-                  <sl-button>
+                  <sl-button @click=${this.handleSelectDevModeTile} data-tile-id=${tile.id}>
                     ${tile.manifest?.icons?.[0]?.src
-                          ? html`<img src=${tile.manifest.icons[0].src} width="24" height="24" slot="prefix">`
+                          ? html`<img src=${new URL(tile.manifest.icons[0].src, tile.url).href} width="24" height="24" slot="prefix">`
                           : nothing}
                     ${tileName(tile)}
                   </sl-button>
@@ -102,12 +110,12 @@ export class CosmoLabSidebar extends LitElement {
                 </td>
                 <td class="icon">
                   <sl-tooltip content="Refresh">
-                    <sl-icon-button name="arrow-clockwise" label="Refresh" @click=${this.handleRefresh}></sl-icon-button>
+                    <sl-icon-button name="arrow-clockwise" label="Refresh" @click=${this.handleRefresh} data-tile-id=${tile.id}></sl-icon-button>
                   </sl-tooltip>
                 </td>
                 <td class="icon">
                   <sl-tooltip content="Remove">
-                    <sl-icon-button name="x-circle-fill" label="Remove" @click=${this.handleRemove}></sl-icon-button>
+                    <sl-icon-button name="x-circle-fill" label="Remove" @click=${this.handleRemove} data-tile-id=${tile.id}></sl-icon-button>
                   </sl-tooltip>
                 </td>
               </tr>`)

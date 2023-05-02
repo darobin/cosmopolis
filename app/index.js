@@ -1,8 +1,8 @@
 
 import { app, BrowserWindow, ipcMain, dialog, protocol }  from 'electron';
-import { get as getSetting, set as setSetting } from 'electron-settings';
+import { get as getSetting, set as setSetting, unset as unsetSetting } from 'electron-settings';
 import { join } from 'node:path';
-import { access } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import { createReadStream, constants } from 'node:fs';
 import { PassThrough } from 'node:stream';
 import mime from 'mime-types';
@@ -45,6 +45,8 @@ app.whenReady().then(async () => {
   handle('tiles:list-local', handleListLocalTiles);
   handle('tiles:install', handleInstallTile);
   handle('tiles:like', handleLikeTile);
+  handle('tiles:refresh', handleRefreshTile);
+  handle('tiles:remove', handleRemoveTile);
   mainWindow = new BrowserWindow({
     show: false,
     backgroundColor: '#fff',
@@ -139,18 +141,13 @@ async function handlePickDevTile () {
       const manifest = await loadJSON(join(dir, 'manifest.json'));
       const id = nanoid();
       const url = `tile://${id}/`;
-      manifest.icons?.forEach(icon => {
-        if (!icon.src) return;
-        if (/^data:/i.test(icon.src)) return;
-        icon.src = new URL(icon.src, url).href;
-      });
       const meta = {
         id,
         url,
         dir,
         manifest,
       };
-      await setSetting(`developer.tiles.localMap.${id}`, found);
+      await setSetting(`developer.tiles.localMap.${id}`, meta);
       return meta;
     }
     catch (err) {
@@ -246,4 +243,17 @@ async function handleInstallTile (ev, url, installed = true) {
 }
 async function handleLikeTile (ev, url, liked = true) {
   await setLocalTileField(url, 'liked', liked)
+}
+
+async function handleRemoveTile (ev, url) {
+  const id = new URL(url).hostname;
+  return unsetSetting(`developer.tiles.localMap.${id}`);
+}
+
+async function handleRefreshTile (ev, url) {
+  const id = new URL(url).hostname;
+  const meta = await getSetting(`developer.tiles.localMap.${id}`);
+  if (!meta?.dir) return;
+  meta.manifest = JSON.parse(await readFile(join(meta.dir, 'manifest.json')));
+  return setSetting(`developer.tiles.localMap.${id}`, meta);
 }

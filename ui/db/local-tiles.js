@@ -32,6 +32,15 @@ export async function unlikeTile (url) {
   await refreshLocalTiles();
 }
 
+export async function refreshTile (url) {
+  await window.cosmopolis.refreshTile(url);
+  await refreshLocalTiles();
+}
+export async function removeTile (url) {
+  await window.cosmopolis.removeTile(url);
+  await refreshLocalTiles();
+}
+
 export function localMeta (url) {
   const id = new URL(url).hostname;
   const meta = get(store).tiles[id];
