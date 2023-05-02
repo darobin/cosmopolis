@@ -32,7 +32,7 @@ export class CosmoLabSidebar extends LitElement {
   }
   async refreshHistory () {
     window.cosmopolis
-      .getSetting('developer.tiles.loadHistory')
+      .devTileHistory()
       .then(hist => {
         this.previousDevTiles = hist || [];
         const hash = location.hash.replace(/^#/, '');
@@ -57,6 +57,7 @@ export class CosmoLabSidebar extends LitElement {
     }
     this.currentDevTile = tile.id;
     this.loadSingleTile(tile.url);
+    await this.refreshHistory();
   }
   handleSelectDevModeTile (ev) {
     const id = ev.currentTarget.value;
