@@ -33,7 +33,13 @@ export class CosmoLabSidebar extends LitElement {
   async refreshHistory () {
     window.cosmopolis
       .getSetting('developer.tiles.loadHistory')
-      .then(hist => this.previousDevTiles = hist || [])
+      .then(hist => {
+        this.previousDevTiles = hist || [];
+        const hash = location.hash.replace(/^#/, '');
+        if (!hash) return;
+        if (!/^tile=/.test(hash)) return;
+        this.currentDevTile = hash.replace(/^tile=tile:\/\//, '').replace(/\/$/, '');
+      })
     ;
   }
   // the workshop listens for these
