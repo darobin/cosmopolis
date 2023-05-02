@@ -16,5 +16,14 @@
 </head>
 <body>
   <img src="cats.jpg" alt="My cats playing in the books">
+  <script>
+    setTimeout(() => {
+      const br = document.createElement('br');
+      const img = document.createElement('img');
+      img.setAttribute('alt', 'The Smiling Dolphin strikes again!');
+      img.setAttribute('src', 'dolphin.jpg');
+      document.body.append(br, img);
+    }, 2000);
+  </script>
 </body>
 </html>

@@ -6,6 +6,7 @@ import { access } from 'node:fs/promises';
 import { createReadStream, constants } from 'node:fs';
 import { PassThrough } from 'node:stream';
 import mime from 'mime-types';
+import chalk from 'chalk';
 import { manageWindowPosition } from './lib/window-manager.js';
 import makeRel from './lib/rel.js';
 import loadJSON from './lib/load-json.js';
@@ -40,6 +41,7 @@ app.whenReady().then(async () => {
   handle('settings:get', handleSettingsGet);
   handle('settings:set', handleSettingsSet);
   handle('pick:tile-dev', handlePickDevTile);
+  handle('dbg:warn', handleDebugWarn);
   // await initIntents();
   mainWindow = new BrowserWindow({
     show: false,
@@ -226,4 +228,8 @@ export async function tileProtocolHandler (req, cb) {
     console.warn(`nope`, err);
     send404();
   }
+}
+
+function handleDebugWarn (ev, str) {
+  console.warn(chalk.magenta(str));
 }

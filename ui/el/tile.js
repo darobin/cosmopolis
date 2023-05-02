@@ -11,8 +11,6 @@ export class CosmoTile extends LitElement {
       }
       webview {
         width: 100%;
-        min-height: 200px;
-        max-height: 800px;
       }
       h3 {
         margin: 0;
@@ -41,13 +39,41 @@ export class CosmoTile extends LitElement {
     `
   ];
   static properties = {
-    src: {},
+    src: { type: String },
     meta: { attribute: false },
+    minheight: { type: Number },
+    maxheight: { type: Number },
   };
   constructor () {
     super();
+    this.minheight = 150;
+    this.maxheight = 800;
     this.meta = {};
     if (this.src) this.loadURL(this.src);
+  }
+  firstUpdated () {
+    // XXX THIS IS PROBABLY WRONG
+    // WE DON'T WANT A NEW LISTENER EVERY TIME
+    // const ifr = this.shadowRoot.querySelector('webview').shadowRoot.querySelector('iframe');
+    // if (!ifr) console.warn('No iframe in webview');
+    const wv = this.shadowRoot.querySelector('webview');
+    const ifr = wv.shadowRoot.querySelector('iframe');
+    // ifr.addEventListener('cm-tile-resize', (ev) => console.warn(`RESIZE`, ev));
+    window.addEventListener('message', (ev) => {
+      const origin = `tile://${new URL(this.src).hostname}`;
+      if (origin === ev.origin && ev.data.type === 'cm-tile-resize') {
+        console.warn(`resizing to`, ev.data.height);
+        console.warn(ev.data);
+        // let h = ev.data.height;
+        // if (h < this.minheight) h = this.minheight;
+        // else if (h > this.maxheight) h = this.maxheight;
+        // wv.style.height = `${h}px`;
+        // console.warn(`wvheight`, wv.style.height);
+      }
+    });
+    wv.addEventListener('dom-ready', async () => {
+      ifr.contentWindow.postMessage({ type: 'cm-tile-resize-init' }, '*');
+    });
   }
   willUpdate (changedProps) {
     if (changedProps.has('src')) this.loadURL(this.src);
@@ -76,8 +102,6 @@ export class CosmoTile extends LitElement {
     //  - layout to be flush
     const icon = this.meta.icons?.[0]?.src ? new URL(this.meta.icons[0].src, this.src).href : null;
     const name = this.meta.name || this.meta.short_name || 'Untitled';
-    const authority = new URL(this.src).hostname;
-    console.warn(authority);
     return html`
       <sl-card>
         <div slot="header">
