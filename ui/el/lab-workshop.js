@@ -19,14 +19,21 @@ export class CosmoLabWorkshop extends LitElement {
       const { detail: { url }} = ev;
       this.currentTileURL = url;
     };
+    this.handleHashChange = () => {
+      const hash = location.hash.replace(/^#/, '');
+      if (!hash) return;
+      if (!/^tile=/.test(hash)) return;
+      this.currentTileURL = hash.replace(/^tile=/, '');
+    };
+    this.handleHashChange();
   }
   connectedCallback () {
     super.connectedCallback();
-    window.addEventListener('cm-lab-workshop-source', this.handleWorkshopSourceChange);
+    window.addEventListener('hashchange', this.handleHashChange);
   }
   disconnectedCallback () {
     super.disconnectedCallback();
-    window.removeEventListener('cm-lab-workshop-source', this.handleWorkshopSourceChange);
+    window.removeEventListener('hashchange', this.handleHashChange);
   }
   render () {
     if (!this.currentTileURL) return html`<div id="root"></div>`;

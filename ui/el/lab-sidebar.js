@@ -38,8 +38,7 @@ export class CosmoLabSidebar extends LitElement {
   }
   // the workshop listens for these
   loadSingleTile (url) {
-    const ev = new CustomEvent('cm-lab-workshop-source', { detail: { url }});
-    window.dispatchEvent(ev);
+    window.location.hash = `#tile=${url}`;
   }
   async handleOpenDevModeTile () {
     const tile = await window.cosmopolis.pickDevTile();
