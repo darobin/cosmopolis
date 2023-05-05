@@ -103,7 +103,7 @@ class Wish {
     if (typeof message === 'string') this.#message = message;
   }
   get type () { return this.#type; }
-  get filters () { return this.#filters; }
+  get filters () { return this.#filters; } // XXX these need to be passed to registerWishInteraction and instantiateWish
   get multiple () { return this.#multiple; }
   get title () { return this.#title; }
   get message () { return this.#message; }
