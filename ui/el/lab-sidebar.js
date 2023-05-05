@@ -52,8 +52,9 @@ export class CosmoLabSidebar extends LitElement {
     this.currentDevTile = hash.replace(/^tile=tile:\/\//, '').replace(/\/$/, '');
   }
   // the workshop listens for these
-  loadSingleTile (url) {
-    window.location.hash = `#tile=${url}`;
+  loadSingleTile (id) {
+    this.currentDevTile = id;
+    window.location.hash = `#tile=tile://${id}/`;
   }
   async handleOpenDevModeTile () {
     const tile = await window.cosmopolis.pickDevTile();
@@ -64,13 +65,12 @@ export class CosmoLabSidebar extends LitElement {
       console.error(tile.message);
       return;
     }
-    this.currentDevTile = tile.id;
-    this.loadSingleTile(tile.url);
+    this.loadSingleTile(tile.id);
     await refreshLocalTiles();
   }
   handleSelectDevModeTile (ev) {
     const id = ev.currentTarget.getAttribute('data-tile-id');
-    this.loadSingleTile(`tile://${id}/`);
+    this.loadSingleTile(id);
   }
   async handleRefresh (ev) {
     const id = ev.currentTarget.getAttribute('data-tile-id');
