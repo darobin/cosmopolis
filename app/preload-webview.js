@@ -1,20 +1,11 @@
-
+/* eslint-disable global-require */
+/* global require */
 const { contextBridge, ipcRenderer } = require('electron');
-const { invoke, sendToHost } = ipcRenderer;
+const { invoke } = ipcRenderer;
+const { Wish } = require('./lib/wishes.js');
 
-contextBridge.exposeInMainWorld('cosmopolis',{
-  // intent: (action, type, data) => {
-  //   const id = 'x' + intentID++;
-  //   invoke('intent:show-matching-intents', action, type, data, id);
-  //   return id;
-  // },
-  // signalIntentCancelled: () => {
-  //   sendToHost('intent-cancelled');
-  // },
-  // signalCreateFeed: (data) => {
-  //   sendToHost('create-feed', data);
-  // },
-});
+// wishing
+contextBridge.exposeInMainWorld('Wish', Wish);
 
 // WOW
 // A function that triggers an IPC invoke() works if it's local; if you `export` it then it
