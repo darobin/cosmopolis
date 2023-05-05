@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Pickle</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+    pre, button {
+      margin: 1rem;
+    }
+    img {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <pre>
+debug…
+</pre>
+  <button>Pick Pic</button>
+  <script>
+    const debug = document.querySelector('pre');
+    const but = document.querySelector('button');
+    function dbg (...str) { debug.textContent += `${str.join(' ')}\n`; }
+    alert(window.Wish);
+    dbg(`starting…`);
+    dbg(`has Wish`, !!Wish);
+    but.onclick = () => {
+      const w = new Wish('pick', { filters: ['image/*'] });
+      dbg('making a wish…');
+      const blob = w.grant();
+      if (!blob) return dbg('cancelled');
+      const img = document.createElement('img');
+      img.src = blob.src;
+      document.body.appendChild(img);
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "Pickle Wishing",
+  "short_name": "Pickle",
+  "icons": [
+    {
+      "src": "pickle.svg"
+    }
+  ]
+}
