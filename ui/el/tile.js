@@ -60,6 +60,7 @@ export class CosmoTile extends LitElement {
   firstUpdated () {
     const wv = this.shadowRoot.querySelector('webview');
     wv.addEventListener('ipc-message', (ev) => {
+      console.warn(ev.channel, ev.args);
       if (ev.channel === 'cm-test') console.warn(`CM TEST ACK`);
       else if (ev.channel === 'cm-debug') console.warn(ev.args[0].message);
       else if (ev.channel === 'cm-tile-resize') {
@@ -67,6 +68,11 @@ export class CosmoTile extends LitElement {
         if (h < this.minheight) h = this.minheight;
         else if (h > this.maxheight) h = this.maxheight;
         wv.style.height = `${h}px`;
+      }
+      else if (ev.channel === 'cm-wish-select-granter') {
+        const [opts, wid] = ev.args;
+        console.warn(`received`,  opts, wid);
+        wv.send('cm-wish-granter-selected', opts.granters[0].id, wid);
       }
     });
   }

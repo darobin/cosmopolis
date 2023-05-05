@@ -23,20 +23,24 @@ debug…
 </pre>
   <button>Pick Pic</button>
   <script>
-    const debug = document.querySelector('pre');
+    const pre = document.querySelector('pre');
     const but = document.querySelector('button');
-    function dbg (...str) { debug.textContent += `${str.join(' ')}\n`; }
-    alert(window.Wish);
+    function dbg (...str) { pre.textContent += `${str.join(' ')}\n`; }
     dbg(`starting…`);
-    dbg(`has Wish`, !!Wish);
-    but.onclick = () => {
-      const w = new Wish('pick', { filters: ['image/*'] });
+    dbg(`has Wish`, !!window.makeWish);
+    but.onclick = async () => {
       dbg('making a wish…');
-      const blob = w.grant();
+      const blob = await window.makeWish('pick', { filters: ['image/*'] });
       if (!blob) return dbg('cancelled');
-      const img = document.createElement('img');
-      img.src = blob.src;
-      document.body.appendChild(img);
+      dbg('got blob');
+      dbg(`• type: ${blob.type}`);
+      dbg(`• text: ${await blob.text()}`);
+      // --------------------------------------------------------------------------------------------------------------------
+      // XXX bring the image bit back
+      // --------------------------------------------------------------------------------------------------------------------
+      // const img = document.createElement('img');
+      // img.src = blob.src;
+      // document.body.appendChild(img);
     };
   </script>
 </body>
