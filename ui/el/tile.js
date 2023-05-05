@@ -41,6 +41,7 @@ export class CosmoTile extends LitElement {
   ];
   static properties = {
     src: { type: String },
+    iconSrc: { type: String },
     meta: { attribute: false },
     minheight: { type: Number },
     maxheight: { type: Number },
@@ -76,6 +77,7 @@ export class CosmoTile extends LitElement {
     console.warn(`loadURL`, src);
     const res = await fetch(new URL('manifest.json', src));
     this.meta = await res.json();
+    this.iconSrc = this.meta.icons?.[0]?.src ? new URL(this.meta.icons[0].src, this.src).href : null;
     this.refreshLocalMeta();
     console.warn(`meta`, this.meta);
   }
@@ -104,7 +106,7 @@ export class CosmoTile extends LitElement {
     if (!this.src) return nothing;
     // TODO:
     // I would like to set partition=${`persist:${authority}`} on the webview but it fails silently. Need to investigate.
-    const icon = this.meta.icons?.[0]?.src ? new URL(this.meta.icons[0].src, this.src).href : null;
+    const icon = this.iconSrc;
     const name = this.meta.name || this.meta.short_name || 'Untitled';
     const likeLabel = this.meta.liked ? 'Unlike' : 'Like';
     const installLabel = this.meta.installed ? 'Uninstall' : 'Install';
