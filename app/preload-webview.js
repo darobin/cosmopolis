@@ -24,7 +24,7 @@ window.addEventListener('DOMContentLoaded', () => {
 // ipcRenderer.sendToHost('cm-test', { value: 'AFTER' });
 
 const WISH_TYPES = new Set(['pick']);
-const ICONS_PATH = 'file:///ui/assets/icons';
+const ICONS_PATH = 'file:ui/assets/icons';
 
 let interactionID = 1;
 function nanoid () {
@@ -65,7 +65,7 @@ function hasMatchingType (supported, filters) {
   });
 }
 
-async function listPotentialGranters (granters) {
+async function listPotentialGranters (type, granters) {
   ww(`listPotential`, JSON.stringify(granters))
   return new Promise((resolve) => {
     ww('SENDING UP');
@@ -74,11 +74,12 @@ async function listPotentialGranters (granters) {
       ww(`msg`, gid, wid);
       if (wid !== wishID) return;
       ipcRenderer.off('cm-wish-granter-selected', handler);
-      if (gid) resolve({ granter: granters.find(g => g.id === gid) });
+      ww(`granter for ${gid}: ${JSON.stringify(granters.find(g => g.id === gid))}`)
+      if (gid) resolve({ granter: granters.find(g => g.id == gid) });
       else resolve({});
     };
     ipcRenderer.on('cm-wish-granter-selected', handler);
-    ipcRenderer.sendToHost('cm-wish-select-granter', { granters }, wishID);
+    ipcRenderer.sendToHost('cm-wish-select-granter', { type, granters }, wishID);
   });
 }
 
@@ -111,7 +112,7 @@ async function makeWish (type, { filters } = {}) {
   // In the UI, if there are no granters we need an interaction to run a search. That won't work with this model
   // that expects to already know about them all. We will refactor later.
   ww(`listing…`)
-  const { granter } = await listPotentialGranters(granters);
+  const { granter } = await listPotentialGranters(type, granters);
   ww(`g=`, granter)
   // wish was cancelled, we resolve with undefined
   if (!granter) return;

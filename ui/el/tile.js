@@ -5,7 +5,7 @@ import { localMeta, likeTile, unlikeTile, installTile, uninstallTile } from '../
 export class CosmoTile extends LitElement {
   static styles = [
     css`
-      sl-card {
+      #tile {
         display: block;
         width: 600px;
         margin: 0 auto;
@@ -37,6 +37,9 @@ export class CosmoTile extends LitElement {
       sl-dialog.about::part(body) {
         text-align: center;
       }
+      sl-popup {
+        --arrow-color: #fff;
+      }
     `
   ];
   static properties = {
@@ -47,6 +50,10 @@ export class CosmoTile extends LitElement {
     maxheight: { type: Number },
     installed: { attribute: false },
     liked: { attribute: false },
+    showWishPicker: { attribute: false },
+    wishPickerTitle: { attribute: false },
+    wishPickerOptions: { attribute: false },
+    wishID: { attribute: false },
   };
   constructor () {
     super();
@@ -55,6 +62,7 @@ export class CosmoTile extends LitElement {
     this.meta = {};
     this.installed = false;
     this.liked = false;
+    this.resetWish();
     if (this.src) this.loadURL(this.src);
   }
   firstUpdated () {
@@ -71,8 +79,11 @@ export class CosmoTile extends LitElement {
       }
       else if (ev.channel === 'cm-wish-select-granter') {
         const [opts, wid] = ev.args;
-        console.warn(`received`,  opts, wid);
-        wv.send('cm-wish-granter-selected', opts.granters[0].id, wid);
+        console.warn(`received`, opts, wid);
+        this.showWishPicker = true;
+        this.wishPickerTitle = opts.type.charAt(0).toUpperCase() + opts.type.slice(1);
+        this.wishPickerOptions = opts.granters;
+        this.wishID = wid;
       }
     });
   }
@@ -90,11 +101,30 @@ export class CosmoTile extends LitElement {
   refreshLocalMeta () {
     this.meta = { ...this.meta, ...localMeta(this.src) };
   }
+  resetWish () {
+    this.showWishPicker = false;
+    this.wishID = null;
+    this.wishPickerTitle = null;
+    this.wishPickerOptions = null;
+  }
   handleMenu (ev) {
     const menu = ev.detail?.item?.value;
     if (menu === 'about') {
       this.shadowRoot.querySelector('sl-dialog.about').show();
     }
+  }
+  handleSelectedWish (ev) {
+    console.warn(ev);
+    const wishGranterID = ev.detail?.item?.value;
+    const wv = this.shadowRoot.querySelector('webview');
+    wv.send('cm-wish-granter-selected', wishGranterID, this.wishID);
+    this.resetWish();
+  }
+  handleWishCancel () {
+    console.warn('cancelling');
+    const wv = this.shadowRoot.querySelector('webview');
+    wv.send('cm-wish-granter-selected', undefined, this.wishID);
+    this.resetWish();
   }
   async handleLike () {
     if (!this.meta) return;
@@ -117,7 +147,7 @@ export class CosmoTile extends LitElement {
     const likeLabel = this.meta.liked ? 'Unlike' : 'Like';
     const installLabel = this.meta.installed ? 'Uninstall' : 'Install';
     return html`
-      <sl-card>
+      <sl-card id="tile">
         <div slot="header">
           <h3>
             ${icon
@@ -152,6 +182,32 @@ export class CosmoTile extends LitElement {
             : nothing}
           <strong>${name}</strong>
         </sl-dialog>
+        <sl-popup ?active=${this.showWishPicker} placement="right-start" anchor="tile" distance="7" strategy="fixed" arrow arrow-placement="start">
+          <sl-card>
+            <h3 slot="header">${this.wishPickerTitle || 'Choose'}</h3>
+            <!--
+              - here we should handle the case of not having any wish granter
+              - need to make this cancellable
+              -->
+            <sl-menu @sl-select=${this.handleSelectedWish}>
+              ${
+                (this.wishPickerOptions || []).map(opt => html`
+                  <sl-menu-item value=${opt.id}>
+                    ${
+                      opt.icons?.[0]
+                      ? html`<img src=${opt.icons?.[0].src} width="32" height="32" slot="prefix">`
+                      : nothing
+                    }
+                    ${opt.name}
+                  </sl-menu-item>`
+                )
+              }
+            </sl-menu>
+            <div slot="footer">
+              <sl-button @click=${this.handleWishCancel}>Cancel</sl-button>
+            </div>
+          </sl-card>
+        </sl-popup>
       </sl-card>
     `;
   }
