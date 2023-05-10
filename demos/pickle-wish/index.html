@@ -23,6 +23,14 @@ debug…
 </pre>
   <button>Pick Pic</button>
   <script>
+    // const ifr = document.createElement('iframe');
+    // ifr.setAttribute('width', '100');
+    // ifr.setAttribute('height', '100');
+    // const b = new Blob(['<p>YES BLOB</p>'], { type: 'text/html' });
+    // ifr.src = URL.createObjectURL(b);
+    // // ifr.src = 'data:text/html,<p>YES DATA</p>';
+    // document.body.append(ifr);
+
     const pre = document.querySelector('pre');
     const but = document.querySelector('button');
     function dbg (...str) { pre.textContent += `${str.join(' ')}\n`; }
@@ -33,14 +41,29 @@ debug…
       const blob = await window.makeWish('pick', { filters: ['image/*'] });
       if (!blob) return dbg('cancelled');
       dbg('got blob');
-      dbg(`• type: ${blob.type}`);
-      dbg(`• text: ${await blob.text()}`);
-      // --------------------------------------------------------------------------------------------------------------------
-      // XXX bring the image bit back
-      // --------------------------------------------------------------------------------------------------------------------
-      // const img = document.createElement('img');
-      // img.src = blob.src;
-      // document.body.appendChild(img);
+      // dbg(`• url: ${blob}`);
+      // dbg(`• type: ${blob.type}`);
+      // const url = URL.createObjectURL(blob);
+      dbg(`• URL: ${blob}`);
+      const img = document.createElement('img');
+      img.src = blob;
+      document.body.appendChild(img);
+      // dbg('creating reader');
+      // const r = new FileReader();
+      // r.addEventListener('load', () => {
+      //   dbg('reader loading');
+      //   const img = document.createElement('img');
+      //   img.onerror = (err) => {
+      //     dbg(err);
+      //     alert(String(err));
+      //   };
+      //   dbg(`res=${this.result}`);
+      //   img.src = this.result;
+      //   document.body.appendChild(img);
+      // });
+      // dbg('about to read');
+      // r.readAsDataURL();
+      // dbg('reading');
     };
   </script>
 </body>

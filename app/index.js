@@ -47,6 +47,7 @@ app.whenReady().then(async () => {
   handle('tiles:like', handleLikeTile);
   handle('tiles:refresh', handleRefreshTile);
   handle('tiles:remove', handleRemoveTile);
+  handle('wish:pick-local-image', handlePickLocalImage);
   mainWindow = new BrowserWindow({
     show: false,
     backgroundColor: '#fff',
@@ -159,6 +160,26 @@ async function handlePickDevTile () {
   }
 }
 
+// XXX we should be passing parameters here
+async function handlePickLocalImage () {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    title: 'Pick Image',
+    buttonLabel: 'Pick',
+    properties: ['openFile', 'treatPackageAsDirectory'],
+    message: 'Pick an image.'
+  });
+  if (canceled) return;
+  if (filePaths && filePaths.length) {
+    const img = filePaths[0];
+    const type = mime.lookup(img);
+    return {
+      url: `data:${type};base64,${(await readFile(img)).toString('base64')}`,
+      // blob: await readFile(img),
+      type,
+    };
+  }
+}
+
 // this is so that we can send strings as streams
 function createStream (text) {
   const rv = new PassThrough();
@@ -214,7 +235,7 @@ export async function tileProtocolHandler (req, cb) {
       statusCode: 200,
       mimeType,
       headers: {
-        'Content-Security-Policy': `default-src 'self' ${cspBase} data:; style-src 'self' 'unsafe-inline' ${cspBase}; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; img-src 'self' ${cspBase} blob: data:; media-src 'self' ${cspBase} blob: data:`,
+        'Content-Security-Policy': `default-src 'self' ${cspBase} data: blob:; style-src 'self' 'unsafe-inline' ${cspBase}; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; img-src 'self' ${cspBase} blob: data:; media-src 'self' ${cspBase} blob: data:; frame-src 'self' ${cspBase} blob: data:`,
       },
       data: createReadStream(path),
     });

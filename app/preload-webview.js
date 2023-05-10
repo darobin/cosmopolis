@@ -68,13 +68,11 @@ function hasMatchingType (supported, filters) {
 async function listPotentialGranters (type, granters) {
   ww(`listPotential`, JSON.stringify(granters))
   return new Promise((resolve) => {
-    ww('SENDING UP');
     const wishID = nanoid();
     const handler = (ev, gid, wid) => {
-      ww(`msg`, gid, wid);
       if (wid !== wishID) return;
       ipcRenderer.off('cm-wish-granter-selected', handler);
-      ww(`granter for ${gid}: ${JSON.stringify(granters.find(g => g.id === gid))}`)
+      // this is == on purpose for casting purposes
       if (gid) resolve({ granter: granters.find(g => g.id == gid) });
       else resolve({});
     };
@@ -127,13 +125,16 @@ class FilePickerPickWish {
   constructor ({ filters } = {}) {
     this.filters = filters;
   }
-// --------------------------------------------------------------------------------------------------------------------
-// XXX this needs to call the backend picker instead
-// --------------------------------------------------------------------------------------------------------------------
+  // XXX
+  // Very annouyingly, I haven't been able to get Blobs and createObjectURL working in a tile.
+  // No matter how much I open the CSP, it still produces a CSP error.
   async run () {
-    ww('RUN!!!');
-    // XXX call the backend picker
-    return new Blob(['hello there!'], { type: 'text/plain' });
+    const data = await invoke('wish:pick-local-image');
+    return data.url;
+    // return new Blob(data.blob, { type: data.type });
+    // ww('RUN!!!');
+    // // XXX call the backend picker
+    // return new Blob(['hello there!'], { type: 'text/plain' });
   }
 }
 
