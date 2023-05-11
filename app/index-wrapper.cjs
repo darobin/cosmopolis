@@ -1,4 +1,6 @@
 
+/* eslint-disable global-require, no-global-assign */
+/* global require, module */
 const { protocol, app } = require('electron');
 
 // I don't fully understand why but the esm load wrapper, together with the delayed import (which we can't await)

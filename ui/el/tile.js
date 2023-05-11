@@ -86,6 +86,20 @@ export class CosmoTile extends LitElement {
         this.wishID = wid;
       }
     });
+    // XXX debugging blogs
+    // const ifr = document.createElement('iframe');
+    // const blob = new Blob(['<p>THIS IS A BLOB</p>'], { type: 'text/html' });
+    // const url = URL.createObjectURL(blob);
+    // ifr.src = url;
+    // ifr.setAttribute('width', 200);
+    // ifr.setAttribute('height', 200);
+    // ifr.setAttribute('style', 'border: 3px solid orange');
+    // document.body.append(ifr);
+    // wv.addEventListener('dom-ready', () => {
+    //   console.warn('READY');
+    //   wv.send('DEBUG-BLOB-URL', url);
+    // });
+    // XXX EO DEBUG
   }
   willUpdate (changedProps) {
     if (changedProps.has('src')) this.loadURL(this.src);

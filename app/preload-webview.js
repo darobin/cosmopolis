@@ -81,12 +81,14 @@ async function listPotentialGranters (type, granters) {
   });
 }
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // XXX this hasn't been implemented yet
 // --------------------------------------------------------------------------------------------------------------------
 async function instantiateWish (granter) {
   return new Promise((resolve) => {
     ww(`send instantiation`, granter);
+    // XXX this is the wrong implementation, needs to use ipcRenderer
     parent.postMessage({ type: 'cm-wish-instantiate', granter });
     const handler = (ev) => {
       ww(`msg`, ev.data.type);
@@ -130,8 +132,13 @@ class FilePickerPickWish {
   // No matter how much I open the CSP, it still produces a CSP error.
   async run () {
     const data = await invoke('wish:pick-local-image');
-    return data.url;
-    // return new Blob(data.blob, { type: data.type });
+    // return data.url;
+    ww('BLB');
+    // ww('BLB:' + data.blob.readAsText());
+    // XXXX
+    // Ok — testing with text is better
+    // This is returning a list of numbers instead of the pick-me.html HTML
+    return new Blob(data.blob, { type: data.type });
     // ww('RUN!!!');
     // // XXX call the backend picker
     // return new Blob(['hello there!'], { type: 'text/plain' });
@@ -141,3 +148,15 @@ class FilePickerPickWish {
 function ww (...str) {
   ipcRenderer.sendToHost('cm-debug', { message: str.join(' ') })
 }
+
+// XXX DEBUG
+// ipcRenderer.on('DEBUG-BLOB-URL', (ev, url) => {
+//   ww(`debugging with url ${url}`);
+//   const ifr = document.createElement('iframe');
+//   ifr.src = url;
+//   ifr.setAttribute('width', 200);
+//   ifr.setAttribute('height', 200);
+//   ifr.setAttribute('style', 'border: 3px solid red');
+//   document.body.append(ifr);
+// });
+// XXX EO DEBUG

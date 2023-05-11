@@ -174,7 +174,8 @@ async function handlePickLocalImage () {
     const type = mime.lookup(img);
     return {
       url: `data:${type};base64,${(await readFile(img)).toString('base64')}`,
-      // blob: await readFile(img),
+      // blob: new Uint8Array(await readFile(img)),
+      blob: await readFile(img),
       type,
     };
   }

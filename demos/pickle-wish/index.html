@@ -42,12 +42,21 @@ debug…
       if (!blob) return dbg('cancelled');
       dbg('got blob');
       // dbg(`• url: ${blob}`);
-      // dbg(`• type: ${blob.type}`);
-      // const url = URL.createObjectURL(blob);
-      dbg(`• URL: ${blob}`);
-      const img = document.createElement('img');
-      img.src = blob;
-      document.body.appendChild(img);
+      dbg(`• type: ${blob.type}`);
+      const url = URL.createObjectURL(blob);
+      dbg(`• URL: ${url}`);
+
+      const ifr = document.createElement('iframe');
+      // const url = URL.createObjectURL(b);
+      ifr.src = url;
+      ifr.setAttribute('width', 200);
+      ifr.setAttribute('height', 200);
+      ifr.setAttribute('style', 'border: 3px solid purple');
+      document.body.append(ifr);
+
+      // const img = document.createElement('img');
+      // img.src = url;
+      // document.body.appendChild(img);
       // dbg('creating reader');
       // const r = new FileReader();
       // r.addEventListener('load', () => {
@@ -65,6 +74,15 @@ debug…
       // r.readAsDataURL();
       // dbg('reading');
     };
+    const ifr = document.createElement('iframe');
+    const b = new Blob(['<p>THIS IS A BLOB</p>'], { type: 'text/html' });
+    const url = URL.createObjectURL(b);
+    dbg(`blob url ${url}`)
+    ifr.src = url;
+    ifr.setAttribute('width', 200);
+    ifr.setAttribute('height', 200);
+    ifr.setAttribute('style', 'border: 3px solid orange');
+    document.body.append(ifr);
   </script>
 </body>
 </html>
