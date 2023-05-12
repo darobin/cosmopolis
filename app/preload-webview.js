@@ -127,36 +127,12 @@ class FilePickerPickWish {
   constructor ({ filters } = {}) {
     this.filters = filters;
   }
-  // XXX
-  // Very annouyingly, I haven't been able to get Blobs and createObjectURL working in a tile.
-  // No matter how much I open the CSP, it still produces a CSP error.
   async run () {
     const data = await invoke('wish:pick-local-image');
-    // return data.url;
-    ww('BLB');
-    // ww('BLB:' + data.blob.readAsText());
-    // XXXX
-    // Ok — testing with text is better
-    // This is returning a list of numbers instead of the pick-me.html HTML
-    return new Blob(data.blob, { type: data.type });
-    // ww('RUN!!!');
-    // // XXX call the backend picker
-    // return new Blob(['hello there!'], { type: 'text/plain' });
+    return new Blob([data.blob], { type: data.type });
   }
 }
 
 function ww (...str) {
   ipcRenderer.sendToHost('cm-debug', { message: str.join(' ') })
 }
-
-// XXX DEBUG
-// ipcRenderer.on('DEBUG-BLOB-URL', (ev, url) => {
-//   ww(`debugging with url ${url}`);
-//   const ifr = document.createElement('iframe');
-//   ifr.src = url;
-//   ifr.setAttribute('width', 200);
-//   ifr.setAttribute('height', 200);
-//   ifr.setAttribute('style', 'border: 3px solid red');
-//   document.body.append(ifr);
-// });
-// XXX EO DEBUG

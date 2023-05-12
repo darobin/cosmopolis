@@ -23,14 +23,6 @@ debug…
 </pre>
   <button>Pick Pic</button>
   <script>
-    // const ifr = document.createElement('iframe');
-    // ifr.setAttribute('width', '100');
-    // ifr.setAttribute('height', '100');
-    // const b = new Blob(['<p>YES BLOB</p>'], { type: 'text/html' });
-    // ifr.src = URL.createObjectURL(b);
-    // // ifr.src = 'data:text/html,<p>YES DATA</p>';
-    // document.body.append(ifr);
-
     const pre = document.querySelector('pre');
     const but = document.querySelector('button');
     function dbg (...str) { pre.textContent += `${str.join(' ')}\n`; }
@@ -41,48 +33,13 @@ debug…
       const blob = await window.makeWish('pick', { filters: ['image/*'] });
       if (!blob) return dbg('cancelled');
       dbg('got blob');
-      // dbg(`• url: ${blob}`);
       dbg(`• type: ${blob.type}`);
       const url = URL.createObjectURL(blob);
       dbg(`• URL: ${url}`);
-
-      const ifr = document.createElement('iframe');
-      // const url = URL.createObjectURL(b);
-      ifr.src = url;
-      ifr.setAttribute('width', 200);
-      ifr.setAttribute('height', 200);
-      ifr.setAttribute('style', 'border: 3px solid purple');
-      document.body.append(ifr);
-
-      // const img = document.createElement('img');
-      // img.src = url;
-      // document.body.appendChild(img);
-      // dbg('creating reader');
-      // const r = new FileReader();
-      // r.addEventListener('load', () => {
-      //   dbg('reader loading');
-      //   const img = document.createElement('img');
-      //   img.onerror = (err) => {
-      //     dbg(err);
-      //     alert(String(err));
-      //   };
-      //   dbg(`res=${this.result}`);
-      //   img.src = this.result;
-      //   document.body.appendChild(img);
-      // });
-      // dbg('about to read');
-      // r.readAsDataURL();
-      // dbg('reading');
+      const img = document.createElement('img');
+      img.src = url;
+      document.body.appendChild(img);
     };
-    const ifr = document.createElement('iframe');
-    const b = new Blob(['<p>THIS IS A BLOB</p>'], { type: 'text/html' });
-    const url = URL.createObjectURL(b);
-    dbg(`blob url ${url}`)
-    ifr.src = url;
-    ifr.setAttribute('width', 200);
-    ifr.setAttribute('height', 200);
-    ifr.setAttribute('style', 'border: 3px solid orange');
-    document.body.append(ifr);
   </script>
 </body>
 </html>
