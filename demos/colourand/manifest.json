@@ -1,0 +1,16 @@
+{
+  "name": "Colourand",
+  "short_name": "Colourand",
+  "icons": [
+    {
+      "src": "colourand.svg"
+    }
+  ],
+  "wishes": [
+    {
+      "name": "Pick random colour",
+      "action": "pick",
+      "types": ["image/png"]
+    }
+  ]
+}

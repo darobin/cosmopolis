@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Colourand</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+    button {
+      margin: 1rem;
+    }
+    #select {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas height="300" width="598"></canvas>
+  <button id="select">Select</button>
+  <button id="gen">Generate</button>
+  <script>
+    let wish;
+    const but = document.querySelector('#gen');
+    const sel = document.querySelector('#select');
+    const canvas = document.querySelector('canvas')
+    const ctx = canvas.getContext('2d');
+    function randomComponent () {
+      return Math.floor(255 * Math.random());
+    }
+    function randomFill () {
+      ctx.fillStyle = `rgb(${randomComponent()}, ${randomComponent()}, ${randomComponent()})`;
+      ctx.fillRect(0, 0, 598, 300);
+    }
+    randomFill();
+    but.onclick = () => randomFill();
+    sel.onclick = () => {
+      wish = null;
+      sel.style.display = 'none';
+      canvas.getBlob((blob) => wish.grant(blob));
+    };
+    window.addEventListener('wish', (ev) => {
+      wish = ev.wish;
+      sel.style.display = 'initial';
+    });
+  </script>
+</body>
+</html>
