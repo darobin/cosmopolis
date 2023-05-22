@@ -57,7 +57,10 @@ app.whenReady().then(async () => {
   await manageWindowPosition(mainWindow);
   // mainWindow.loadFile('index.html');
   mainWindow.loadFile('lab.html');
-  mainWindow.once('ready-to-show', () => mainWindow.show());
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+    mainWindow.webContents.openDevTools(); // remove this in builds
+  });
   const { webContents } = mainWindow;
   // reloading
   webContents.on('before-input-event', makeKeyDownMatcher('cmd+R', reload));
