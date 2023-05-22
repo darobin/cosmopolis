@@ -10,9 +10,11 @@ const { readdirSync } = require('fs');
 // restart files.
 // `electronmon --trace-warnings --require ./dev-watch.cjs .`
 
+const filter = (n) => /\.c?js$/.test(n) && !/preload/.test(n);
+
 const appDir = join(__dirname, 'app');
 const appLibDir = join(appDir, 'lib');
-const files = readdirSync(appDir).filter(n => /\.c?js$/.test(n)).map(n => join(appDir, n));
-files.push(...readdirSync(appLibDir).filter(n => /\.c?js$/.test(n)).map(n => join(appLibDir, n)));
+const files = readdirSync(appDir).filter(filter).map(n => join(appDir, n));
+files.push(...readdirSync(appLibDir).filter(filter).map(n => join(appLibDir, n)));
 
 files.forEach(file => process.send({ type: 'discover', file }));

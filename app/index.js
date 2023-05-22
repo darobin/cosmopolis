@@ -265,6 +265,7 @@ async function manageWishInstallation (url, installed, wishes) {
       wishSources[type] = wishSources[type].filter(src => src.url !== url);
       if (installed) {
         wishSources[type].push({
+          type,
           name,
           description,
           icons,

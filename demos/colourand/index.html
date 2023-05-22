@@ -22,7 +22,7 @@
   <button id="select">Select</button>
   <button id="gen">Generate</button>
   <script>
-    let wish;
+    // let wish;
     const but = document.querySelector('#gen');
     const sel = document.querySelector('#select');
     const canvas = document.querySelector('canvas')
@@ -37,14 +37,17 @@
     randomFill();
     but.onclick = () => randomFill();
     sel.onclick = () => {
-      wish = null;
       sel.style.display = 'none';
-      canvas.getBlob((blob) => wish.grant(blob));
+      canvas.toBlob((blob) => {
+        console.warn(blob);
+        window.currentWish.grant(blob);
+      });
     };
     window.addEventListener('wish', (ev) => {
-      wish = ev.wish;
+      console.warn(`WISH`, ev, window.currentWish);
       sel.style.display = 'initial';
     });
+    console.warn(`Ok in here?`);
   </script>
 </body>
 </html>

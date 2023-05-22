@@ -31,6 +31,7 @@ debug…
     but.onclick = async () => {
       dbg('making a wish…');
       const blob = await window.makeWish('pick', { filters: ['image/*'] });
+      dbg('wish resolved…');
       if (!blob) return dbg('cancelled');
       dbg('got blob');
       dbg(`• type: ${blob.type}`);
