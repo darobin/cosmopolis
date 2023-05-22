@@ -22,7 +22,7 @@ export async function installTile (url) {
   const mergedWishes = (meta.wishes || []).map(w => {
     return {
       ...{
-        icons: meta.icons,
+        icons: (meta.icons || []).map(ic => ({ ...ic, src: new URL(ic.src, url).href })),
         name: `${meta.name || meta.short_name || 'Untitled'} (${w.type})`,
       },
       ...w,
