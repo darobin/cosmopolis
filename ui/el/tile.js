@@ -102,6 +102,7 @@ export class CosmoTile extends LitElement {
       }
       else if (ev.channel === 'cm-wish-select-granter') {
         const [opts, wid] = ev.args;
+        this.resetWish();
         this.showWishPicker = true;
         this.wishPickerTitle = opts.type.charAt(0).toUpperCase() + opts.type.slice(1);
         this.wishPickerOptions = opts.granters;
@@ -136,6 +137,7 @@ export class CosmoTile extends LitElement {
     this.wishID = null;
     this.wishPickerTitle = null;
     this.wishPickerOptions = null;
+    this.wishInstance = null;
   }
   handleMenu (ev) {
     const menu = ev.detail?.item?.value;
