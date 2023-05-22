@@ -33,6 +33,29 @@ export class CosmoLabSidebar extends LitElement {
       table.local-tiles sl-button::part(base) {
         border: none;
       }
+      /* there was a very weird z-index issue with sl-button, this is a workaround */
+      button {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: var(--sl-button-font-size-medium);
+        padding: 0 var(--sl-spacing-medium);
+        height: var(--sl-input-height-medium);
+        line-height: calc(var(--sl-input-height-medium) - var(--sl-input-border-width) * 2);
+        font-family: var(--sl-input-font-family);
+        font-weight: var(--sl-font-weight-semibold);
+        user-select: none;
+        white-space: nowrap;
+        vertical-align: middle;
+        transition: var(--sl-transition-x-fast) background-color, var(--sl-transition-x-fast) color, var(--sl-transition-x-fast) border, var(--sl-transition-x-fast) box-shadow;
+      }
+      button:hover {
+        background-color: var(--sl-color-primary-50);
+        color: var(--sl-color-primary-700);
+      }
+      button img {
+        vertical-align: middle;
+      }
     `
   ];
   static properties = {
@@ -91,12 +114,12 @@ export class CosmoLabSidebar extends LitElement {
               .sort((a, b) => tileName(a).localeCompare(tileName(b)))
               .map(tile => html`<tr class=${current === tile.id ? 'selected' : ''}>
                 <td>
-                  <sl-button @click=${this.handleSelectDevModeTile} data-tile-id=${tile.id}>
+                  <button @click=${this.handleSelectDevModeTile} data-tile-id=${tile.id}>
                     ${tile.manifest?.icons?.[0]?.src
                           ? html`<img src=${new URL(tile.manifest.icons[0].src, tile.url).href} width="24" height="24" slot="prefix">`
                           : nothing}
                     ${tileName(tile)}
-                  </sl-button>
+                  </button>
                 </td>
                 <td class="icon">
                   ${tile.liked
