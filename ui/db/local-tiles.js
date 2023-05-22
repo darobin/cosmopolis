@@ -15,8 +15,8 @@ export async function refreshLocalTiles () {
   store.update((data) => ({ ...data, tiles }));
 }
 
-export async function installTile (url) {
-  await window.cosmopolis.installTile(url, true);
+export async function installTile (url, wishes) {
+  await window.cosmopolis.installTile(url, true, wishes);
   await refreshLocalTiles();
 }
 export async function uninstallTile (url) {

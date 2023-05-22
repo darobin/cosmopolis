@@ -135,7 +135,7 @@ export class CosmoTile extends LitElement {
   async handleInstall () {
     if (!this.meta) return;
     if (this.meta.installed) await uninstallTile(this.src);
-    else await installTile(this.src);
+    else await installTile(this.src, this.meta.wishes);
     this.refreshLocalMeta();
   }
   render () {

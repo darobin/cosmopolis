@@ -258,8 +258,28 @@ async function setLocalTileField (url, key, value) {
   await setSetting(`developer.tiles.localMap.${id}.${key}`, value);
 }
 
-async function handleInstallTile (ev, url, installed = true) {
+async function manageWishInstallation (url, installed, wishes) {
+  const wishSources = await getSetting('wish.sources');
+  Object.keys(wishes).forEach(wish => {
+    const { type, name, description, icons, mediaTypes } = wish;
+    if (!wishSources[type]) wishSources[type] = [];
+    wishSources[type] = wishSources[type].filter(src => src.url !== url);
+    if (installed) {
+      wishSources[type].push({
+        name,
+        description,
+        icons,
+        url,
+        mediaTypes,
+      });
+    }
+  });
+  await setSetting('wish.sources', wishSources);
+}
+
+async function handleInstallTile (ev, url, installed = true, wishes) {
   await setLocalTileField(url, 'installed', installed)
+  await manageWishInstallation(url, installed, wishes);
 }
 async function handleLikeTile (ev, url, liked = true) {
   await setLocalTileField(url, 'liked', liked)

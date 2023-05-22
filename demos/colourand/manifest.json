@@ -9,8 +9,8 @@
   "wishes": [
     {
       "name": "Pick random colour",
-      "action": "pick",
-      "types": ["image/png"]
+      "type": "pick",
+      "mediaTypes": ["image/png"]
     }
   ]
 }
