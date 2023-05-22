@@ -17,11 +17,6 @@ const { handle } = ipcMain;
 let mainWindow;
 const rel = makeRel(import.meta.url);
 
-// XXX
-// It would be helpful to have better monitoring than what electronmon gives us (and same for the others
-// they all fail because of ESM). I think that taking the electronmon code and simply watching for changes
-// under `app/` instead of trying to do magic would be great.
-
 // there can be only one
 const singleInstanceLock = app.requestSingleInstanceLock();
 if (!singleInstanceLock) {

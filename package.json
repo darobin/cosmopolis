@@ -8,7 +8,7 @@
   "scripts": {
     "start": "electron --trace-warnings .",
     "watch": "concurrently --handle-input npm:watch-js npm:monitor",
-    "monitor": "electronmon --trace-warnings .",
+    "monitor": "electronmon --trace-warnings --require ./dev-watch.cjs .",
     "build": "npm run build-assets && npm run build-js && npm run build-electron",
     "watch-js": "esbuild ui/cosmopolis.js --bundle --outfile=ui/cosmopolis.min.js --format=esm --watch --sourcemap",
     "build-js": "esbuild ui/cosmopolis.js --bundle --outfile=ui/cosmopolis.min.js --format=esm",
