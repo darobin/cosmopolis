@@ -254,25 +254,33 @@ async function setLocalTileField (url, key, value) {
 }
 
 async function manageWishInstallation (url, installed, wishes) {
-  const wishSources = await getSetting('wish.sources');
-  Object.keys(wishes).forEach(wish => {
-    const { type, name, description, icons, mediaTypes } = wish;
-    if (!wishSources[type]) wishSources[type] = [];
-    wishSources[type] = wishSources[type].filter(src => src.url !== url);
-    if (installed) {
-      wishSources[type].push({
-        name,
-        description,
-        icons,
-        url,
-        mediaTypes,
-      });
-    }
-  });
+  const wishSources = await getSetting('wish.sources') || {};
+  if (installed) {
+    wishes.forEach(wish => {
+      const { type, name, description, icons, mediaTypes } = wish;
+      if (!wishSources[type]) wishSources[type] = [];
+      wishSources[type] = wishSources[type].filter(src => src.url !== url);
+      if (installed) {
+        wishSources[type].push({
+          name,
+          description,
+          icons,
+          url,
+          mediaTypes,
+        });
+      }
+    });
+  }
+  else {
+    Object.keys(wishSources).forEach(type => {
+      wishSources[type] = wishSources[type].filter(w => w.url !== url);
+    });
+  }
   await setSetting('wish.sources', wishSources);
 }
 
 async function handleInstallTile (ev, url, installed = true, wishes) {
+  console.warn(url, installed, wishes);
   await setLocalTileField(url, 'installed', installed)
   await manageWishInstallation(url, installed, wishes);
 }

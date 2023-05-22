@@ -11,7 +11,7 @@ contextBridge.exposeInMainWorld('cosmopolis', {
   pickDevTile: () => invoke('pick:tile-dev'),
   // stored tiles
   localTiles: () => invoke('tiles:list-local'),
-  installTile: (url, installed) => invoke('tiles:install', url, installed),
+  installTile: (url, installed, wishes) => invoke('tiles:install', url, installed, wishes),
   likeTile: (url, liked) => invoke('tiles:like', url, liked),
   refreshTile: (url) => invoke('tiles:refresh', url),
   removeTile: (url) => invoke('tiles:remove', url),
