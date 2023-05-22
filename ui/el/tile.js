@@ -40,6 +40,10 @@ export class CosmoTile extends LitElement {
       sl-popup {
         --arrow-color: #fff;
       }
+      .empty-icon {
+        width: 16px;
+        height: 16px;
+      }
     `
   ];
   static properties = {
@@ -138,10 +142,11 @@ export class CosmoTile extends LitElement {
   async handleInstall () {
     if (!this.meta) return;
     if (this.meta.installed) await uninstallTile(this.src);
-    else await installTile(this.src, this.meta.wishes);
+    else await installTile(this.src);
     this.refreshLocalMeta();
   }
   render () {
+    console.warn(this.wishPickerOptions);
     if (!this.src) return nothing;
     // TODO:
     // I would like to set partition=${`persist:${authority}`} on the webview but it fails silently. Need to investigate.
@@ -196,8 +201,8 @@ export class CosmoTile extends LitElement {
                   <sl-menu-item value=${opt.id}>
                     ${
                       opt.icons?.[0]
-                      ? html`<img src=${opt.icons?.[0].src} width="32" height="32" slot="prefix">`
-                      : nothing
+                      ? html`<img src=${opt.icons?.[0].src} width="16" height="16" slot="prefix">`
+                      : html`<div class="empty-icon" slot="prefix"></div>`
                     }
                     ${opt.name}
                   </sl-menu-item>`

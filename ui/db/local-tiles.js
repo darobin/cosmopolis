@@ -15,8 +15,21 @@ export async function refreshLocalTiles () {
   store.update((data) => ({ ...data, tiles }));
 }
 
-export async function installTile (url, wishes) {
-  await window.cosmopolis.installTile(url, true, wishes);
+export async function installTile (url) {
+  const id = url2id(url);
+  const meta = get(store).tiles[id].manifest;
+  console.warn(`install`, meta);
+  const mergedWishes = (meta.wishes || []).map(w => {
+    return {
+      ...{
+        icons: meta.icons,
+        name: `${meta.name || meta.short_name || 'Untitled'} (${w.type})`,
+      },
+      ...w,
+    };
+  });
+  console.warn(`merged`, mergedWishes);
+  await window.cosmopolis.installTile(url, true, mergedWishes);
   await refreshLocalTiles();
 }
 export async function uninstallTile (url) {
@@ -42,11 +55,15 @@ export async function removeTile (url) {
 }
 
 export function localMeta (url) {
-  const id = new URL(url).hostname;
+  const id = url2id(url);
   const meta = get(store).tiles[id];
   if (!meta) return {};
   return {
     installed: !!meta.installed,
     liked: !!meta.liked,
   }
+}
+
+function url2id (url) {
+  return new URL(url).hostname;
 }
