@@ -81,22 +81,19 @@ async function listPotentialGranters (type, granters) {
   });
 }
 
-
-// --------------------------------------------------------------------------------------------------------------------
-// XXX this hasn't been implemented yet
-// --------------------------------------------------------------------------------------------------------------------
 async function instantiateWish (granter) {
   return new Promise((resolve) => {
-    ww(`send instantiation`, granter);
-    // XXX this is the wrong implementation, needs to use ipcRenderer
-    parent.postMessage({ type: 'cm-wish-instantiate', granter });
-    const handler = (ev) => {
-      ww(`msg`, ev.data.type);
-      window.removeEventListener('message', handler);
-      if (ev.data?.type === 'cm-wish-granted') resolve({ payload: ev.data.payload });
-      else if (ev.data?.type === 'cm-wish-cancelled') resolve({});
+    ww(`send instantiation`);
+    const wishID = nanoid();
+    // blob may be null for cancelled wishes
+    const handler = (ev, blob, wid) => {
+      if (wid !== wishID) return;
+      ipcRenderer.off('cm-wish-granted', handler);
+      if (blob) resolve({ data: blob });
+      else resolve({});
     };
-    window.addEventListener('message', handler);
+    ipcRenderer.on('cm-wish-granted', handler);
+    ipcRenderer.sendToHost('cm-wish-instantiate', { granter }, wishID);
   });
 }
 

@@ -5,6 +5,21 @@ import { localMeta, likeTile, unlikeTile, installTile, uninstallTile } from '../
 export class CosmoTile extends LitElement {
   static styles = [
     css`
+      cm-tile[wish] {
+        margin-left: var(--sl-spacing-small);
+        position: relative;
+      }
+      cm-tile[wish]::before {
+        content: '';
+        position: absolute;
+        top: var(--sl-spacing-2x-large);;
+        left: -6px;
+        width: 12px;
+        height: 12px;
+        rotate: 45deg;
+        background: #fff;
+        z-index: -1;
+      }
       #tile {
         display: block;
         width: 600px;
@@ -44,6 +59,9 @@ export class CosmoTile extends LitElement {
         width: 16px;
         height: 16px;
       }
+      .tile-pile {
+        display: flex;
+      }
     `
   ];
   static properties = {
@@ -57,6 +75,7 @@ export class CosmoTile extends LitElement {
     showWishPicker: { attribute: false },
     wishPickerTitle: { attribute: false },
     wishPickerOptions: { attribute: false },
+    wishInstance: { attribute: false },
     wishID: { attribute: false },
   };
   constructor () {
@@ -83,10 +102,16 @@ export class CosmoTile extends LitElement {
       }
       else if (ev.channel === 'cm-wish-select-granter') {
         const [opts, wid] = ev.args;
-        console.warn(`received`, opts, wid);
         this.showWishPicker = true;
         this.wishPickerTitle = opts.type.charAt(0).toUpperCase() + opts.type.slice(1);
         this.wishPickerOptions = opts.granters;
+        this.wishID = wid;
+      }
+      else if (ev.channel === 'cm-wish-instantiate') {
+        const [opts, wid] = ev.args;
+        console.warn(`received`, opts, wid);
+        this.showWishPicker = false;
+        this.wishInstance = opts.granter;
         this.wishID = wid;
       }
     });
@@ -95,12 +120,13 @@ export class CosmoTile extends LitElement {
     if (changedProps.has('src')) this.loadURL(this.src);
   }
   async loadURL (src) {
-    console.warn(`loadURL`, src);
+    // console.warn(`loadURL`, src);
+    this.resetWish();
     const res = await fetch(new URL('manifest.json', src));
     this.meta = await res.json();
     this.iconSrc = this.meta.icons?.[0]?.src ? new URL(this.meta.icons[0].src, this.src).href : null;
     this.refreshLocalMeta();
-    console.warn(`meta`, this.meta);
+    // console.warn(`meta`, this.meta);
   }
   refreshLocalMeta () {
     this.meta = { ...this.meta, ...localMeta(this.src) };
@@ -146,8 +172,8 @@ export class CosmoTile extends LitElement {
     this.refreshLocalMeta();
   }
   render () {
-    console.warn(this.wishPickerOptions);
     if (!this.src) return nothing;
+    if (this.wishInstance) console.warn(`instance`, this.wishInstance);
     // TODO:
     // I would like to set partition=${`persist:${authority}`} on the webview but it fails silently. Need to investigate.
     const icon = this.iconSrc;
@@ -155,66 +181,73 @@ export class CosmoTile extends LitElement {
     const likeLabel = this.meta.liked ? 'Unlike' : 'Like';
     const installLabel = this.meta.installed ? 'Uninstall' : 'Install';
     return html`
-      <sl-card id="tile">
-        <div slot="header">
-          <h3>
-            ${icon
-              ? html`<img src=${icon} width="32" height="32" class='tile-icon'>`
-              : nothing}
-            ${name}
-          </h3>
-          <div>
-            <sl-tooltip content=${`${installLabel} Tile`}>
-              <sl-icon-button name=${`bookmark-star${this.meta.installed ? '-fill' : ''}`} label=${installLabel} @click=${this.handleInstall}></sl-icon-button>
-            </sl-tooltip>
-            <sl-dropdown hoist>
-              <sl-icon-button name="three-dots-vertical" label="Actions" slot="trigger"></sl-icon-button>
-              <sl-menu @sl-select=${this.handleMenu}>
-                <sl-menu-item value='debug'>Debug</sl-menu-item>
-                <sl-menu-item value='about'>About ${name}</sl-menu-item>
-              </sl-menu>
-            </sl-dropdown>
-          </div>
-        </div>
-        <webview src=${this.src} preload="./app/preload-webview.js" autosize></webview>
-        <div slot="footer">
-          <sl-tooltip content=${`${likeLabel} Tile`}>
-            <sl-icon-button name=${`arrow-through-heart${this.meta.liked ? '-fill' : ''}`} label=${likeLabel} @click=${this.handleLike}></sl-icon-button>
-          </sl-tooltip>
-        </div>
-        <sl-dialog label="About" class="about">
-          ${icon
-            ? html`<img src=${icon} width="64" height="64"><br>`
-            : nothing}
-          <strong>${name}</strong>
-        </sl-dialog>
-        <sl-popup ?active=${this.showWishPicker} placement="right-start" anchor="tile" distance="7" strategy="fixed" arrow arrow-placement="start">
-          <sl-card>
-            <h3 slot="header">${this.wishPickerTitle || 'Choose'}</h3>
-            <!--
-              - here we should handle the case of not having any wish granter
-              - need to make this cancellable
-              -->
-            <sl-menu @sl-select=${this.handleSelectedWish}>
-              ${
-                (this.wishPickerOptions || []).map(opt => html`
-                  <sl-menu-item value=${opt.id}>
-                    ${
-                      opt.icons?.[0]
-                      ? html`<img src=${opt.icons?.[0].src} width="16" height="16" slot="prefix">`
-                      : html`<div class="empty-icon" slot="prefix"></div>`
-                    }
-                    ${opt.name}
-                  </sl-menu-item>`
-                )
-              }
-            </sl-menu>
-            <div slot="footer">
-              <sl-button @click=${this.handleWishCancel}>Cancel</sl-button>
+      <div class="tile-pile">
+        <sl-card id="tile">
+          <div slot="header">
+            <h3>
+              ${icon
+                ? html`<img src=${icon} width="32" height="32" class='tile-icon'>`
+                : nothing}
+              ${name}
+            </h3>
+            <div>
+              <sl-tooltip content=${`${installLabel} Tile`}>
+                <sl-icon-button name=${`bookmark-star${this.meta.installed ? '-fill' : ''}`} label=${installLabel} @click=${this.handleInstall}></sl-icon-button>
+              </sl-tooltip>
+              <sl-dropdown hoist>
+                <sl-icon-button name="three-dots-vertical" label="Actions" slot="trigger"></sl-icon-button>
+                <sl-menu @sl-select=${this.handleMenu}>
+                  <sl-menu-item value='debug'>Debug</sl-menu-item>
+                  <sl-menu-item value='about'>About ${name}</sl-menu-item>
+                </sl-menu>
+              </sl-dropdown>
             </div>
-          </sl-card>
-        </sl-popup>
-      </sl-card>
+          </div>
+          <webview src=${this.src} preload="./app/preload-webview.js" autosize></webview>
+          <div slot="footer">
+            <sl-tooltip content=${`${likeLabel} Tile`}>
+              <sl-icon-button name=${`arrow-through-heart${this.meta.liked ? '-fill' : ''}`} label=${likeLabel} @click=${this.handleLike}></sl-icon-button>
+            </sl-tooltip>
+          </div>
+          <sl-dialog label="About" class="about">
+            ${icon
+              ? html`<img src=${icon} width="64" height="64"><br>`
+              : nothing}
+            <strong>${name}</strong>
+          </sl-dialog>
+          <sl-popup ?active=${this.showWishPicker} placement="right-start" anchor="tile" distance="7" strategy="fixed" arrow arrow-placement="start">
+            <sl-card>
+              <h3 slot="header">${this.wishPickerTitle || 'Choose'}</h3>
+              <!--
+                - here we should handle the case of not having any wish granter
+                - need to make this cancellable
+                -->
+              <sl-menu @sl-select=${this.handleSelectedWish}>
+                ${
+                  (this.wishPickerOptions || []).map(opt => html`
+                    <sl-menu-item value=${opt.id}>
+                      ${
+                        opt.icons?.[0]
+                        ? html`<img src=${opt.icons?.[0].src} width="16" height="16" slot="prefix">`
+                        : html`<div class="empty-icon" slot="prefix"></div>`
+                      }
+                      ${opt.name}
+                    </sl-menu-item>`
+                  )
+                }
+              </sl-menu>
+              <div slot="footer">
+                <sl-button @click=${this.handleWishCancel}>Cancel</sl-button>
+              </div>
+            </sl-card>
+          </sl-popup>
+        </sl-card>
+        ${
+          this.wishInstance
+          ? html`<cm-tile src=${this.wishInstance.url} wish></cm-tile>`
+          : nothing
+        }
+      </div>
     `;
   }
 }
