@@ -112,6 +112,9 @@ export class CosmoTile extends LitElement {
     if (menu === 'about') {
       this.shadowRoot.querySelector('sl-dialog.about').show();
     }
+    else if (menu === 'debug') {
+      this.shadowRoot.querySelector('webview').openDevTools();
+    }
   }
   handleSelectedWish (ev) {
     console.warn(ev);
@@ -162,10 +165,8 @@ export class CosmoTile extends LitElement {
             <sl-dropdown hoist>
               <sl-icon-button name="three-dots-vertical" label="Actions" slot="trigger"></sl-icon-button>
               <sl-menu @sl-select=${this.handleMenu}>
-                <sl-menu-item value='about'>
-                  ${icon ? html`<img src=${icon} width="32" height="32" class='tile-icon' slot="prefix">` : nothing}
-                  About ${name}
-                </sl-menu-item>
+                <sl-menu-item value='debug'>Debug</sl-menu-item>
+                <sl-menu-item value='about'>About ${name}</sl-menu-item>
               </sl-menu>
             </sl-dropdown>
           </div>
