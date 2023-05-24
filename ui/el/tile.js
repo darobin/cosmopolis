@@ -79,6 +79,7 @@ export class CosmoTile extends LitElement {
     wishInstantiationData: { attribute: false },
     wishInstantiationID: { attribute: false },
     wishID: { attribute: false },
+    isWishMode: { attribute: false },
   };
   constructor () {
     super();
@@ -87,6 +88,7 @@ export class CosmoTile extends LitElement {
     this.meta = {};
     this.installed = false;
     this.liked = false;
+    this.isWishMode = this.hasAttribute('wish');
     this.resetWish();
     if (this.src) this.loadURL(this.src);
   }
@@ -132,9 +134,7 @@ export class CosmoTile extends LitElement {
     if (changedProps.has('src')) this.loadURL(this.src);
   }
   updated (changedProps) {
-    console.warn(`UPDATED`);
     if (changedProps.has('wishInstance') && this.wishInstance) {
-      console.warn(`SCROLLING…`);
       this.shadowRoot.querySelector('cm-tile[wish]')?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
   }
@@ -189,6 +189,10 @@ export class CosmoTile extends LitElement {
     this.resetWish();
     this.resetWishInstantiation();
   }
+  handleWishInstanceCancel () {
+    console.warn(`cancelling`, this.wishInstantiationID);
+    this.dispatchEvent(new CustomEvent('cm-wish-granted', { detail: { wishID: this.wishInstantiationID }, composed: true }));
+  }
   async handleLike () {
     if (!this.meta) return;
     if (this.meta.liked) await unlikeTile(this.src);
@@ -221,9 +225,15 @@ export class CosmoTile extends LitElement {
               ${name}
             </h3>
             <div>
-              <sl-tooltip content=${`${installLabel} Tile`}>
-                <sl-icon-button name=${`bookmark-star${this.meta.installed ? '-fill' : ''}`} label=${installLabel} @click=${this.handleInstall}></sl-icon-button>
-              </sl-tooltip>
+              ${
+                this.isWishMode
+                ? nothing
+                : html`
+                  <sl-tooltip content=${`${installLabel} Tile`}>
+                    <sl-icon-button name=${`bookmark-star${this.meta.installed ? '-fill' : ''}`} label=${installLabel} @click=${this.handleInstall}></sl-icon-button>
+                  </sl-tooltip>
+                `
+              }
               <sl-dropdown hoist>
                 <sl-icon-button name="three-dots-vertical" label="Actions" slot="trigger"></sl-icon-button>
                 <sl-menu @sl-select=${this.handleMenu}>
@@ -235,9 +245,15 @@ export class CosmoTile extends LitElement {
           </div>
           <webview src=${this.src} preload="./app/preload-webview.js" autosize></webview>
           <div slot="footer">
-            <sl-tooltip content=${`${likeLabel} Tile`}>
-              <sl-icon-button name=${`arrow-through-heart${this.meta.liked ? '-fill' : ''}`} label=${likeLabel} @click=${this.handleLike}></sl-icon-button>
-            </sl-tooltip>
+            ${
+                this.isWishMode
+                ? html`<sl-button @click=${this.handleWishInstanceCancel}>Cancel</sl-button>`
+                : html`
+                  <sl-tooltip content=${`${likeLabel} Tile`}>
+                    <sl-icon-button name=${`arrow-through-heart${this.meta.liked ? '-fill' : ''}`} label=${likeLabel} @click=${this.handleLike}></sl-icon-button>
+                  </sl-tooltip>
+               `
+              }
           </div>
           <sl-dialog label="About" class="about">
             ${icon

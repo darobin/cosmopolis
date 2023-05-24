@@ -133,8 +133,14 @@ ipcRenderer.on('cm-wish-instantiation', (ev, granter, wid) => {
 });
 
 ipcRenderer.on('cm-wish-granted', (ev, blob, wid) => {
-  // Reconstructing a blob as detailed above.
-  wishRegistry[wid]?.(new Blob([blob.arrayBuffer], { type: blob.type }));
+  if (blob) {
+    // Reconstructing a blob as detailed above.
+    wishRegistry[wid]?.(new Blob([blob.arrayBuffer], { type: blob.type }));
+  }
+  // was cancelled
+  else {
+    wishRegistry[wid]?.();
+  }
 });
 
 // this is an internal wish implementation
