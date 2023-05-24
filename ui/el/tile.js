@@ -131,6 +131,13 @@ export class CosmoTile extends LitElement {
   willUpdate (changedProps) {
     if (changedProps.has('src')) this.loadURL(this.src);
   }
+  updated (changedProps) {
+    console.warn(`UPDATED`);
+    if (changedProps.has('wishInstance') && this.wishInstance) {
+      console.warn(`SCROLLING…`);
+      this.shadowRoot.querySelector('cm-tile[wish]')?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }
   async loadURL (src) {
     // console.warn(`loadURL`, src);
     this.resetWish();
