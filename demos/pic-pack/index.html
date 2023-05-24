@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Pic Pack!!!</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0 1rem;
+      font-family: sans-serif;
+    }
+    #grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    img {
+      max-width: 170px;
+      border-radius: 10px;
+    }
+    div.tools {
+      display: none;
+    }
+    .wishing div.tools {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 1rem 0.5rem 1rem;
+    }
+  </style>
+</head>
+<body>
+  <p>
+    Pick one of our nine (9!) most excellent pictures in the pack!
+  </p>
+  <div id="grid"></div>
+  <script>
+    const grid = document.querySelector('#grid');
+    function makePickHandler (num) {
+      return async () => {
+        const res = await fetch(`${num}.jpg`);
+        const blob = await res.blob();
+        window.currentWish.grant(blob);
+      };
+    }
+    function makeEditHandler (num) {
+      return async () => {
+        const res = await fetch(`${num}.jpg`);
+        const blob = await res.blob();
+        // XXX trigger an edit wish
+        // window.currentWish.grant(blob);
+      };
+    }
+    [...Array(9).keys()].forEach(n => {
+      const imgDiv = document.createElement('div');
+      const toolDiv = document.createElement('div');
+      toolDiv.classList.add('tools');
+      const pickBut = document.createElement('button');
+      pickBut.textContent = 'pick';
+      pickBut.classList.add('pick');
+      pickBut.onclick = makePickHandler(n + 1);
+      const editBut = document.createElement('button');
+      editBut.textContent = 'edit';
+      editBut.classList.add('edit');
+      editBut.onclick = makeEditHandler(n + 1);
+      const img = document.createElement('img');
+      img.src = `${n + 1}.jpg`;
+      toolDiv.append(pickBut, editBut);
+      imgDiv.append(img, toolDiv);
+      grid.append(imgDiv);
+    });
+    window.addEventListener('wish', (ev) => {
+      document.body.classList.add('wishing');
+    });
+  </script>
+</body>
+</html>

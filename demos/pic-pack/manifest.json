@@ -1,0 +1,16 @@
+{
+  "name": "Picture Pack",
+  "short_name": "Pic Pack",
+  "icons": [
+    {
+      "src": "pic-pack.svg"
+    }
+  ],
+  "wishes": [
+    {
+      "name": "Pack of pics!",
+      "type": "pick",
+      "mediaTypes": ["image/jpeg"]
+    }
+  ]
+}
