@@ -8,4 +8,4 @@
 - [x] support triggering a tile for a wish and having it reply
 - [ ] make an image pick wish that returns a picture from fetching an image as blob in its own content
 - [x] when a wish tile is shown, scrollIntoView()
-- [ ] affordance to cancel wish, and no affordance to install/like/etc. when shown as wish
+- [x] affordance to cancel wish, and no affordance to install/like/etc. when shown as wish

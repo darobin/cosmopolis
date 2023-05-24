@@ -42,6 +42,9 @@ export class CosmoTile extends LitElement {
       [slot='footer'] sl-icon-button {
         font-size: 1.4rem;
       }
+      [slot='footer'].wish-mode {
+        justify-content: end;
+      }
       sl-card::part(body) {
         padding: 0;
       }
@@ -190,7 +193,6 @@ export class CosmoTile extends LitElement {
     this.resetWishInstantiation();
   }
   handleWishInstanceCancel () {
-    console.warn(`cancelling`, this.wishInstantiationID);
     this.dispatchEvent(new CustomEvent('cm-wish-granted', { detail: { wishID: this.wishInstantiationID }, composed: true }));
   }
   async handleLike () {
@@ -244,7 +246,7 @@ export class CosmoTile extends LitElement {
             </div>
           </div>
           <webview src=${this.src} preload="./app/preload-webview.js" autosize></webview>
-          <div slot="footer">
+          <div slot="footer" class=${this.isWishMode ? 'wish-mode' : ''}>
             ${
                 this.isWishMode
                 ? html`<sl-button @click=${this.handleWishInstanceCancel}>Cancel</sl-button>`
