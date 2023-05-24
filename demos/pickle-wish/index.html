@@ -8,8 +8,9 @@
     html, body {
       margin: 0;
       padding: 0;
+      font-family: sans-serif
     }
-    pre, button {
+    p, pre, button {
       margin: 1rem;
     }
     img {
@@ -18,28 +19,27 @@
   </style>
 </head>
 <body>
+  <p>
+    This is just a simple tile that allows you to pick an image (a wish to pick image/*).
+  </p>
+  <button>Pick Pic</button>
   <pre>
 debug…
-</pre>
-  <button>Pick Pic</button>
+  </pre>
   <script>
     const pre = document.querySelector('pre');
     const but = document.querySelector('button');
     function dbg (...str) { pre.textContent += `${str.join(' ')}\n`; }
-    dbg(`starting…`);
-    dbg(`has Wish`, !!window.makeWish);
     but.onclick = async () => {
       dbg('making a wish…');
       const blob = await window.makeWish('pick', { filters: ['image/*'] });
       dbg('wish resolved…');
       if (!blob) return dbg('cancelled');
-      dbg('got blob');
-      dbg(`• type: ${blob.type}`);
       const url = URL.createObjectURL(blob);
-      dbg(`• URL: ${url}`);
+      dbg(`got blob ${blob.type} (${url})`);
       const img = document.createElement('img');
       img.src = url;
-      document.body.appendChild(img);
+      but.after(img);
     };
   </script>
 </body>
