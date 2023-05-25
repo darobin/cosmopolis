@@ -84,6 +84,7 @@ async function listPotentialGranters (type, granters) {
 }
 
 async function instantiateWish (granter, data) {
+  if (data) data = await cloneableBlob(data);
   return new Promise((resolve) => {
     ww(`send instantiation`);
     const wishID = nanoid();
@@ -117,7 +118,7 @@ async function makeWish (type, { filters, data } = {}) {
 ipcRenderer.on('cm-wish-instantiation', (ev, granter, wid, data) => {
   contextBridge.exposeInMainWorld('currentWish', {
     type: granter.type,
-    data,
+    data: data ? blobFromCloneable(data) : undefined,
     grant: async (blob) => {
       // This is a bit of a mindfuck. Each preload is a different instance. Here we are in a wish tile. We send the
       // granted blob to our host, a webview in a cm-tile element. That cm-tile element has a parent cm-tile element.
@@ -126,7 +127,7 @@ ipcRenderer.on('cm-wish-instantiation', (ev, granter, wid, data) => {
       // by hitting the wishRegistry.
       // To make things EVEN MORE interesting, in this case Eletron refuses to structure-clone a blob. So instead we
       // convert it to an ArrayBuffer and type, and rebuild it on the other side
-      ipcRenderer.sendToHost('cm-wish-granted', { arrayBuffer: await blob.arrayBuffer(), type: blob.type }, wid);
+      ipcRenderer.sendToHost('cm-wish-granted', await cloneableBlob(blob), wid);
     },
   });
   const wev = new CustomEvent('wish');
@@ -136,7 +137,7 @@ ipcRenderer.on('cm-wish-instantiation', (ev, granter, wid, data) => {
 ipcRenderer.on('cm-wish-granted', (ev, blob, wid) => {
   if (blob) {
     // Reconstructing a blob as detailed above.
-    wishRegistry[wid]?.(new Blob([blob.arrayBuffer], { type: blob.type }));
+    wishRegistry[wid]?.(blobFromCloneable(blob));
   }
   // was cancelled
   else {
@@ -158,4 +159,12 @@ class FilePickerPickWish {
 
 function ww (...str) {
   ipcRenderer.sendToHost('cm-debug', { message: str.join(' ') })
+}
+
+async function cloneableBlob (blob) {
+  return { arrayBuffer: await blob.arrayBuffer(), type: blob.type };
+}
+
+function blobFromCloneable (data) {
+  return new Blob([data.arrayBuffer], { type: data.type });
 }
