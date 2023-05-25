@@ -23,7 +23,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 // ipcRenderer.sendToHost('cm-test', { value: 'AFTER' });
 
-const WISH_TYPES = new Set(['pick']);
+const WISH_TYPES = new Set(['pick', 'edit']);
 const ICONS_PATH = 'file:ui/assets/icons';
 const wishRegistry = {};
 
@@ -43,8 +43,8 @@ function nanoid () {
 async function findMatchingWish (type, options = {}) {
   if (!WISH_TYPES.has(type)) throw new Error(`Unknown wish type "${type}".`);
   let granters = await getSetting(`wish.sources.${type}`) || [];
+  if (options.filters && (type === 'pick' || type === 'edit')) granters = granters.filter(grant => hasMatchingType(grant.mediaTypes, options.filters));
   if (type === 'pick') {
-    if (options.filters) granters = granters.filter(grant => hasMatchingType(grant.mediaTypes, options.filters));
     granters.unshift({
       name: 'Local device file',
       description: 'Pick a file from a local device drive',
@@ -83,18 +83,18 @@ async function listPotentialGranters (type, granters) {
   });
 }
 
-async function instantiateWish (granter) {
+async function instantiateWish (granter, data) {
   return new Promise((resolve) => {
     ww(`send instantiation`);
     const wishID = nanoid();
     // blob may be null for cancelled wishes
     wishRegistry[wishID] = resolve;
-    ipcRenderer.sendToHost('cm-wish-instantiate', { granter }, wishID);
+    ipcRenderer.sendToHost('cm-wish-instantiate', { granter, data }, wishID);
   });
 }
 
 // we want options for multiple, title, message too
-async function makeWish (type, { filters } = {}) {
+async function makeWish (type, { filters, data } = {}) {
   ww(`start`, type, JSON.stringify(filters));
   if (!WISH_TYPES.has(type)) throw new Error(`Unknown wish type "${type}".`);
   if (filters && !Array.isArray(filters)) throw new Error(`Filters must be an array.`);
@@ -110,13 +110,14 @@ async function makeWish (type, { filters } = {}) {
   // wish was cancelled, we resolve with undefined
   if (!granter) return;
   ww(`running…`)
-  if (granter.internal) return await granter.internal.run();
-  return await instantiateWish(granter);
+  if (granter.internal) return await granter.internal.run(type, data);
+  return await instantiateWish(granter, data);
 }
 
-ipcRenderer.on('cm-wish-instantiation', (ev, granter, wid) => {
+ipcRenderer.on('cm-wish-instantiation', (ev, granter, wid, data) => {
   contextBridge.exposeInMainWorld('currentWish', {
     type: granter.type,
+    data,
     grant: async (blob) => {
       // This is a bit of a mindfuck. Each preload is a different instance. Here we are in a wish tile. We send the
       // granted blob to our host, a webview in a cm-tile element. That cm-tile element has a parent cm-tile element.

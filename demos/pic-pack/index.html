@@ -47,8 +47,8 @@
       return async () => {
         const res = await fetch(`${num}.jpg`);
         const blob = await res.blob();
-        // XXX trigger an edit wish
-        // window.currentWish.grant(blob);
+        const editedBlob = await window.makeWish('edit', { filters: ['image/*'], data: blob });
+        window.currentWish.grant(editedBlob);
       };
     }
     [...Array(9).keys()].forEach(n => {

@@ -9,5 +9,6 @@
 - [x] when a wish tile is shown, scrollIntoView()
 - [x] affordance to cancel wish, and no affordance to install/like/etc. when shown as wish
 - [x] make an image pick wish that returns a picture from fetching an image as blob in its own content
-      - [ ] have it offer the option to edit a picture before granting the wish
+      - [x] have it offer the option to edit a picture before granting the wish
       - [ ] write a wish that edits a picture (in the dumbest way)
+      - [ ] keep in mind that we may well need to arraybuffer the blob in the other direction too

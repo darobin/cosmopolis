@@ -79,7 +79,9 @@ export class CosmoTile extends LitElement {
     wishPickerTitle: { attribute: false },
     wishPickerOptions: { attribute: false },
     wishInstance: { attribute: false },
+    wishInstanceData: { attribute: false },
     wishInstantiationData: { attribute: false },
+    wishInstantiationGranter: { attribute: false },
     wishInstantiationID: { attribute: false },
     wishID: { attribute: false },
     isWishMode: { attribute: false },
@@ -120,6 +122,7 @@ export class CosmoTile extends LitElement {
         console.warn(`received`, opts, wid);
         this.showWishPicker = false;
         this.wishInstance = opts.granter;
+        this.wishInstanceData = opts.data;
         this.wishID = wid;
       }
       else if (ev.channel === 'cm-wish-granted') {
@@ -127,9 +130,9 @@ export class CosmoTile extends LitElement {
         this.dispatchEvent(new CustomEvent('cm-wish-granted', { detail: { blob, wishID }, composed: true }));
       }
     });
-    if (this.wishInstantiationData) {
+    if (this.wishInstantiationGranter) {
       wv.addEventListener('did-finish-load', () => {
-        wv.send('cm-wish-instantiation', this.wishInstantiationData, this.wishInstantiationID);
+        wv.send('cm-wish-instantiation', this.wishInstantiationGranter, this.wishInstantiationID, this.wishInstantiationData);
       });
     }
   }
@@ -159,8 +162,10 @@ export class CosmoTile extends LitElement {
     this.wishPickerTitle = null;
     this.wishPickerOptions = null;
     this.wishInstance = null;
+    this.wishInstanceData = null;
   }
   resetWishInstantiation () {
+    this.wishInstantiationGranter = null;
     this.wishInstantiationData = null;
     this.wishInstantiationID = null;
   }
@@ -292,7 +297,7 @@ export class CosmoTile extends LitElement {
         </sl-card>
         ${
           this.wishInstance
-          ? html`<cm-tile src=${this.wishInstance.url} wish .wishInstantiationData=${this.wishInstance} .wishInstantiationID=${this.wishID} @cm-wish-granted=${this.handleWishGranted}></cm-tile>`
+          ? html`<cm-tile src=${this.wishInstance.url} wish .wishInstantiationGranter=${this.wishInstance} .wishInstantiationData=${this.wishInstanceData} .wishInstantiationID=${this.wishID} @cm-wish-granted=${this.handleWishGranted}></cm-tile>`
           : nothing
         }
       </div>
