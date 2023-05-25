@@ -99,7 +99,7 @@ async function makeWish (type, { filters, data } = {}) {
   if (!WISH_TYPES.has(type)) throw new Error(`Unknown wish type "${type}".`);
   if (filters && !Array.isArray(filters)) throw new Error(`Filters must be an array.`);
   ww(`granting…`)
-  const granters = await findMatchingWish('pick', { filters });
+  const granters = await findMatchingWish(type, { filters });
   ww(`matched`, JSON.stringify(granters))
   // IMPORTANT NOTE
   // In the UI, if there are no granters we need an interaction to run a search. That won't work with this model
