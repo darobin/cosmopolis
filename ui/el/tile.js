@@ -179,19 +179,18 @@ export class CosmoTile extends LitElement {
     }
   }
   handleSelectedWish (ev) {
-    console.warn(ev);
     const wishGranterID = ev.detail?.item?.value;
     const wv = this.shadowRoot.querySelector('webview');
     wv.send('cm-wish-granter-selected', wishGranterID, this.wishID);
     this.resetWish();
   }
   handleWishCancel () {
-    console.warn('cancelling');
     const wv = this.shadowRoot.querySelector('webview');
     wv.send('cm-wish-granter-selected', undefined, this.wishID);
     this.resetWish();
   }
   handleWishGranted (ev) {
+    ev.stopPropagation();
     const { blob, wishID } = ev.detail;
     this.shadowRoot.querySelector('webview').send('cm-wish-granted', blob, wishID);
     this.resetWish();
@@ -214,7 +213,6 @@ export class CosmoTile extends LitElement {
   }
   render () {
     if (!this.src) return nothing;
-    if (this.wishInstance) console.warn(`instance`, this.wishInstance);
     // TODO:
     // I would like to set partition=${`persist:${authority}`} on the webview but it fails silently. Need to investigate.
     const icon = this.iconSrc;

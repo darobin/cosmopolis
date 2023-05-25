@@ -99,18 +99,14 @@ async function makeWish (type, { filters, data } = {}) {
   ww(`start`, type, JSON.stringify(filters));
   if (!WISH_TYPES.has(type)) throw new Error(`Unknown wish type "${type}".`);
   if (filters && !Array.isArray(filters)) throw new Error(`Filters must be an array.`);
-  ww(`granting…`)
   const granters = await findMatchingWish(type, { filters });
   ww(`matched`, JSON.stringify(granters))
   // IMPORTANT NOTE
   // In the UI, if there are no granters we need an interaction to run a search. That won't work with this model
   // that expects to already know about them all. We will refactor later.
-  ww(`listing…`)
   const { granter } = await listPotentialGranters(type, granters);
-  ww(`g=`, granter)
   // wish was cancelled, we resolve with undefined
   if (!granter) return;
-  ww(`running…`)
   if (granter.internal) return await granter.internal.run(type, data);
   return await instantiateWish(granter, data);
 }
@@ -125,7 +121,7 @@ ipcRenderer.on('cm-wish-instantiation', (ev, granter, wid, data) => {
       // It tells the parent cm-tile element about the granted blob. The parent then dispatches a cm-wish-granted
       // event to its own webview, which is where the other preload exists. That's the code below handling this event
       // by hitting the wishRegistry.
-      // To make things EVEN MORE interesting, in this case Eletron refuses to structure-clone a blob. So instead we
+      // To make things EVEN MORE interesting, in this case Electron refuses to structure-clone a blob. So instead we
       // convert it to an ArrayBuffer and type, and rebuild it on the other side
       ipcRenderer.sendToHost('cm-wish-granted', await cloneableBlob(blob), wid);
     },
