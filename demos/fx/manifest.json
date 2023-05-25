@@ -1,0 +1,16 @@
+{
+  "name": "Fx Magic",
+  "short_name": "Fx",
+  "icons": [
+    {
+      "src": "fx.svg"
+    }
+  ],
+  "wishes": [
+    {
+      "name": "Fx magic it!",
+      "type": "edit",
+      "mediaTypes": ["image/*"]
+    }
+  ]
+}

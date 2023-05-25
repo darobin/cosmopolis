@@ -38,10 +38,7 @@
     but.onclick = () => randomFill();
     sel.onclick = () => {
       sel.style.display = 'none';
-      canvas.toBlob((blob) => {
-        console.warn(blob);
-        window.currentWish.grant(blob);
-      });
+      canvas.toBlob((blob) => window.currentWish.grant(blob));
     };
     window.addEventListener('wish', (ev) => {
       console.warn(`WISH`, ev, window.currentWish);
