@@ -36,11 +36,10 @@ export class CosmoTitleBar extends withStores(LitElement, [$ui]) {
   ];
   constructor () {
     super();
-    console.warn('CTOR');
   }
   render () {
-    console.warn(`RENDER ${$ui.sideBarShowing}`);
-    const label = $ui.sideBarShowing ? 'Hide side bar' : 'Show side bar';
+    console.warn(`RENDER ${$ui.get().sideBarShowing}`);
+    const label = $ui.get().sideBarShowing ? 'Hide side bar' : 'Show side bar';
     return html`
       <div id="root">
         <div id="icon-bar">
