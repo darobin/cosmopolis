@@ -34,9 +34,6 @@ export class CosmoTitleBar extends withStores(LitElement, [$ui]) {
       }
     `
   ];
-  constructor () {
-    super();
-  }
   render () {
     const label = $ui.get().sideBarShowing ? 'Hide side bar' : 'Show side bar';
     return html`
