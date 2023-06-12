@@ -44,7 +44,7 @@ sources:
 
 ![A long list of feed sources](lots.jpg)
 
-## Inspiration
+## Reader Inspiration
 
 Overall, I looked at a bunch of RSS readers and read-later apps: Web Subscriber, lire,
 Unread, ReadKit, Palabre, The Old Reader, Pocket, Instapaper, FeedMe, NetNewsWire, Feedbin,
@@ -110,3 +110,9 @@ some part of this may be useful for wishes.
 - [Feedly](https://feedly.com/): interesting, but their focus appears to be on AI rather
   than UI. Like Inoreader, they mix multiple feed types with essentially the same
   presentation.
+
+## Command Inspiration
+
+tk
+- Ubiquity
+- Alfred
