@@ -9,7 +9,7 @@ export class CosmoTitleBar extends withStores(LitElement, [$ui]) {
       #root {
         -webkit-app-region: drag;
         color: var(--cm-street-dark);
-        background: #fff;
+        background: var(--cm-lightest);
         display: flex;
         align-items: center;
         /* NOTE: this is OSX-specific */
@@ -18,18 +18,18 @@ export class CosmoTitleBar extends withStores(LitElement, [$ui]) {
       }
       #title {
         width: -webkit-fill-available;
-        border-left: 1px solid #ccc;
+        border-left: 1px solid var(--cm-mid-grey);
       }
       h1 {
         padding: 0 0 0 var(--sl-spacing-x-small);
         margin: 0;
         font-family: var(--cm-title-font);
-        font-size: 1.4rem;
+        font-size: var(--cm-large-text);
         font-weight: 100;
         font-variation-settings: "wght" 100; /* Chrome doesn't apply font-weight correctly. */
       }
       sl-icon-button {
-        font-size: 1.4rem;
+        font-size: var(--cm-large-text);
         color: var(--cm-electric-blue);
       }
     `
@@ -38,7 +38,6 @@ export class CosmoTitleBar extends withStores(LitElement, [$ui]) {
     super();
   }
   render () {
-    console.warn(`RENDER ${$ui.get().sideBarShowing}`);
     const label = $ui.get().sideBarShowing ? 'Hide side bar' : 'Show side bar';
     return html`
       <div id="root">

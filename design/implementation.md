@@ -10,9 +10,9 @@
 
 ## TODO
 
-- [ ] new index to replace lab
-  - [ ] add a custom title bar
-- [ ] start exposing nanostores
+- [x] new index to replace lab
+  - [x] add a custom title bar
+- [x] start exposing nanostores
   - [ ] set up routing
   - [ ] set up every store listed in data
 - [ ] new side bar

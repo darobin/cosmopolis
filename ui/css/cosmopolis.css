@@ -26,9 +26,12 @@ font-style: italic;
   --cm-street-medium: #394fc5;
   --cm-street-light: #4a5bcd;
   --cm-electric-blue: #1789e2;
+  --cm-lightest: #fff;
+  --cm-mid-grey: #ccc;
   --cm-street-size: 50px;
   --cm-title-font: Catamaran;
   --cm-body-font: Mulish;
+  --cm-large-text: 1.4rem;
 
   /* managing Shoelace tokens */
   --sl-input-font-family: var(--cm-body-font);
