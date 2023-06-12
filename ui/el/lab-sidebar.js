@@ -1,7 +1,7 @@
 
 import { LitElement, html, css, nothing } from 'lit';
 import { getStore } from '../lib/model.js';
-import { refreshLocalTiles, refreshTile, removeTile } from '../db/local-tiles.js';
+import { refreshLocalTiles, refreshTile, removeTile } from '../stores/local-tiles.js';
 
 export class CosmoLabSidebar extends LitElement {
   static styles = [

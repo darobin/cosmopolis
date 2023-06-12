@@ -1,6 +1,6 @@
 
 import { LitElement, html, css, nothing } from 'lit';
-import { localMeta, likeTile, unlikeTile, installTile, uninstallTile } from '../db/local-tiles.js';
+import { localMeta, likeTile, unlikeTile, installTile, uninstallTile } from '../stores/local-tiles.js';
 
 export class CosmoTile extends LitElement {
   static styles = [

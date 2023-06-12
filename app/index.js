@@ -29,16 +29,15 @@ app.whenReady().then(async () => {
     show: false,
     backgroundColor: '#fff',
     title: 'cosmopolis',
-    // titleBarStyle: 'hidden',
+    titleBarStyle: 'hiddenInset',
     icon: './img/icon.png',
     webPreferences: {
-      webviewTag: true, // I know that this isn't great, but the alternatives aren't there yet
+      webviewTag: false,
       preload: rel('./preload.js'),
     },
   });
   await manageWindowPosition(mainWindow);
-  // mainWindow.loadFile('index.html');
-  mainWindow.loadFile('lab.html');
+  mainWindow.loadFile('index.html');
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
     mainWindow.webContents.openDevTools(); // remove this in builds

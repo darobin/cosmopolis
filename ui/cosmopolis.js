@@ -13,10 +13,11 @@ const animOptions = { options: { duration: 100 } };
 setDefaultAnimation('details.show', { ...detailsShowAnim, ...animOptions });
 setDefaultAnimation('details.hide', { ...detailsHideAnim, ...animOptions });
 
-// db
-import './db/local-tiles.js';
+// stores
+import './stores/local-tiles.js';
 
 // elements
-import './el/lab-sidebar.js';
-import './el/lab-workshop.js';
+// import './el/lab-sidebar.js';
+// import './el/lab-workshop.js';
+import './el/title-bar.js';
 import './el/tile.js';

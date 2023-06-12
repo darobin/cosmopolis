@@ -25,6 +25,7 @@ font-style: italic;
   --cm-street-dark: #243bb7;
   --cm-street-medium: #394fc5;
   --cm-street-light: #4a5bcd;
+  --cm-electric-blue: #1789e2;
   --cm-street-size: 50px;
   --cm-title-font: Catamaran;
   --cm-body-font: Mulish;
@@ -52,49 +53,16 @@ html, body {
 
 body {
   display: grid;
-  grid-template-rows: min-content 1fr min-content;
-  grid-template-columns: 1fr 400px;
+  grid-template-rows: min-content 1fr;
   grid-template-areas:
-    "a a"
-    "b c"
-    "d d"
+    "a"
+    "b"
   ;
   height: 100%;
 }
 
-h1 {
-  grid-area: d;
-  bottom: 0;
-  color: var(--cm-sky-light);
-  padding: 0 1rem 0 0;
-  margin: 0;
-  text-align: right;
-  font-family: var(--cm-title-font);
-  font-weight: 100;
-  font-variation-settings: "wght" 100; /* Chrome doesn't apply font-weight correctly. */
-  background: linear-gradient(
-    to top,
-    var(--cm-street-light),
-    var(--cm-street-dark)
-  );
-}
-
-cm-lab-workshop {
-  grid-area: b;
-}
-cm-lab-sidebar {
-  grid-area: c;
-}
-
-html.lab {
-  background-color: var(--cm-street-dark);
-  background-image:
-    linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px),
-    linear-gradient(rgba(255,255,255,.3) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.3) 1px, transparent 1px);
-  background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
-  background-position:-2px -2px, -2px -2px, -1px -1px, -1px -1px;
+cm-title-bar {
+  grid-area: a;
 }
 
 html.lab h1 {
