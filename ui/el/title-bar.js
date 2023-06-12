@@ -14,7 +14,7 @@ export class CosmoTitleBar extends withStores(LitElement, [$ui]) {
         align-items: center;
         /* NOTE: this is OSX-specific */
         padding-left: 80px;
-        height: 40px;
+        height: var(--cm-osx-titlebar-height);
       }
       #title {
         width: -webkit-fill-available;
