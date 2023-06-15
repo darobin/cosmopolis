@@ -61,19 +61,19 @@ export function createRouter (routes) {
       // For now this is only for app links.
       event.preventDefault();
       const url = new URL(link.href);
-      router.open(url.hash.replace('#', ''));
+      router.open(dehash(url));
     }
   }
 
   const set = router.set;
   const popstate = () => {
-    const page = parse(location.hash.replace('#', ''));
+    const page = parse(dehash(location));
     if (page !== false) set(page);
   }
 
   if (typeof window !== 'undefined' && typeof location !== 'undefined') {
     onMount(router, () => {
-      const page = parse(location.hash.replace('#', ''));
+      const page = parse(dehash(location));
       if (page !== false) set(page);
       document.body.addEventListener('click', click);
       window.addEventListener('popstate', popstate);
@@ -119,4 +119,9 @@ export function openPage (router, name, params) {
 
 export function redirectPage (router, name, params) {
   router.open(getPagePath(router, name, params), true);
+}
+
+function dehash (obj) {
+  console.warn(`dehashed: ${obj.hash.replace('#', '')}`);
+  return obj.hash.replace('#', '');
 }
