@@ -33,7 +33,9 @@ font-style: italic;
   --cm-body-font: Mulish;
   --cm-large-text: 1.4rem;
 
-  --cm-osx-titlebar-height: 40px;
+  --cm-osx-title-bar-height: 40px;
+  --cm-traffic-light-padding: 80px;
+  --cm-side-bar-width: 400px;
 
   /* managing Shoelace tokens */
   --sl-input-font-family: var(--cm-body-font);

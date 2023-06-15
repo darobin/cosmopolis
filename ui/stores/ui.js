@@ -2,7 +2,7 @@
 import { map, action } from 'nanostores';
 
 export const $ui = map({
-  sideBarShowing: false,
+  sideBarShowing: true,
 });
 
 export const showSideBar = action($ui, 'showSideBar', (store) => store.setKey('sideBarShowing', true));

@@ -13,8 +13,19 @@ export class CosmoTitleBar extends withStores(LitElement, [$ui]) {
         display: flex;
         align-items: center;
         /* NOTE: this is OSX-specific */
-        padding-left: 80px;
-        height: var(--cm-osx-titlebar-height);
+        padding-left: var(--cm-traffic-light-padding);
+        height: var(--cm-osx-title-bar-height);
+        transition: padding-left var(--sl-transition-medium);
+      }
+      #root.open {
+        /* NOTE: this is OSX-specific and assumes 400px wide */
+        padding-left: calc(var(--cm-side-bar-width) - var(--cm-osx-title-bar-height));
+      }
+      #icon-bar {
+        display: flex;
+        align-items: center;
+        min-width: var(--cm-osx-title-bar-height);
+        min-height: var(--cm-osx-title-bar-height);
       }
       #title {
         width: -webkit-fill-available;
@@ -35,9 +46,10 @@ export class CosmoTitleBar extends withStores(LitElement, [$ui]) {
     `
   ];
   render () {
-    const label = $ui.get().sideBarShowing ? 'Hide side bar' : 'Show side bar';
+    const open = $ui.get().sideBarShowing;
+    const label = open ? 'Hide side bar' : 'Show side bar';
     return html`
-      <div id="root">
+      <div id="root" class=${open ? 'open' : 'closed'}>
         <div id="icon-bar">
           <sl-icon-button name="layout-sidebar" label=${label} @click=${toggleSideBar}></sl-icon-button>
         </div>
