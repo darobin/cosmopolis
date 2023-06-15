@@ -18,8 +18,8 @@ export class CosmoSideBar extends withStores(LitElement, [$ui, $router]) {
         bottom: 0;
         width: var(--cm-side-bar-width);
         transition: left var(--sl-transition-medium);
-        background: var(--cm-lightest);
-        border-top: 1px solid var(--cm-mid-grey);
+        background: var(--cm-street-dark);
+        /* border-top: 1px solid var(--cm-mid-grey); */
         border-right: 1px solid var(--cm-mid-grey);
       }
       #root.open {

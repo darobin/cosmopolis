@@ -41,15 +41,15 @@ font-style: italic;
   --sl-input-font-family: var(--cm-body-font);
 }
 
+* {
+  box-sizing: border-box;
+}
+
 html {
   height: 100%;
   background-attachment: fixed;
   background-size: cover;
-  background: linear-gradient(
-    to top,
-    var(--cm-sky-light),
-    var(--cm-sky-dark)
-  );
+  background: var(--cm-lightest);
   font-family: var(--cm-body-font);
 }
 
@@ -70,9 +70,4 @@ body {
 
 cm-title-bar {
   grid-area: a;
-}
-
-html.lab h1 {
-  border-top: 1px solid var(--cm-sky-dark);
-  color: var(--cm-sky-dark);
 }

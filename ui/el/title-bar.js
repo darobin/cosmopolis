@@ -16,6 +16,7 @@ export class CosmoTitleBar extends withStores(LitElement, [$ui]) {
         padding-left: var(--cm-traffic-light-padding);
         height: var(--cm-osx-title-bar-height);
         transition: padding-left var(--sl-transition-medium);
+        border-bottom: 1px solid var(--cm-mid-grey);
       }
       #root.open {
         /* NOTE: this is OSX-specific and assumes 400px wide */
