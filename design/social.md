@@ -23,3 +23,9 @@ From earlier notes:
     - and people have been building their own clients, so…
     - it should be possible to put these two things together
       and to create a forked version that based on tiles
+
+- Is it possible to proxy @at-proto/pds https://www.npmjs.com/package/@atproto/pds?activeTab=code
+  - Have some access checking first because I don't want randos using the same system.
+  - Proxy all xrpc except those of local interest
+
+- ActivityPub support?

@@ -7,3 +7,6 @@ We're unlikely to have working search very soon, however for demo purposes we co
 - Generate an index using one of the search tools, like elasticlunr
 - Have a UI to search that as the only search source of potentially many
 - Show the result as a feed object
+- If you're logged in, we can integrate Bluesky search as a source
+- Brave?
+- DDG?
