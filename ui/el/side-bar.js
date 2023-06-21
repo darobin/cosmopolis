@@ -4,10 +4,6 @@ import { withStores } from "@nanostores/lit";
 import { $ui } from '../stores/ui.js';
 import { $router } from '../stores/router.js';
 
-// XXX
-// this shouldn't be a drawer
-// this is a regular div, with no overlay, that moves the rendering of the rest when shown
-
 export class CosmoSideBar extends withStores(LitElement, [$ui, $router]) {
   static styles = [
     css`
@@ -30,8 +26,11 @@ export class CosmoSideBar extends withStores(LitElement, [$ui, $router]) {
         color: inherit;
         text-decoration: none;
       }
+      cm-identity-switcher {
+        margin: var(--sl-spacing-2x-large);
+      }
       details {
-        padding: var(--sl-spacing-2x-large) var(--sl-spacing-2x-small) var(--sl-spacing-2x-large) var(--sl-spacing-2x-large);
+        margin: var(--sl-spacing-2x-large) var(--sl-spacing-2x-small) var(--sl-spacing-2x-large) var(--sl-spacing-2x-large);
       }
       summary {
         display: flex;
@@ -68,6 +67,7 @@ export class CosmoSideBar extends withStores(LitElement, [$ui, $router]) {
     const route = $router.value?.route;
     return html`
       <div id="root" class=${$ui.get().sideBarShowing ? 'open' : 'closed'}>
+        <cm-identity-switcher></cm-identity-switcher>
         <details class=${ route === 'search' ? 'selected' : ''} ?open=${route === 'search'}>
           <summary><sl-icon name="search"></sl-icon> <a href="#/search/">Search</a></summary>
           <ul>
