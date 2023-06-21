@@ -63,7 +63,6 @@ export class CosmoSideBar extends withStores(LitElement, [$ui, $router]) {
     `
   ];
   render () {
-    console.warn(`router`, $router.value?.route);
     const route = $router.value?.route;
     return html`
       <div id="root" class=${$ui.get().sideBarShowing ? 'open' : 'closed'}>

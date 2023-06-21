@@ -23,3 +23,4 @@ import './el/title-bar.js';
 import './el/side-bar.js';
 import './el/tile.js';
 import './el/identity-switcher.js';
+import './el/feed-tiles-stack.js';

@@ -16,14 +16,18 @@ to leapfrog: it's a client, and then more. *Write the strategy brief*.
 - [x] new index to replace lab
   - [x] add a custom title bar
 - [x] start exposing nanostores
-  - [ ] set up routing
+  - [x] set up routing
   - [ ] set up every store listed in data
 - [ ] Rename get/set pref to be about storing data, and document the schema
 - [ ] new side bar
-  - [ ] button to open
-  - [ ] add each section
+  - [x] button to open
+  - [x] add each section
   - [ ] load data for each section
   - [ ] action wiring for each section
+- [ ] get tiles working with BrowserContext
+  - [ ] Use Apps area for testing
+  - [ ] List dev apps there, icon style
+  - [ ] have them render that way
 - [ ] The bookmark button should have an optional drop down to pick the location. Also maybe don't call it bookmark,
       more like save or file away.
 - [ ] Define tile format based on content claims and implement that.
