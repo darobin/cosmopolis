@@ -18,7 +18,7 @@ export class CosmoSideBar extends withStores(LitElement, [$ui, $router]) {
         bottom: 0;
         width: var(--cm-side-bar-width);
         transition: left var(--sl-transition-medium);
-        background: var(--cm-electric-blue);
+        background: var(--cm-dark-electric);
         /* border-top: 1px solid var(--cm-mid-grey); */
         border-right: 1px solid var(--cm-mid-grey);
         color: var(--cm-lightest);
@@ -31,20 +31,35 @@ export class CosmoSideBar extends withStores(LitElement, [$ui, $router]) {
         text-decoration: none;
       }
       details {
-        padding: var(--sl-spacing-2x-large);
+        padding: var(--sl-spacing-2x-large) var(--sl-spacing-2x-small) var(--sl-spacing-2x-large) var(--sl-spacing-2x-large);
       }
       summary {
+        display: flex;
+        align-items: center;
         font-size: 1.2rem;
         font-weight: 700;
         font-variation-settings: "wght" 700; /* Chrome doesn't apply font-weight correctly. */
-        border-bottom: 1px solid transparent;
+        border-right: var(--sl-spacing-2x-small) solid transparent;
+        border-radius: var(--sl-spacing-2x-small);
         transition: border-bottom var(--sl-transition-medium);
       }
       details.selected summary {
-        border-bottom: 1px solid var(--cm-lightest);
+        border-right-color: var(--cm-lightest);
       }
       summary::marker {
-        display: none;
+        content: "";
+      }
+      summary > sl-icon {
+        margin-right: var(--sl-spacing-small);
+        min-width: var(--sl-spacing-large);
+        min-height: var(--sl-spacing-large);
+      }
+      details ul {
+        margin: var(--sl-spacing-small) 0 var(--sl-spacing-small) calc(var(--sl-spacing-large) + var(--sl-spacing-small));
+        padding: 0;
+      }
+      li.no-results {
+        list-style-type: none;
       }
     `
   ];
@@ -54,9 +69,9 @@ export class CosmoSideBar extends withStores(LitElement, [$ui, $router]) {
     return html`
       <div id="root" class=${$ui.get().sideBarShowing ? 'open' : 'closed'}>
         <details class=${ route === 'search' ? 'selected' : ''} ?open=${route === 'search'}>
-          <summary><a href="#/search/">Search</a></summary>
+          <summary><sl-icon name="search"></sl-icon> <a href="#/search/">Search</a></summary>
           <ul>
-            <li>No saved searches.</li>
+            <li class="no-results">No saved searches.</li>
           </ul>
         </details>
       </div>

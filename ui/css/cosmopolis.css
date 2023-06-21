@@ -26,6 +26,8 @@ font-style: italic;
   --cm-street-medium: #394fc5;
   --cm-street-light: #4a5bcd;
   --cm-electric-blue: #1789e2;
+  --cm-dark-electric: #0a3d63;
+  --cm-complementary-electric: #085996;
   --cm-lightest: #fff;
   --cm-mid-grey: #ccc;
   --cm-street-size: 50px;
@@ -35,7 +37,7 @@ font-style: italic;
 
   --cm-osx-title-bar-height: 40px;
   --cm-traffic-light-padding: 80px;
-  --cm-side-bar-width: 400px;
+  --cm-side-bar-width: 360px;
 
   /* managing Shoelace tokens */
   --sl-input-font-family: var(--cm-body-font);

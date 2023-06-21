@@ -8,7 +8,7 @@ export class CosmoTitleBar extends withStores(LitElement, [$ui]) {
     css`
       #root {
         -webkit-app-region: drag;
-        color: var(--cm-street-dark);
+        color: var(--cm-complementary-electric);
         background: var(--cm-lightest);
         display: flex;
         align-items: center;
