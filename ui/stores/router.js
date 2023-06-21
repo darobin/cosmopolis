@@ -6,4 +6,7 @@ export const $router = createRouter({
   // XXX search can save params to local store with a nanoid, we just have to be careful about changing
   // the ID with every changed param. Use a fake ID for an edited, unsaved search and that is persisted.
   search: '/search/:savedSearch?',
+  social: '/social/:list?',
+  library: '/library/:path?',
+  apps: '/apps/',
 });

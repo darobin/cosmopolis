@@ -68,11 +68,30 @@ export class CosmoSideBar extends withStores(LitElement, [$ui, $router]) {
     return html`
       <div id="root" class=${$ui.get().sideBarShowing ? 'open' : 'closed'}>
         <cm-identity-switcher></cm-identity-switcher>
+
         <details class=${ route === 'search' ? 'selected' : ''} ?open=${route === 'search'}>
           <summary><sl-icon name="search"></sl-icon> <a href="#/search/">Search</a></summary>
           <ul>
             <li class="no-results">No saved searches.</li>
           </ul>
+        </details>
+
+        <details class=${ route === 'social' ? 'selected' : ''} ?open=${route === 'social'}>
+          <summary><sl-icon name="people-fill"></sl-icon> <a href="#/social/">Social</a></summary>
+          <ul>
+            <li class="no-results">No lists.</li>
+          </ul>
+        </details>
+
+        <details class=${ route === 'library' ? 'selected' : ''} ?open=${route === 'library'}>
+          <summary><sl-icon name="collection"></sl-icon> <a href="#/library/">Library</a></summary>
+          <ul>
+            <li class="no-results">Nothing saved to library.</li>
+          </ul>
+        </details>
+
+        <details class=${ route === 'apps' ? 'selected' : ''} ?open=${route === 'apps'}>
+          <summary><sl-icon name="app-indicator"></sl-icon> <a href="#/apps/">Apps</a></summary>
         </details>
       </div>
     `;
