@@ -1,7 +1,15 @@
 
 import { LitElement, html, css } from 'lit';
 import { withStores } from "@nanostores/lit";
+import { nanoid } from 'nanoid';
+// import { computed } from 'nanostores'
 import { $router } from '../stores/router.js';
+import { $ui } from '../stores/ui.js';
+import { addBrowserView } from '../stores/browser-views.js';
+
+// this has to always be px
+// const SIDE_BAR_WIDTH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cm-side-bar-width'), 10);
+// const $left = computed($ui, ui => ui.sideBarShowing ? SIDE_BAR_WIDTH : 0);
 
 // XXX what happens here
 //  - there is a feed column
@@ -17,14 +25,13 @@ import { $router } from '../stores/router.js';
 //    - maybe on scroll they get replaced with an element of the same size, grey (or maybe that's always behind them and they get hidden)
 
 // how do we test this?
-//  - render at the right position based on sidebar (this will be needed for layout anyway)
 //  - only do app
 //  - kinda fake app for now by getting a list of installed tiles
 //  - render the layout/template
 //  - then try to rebuild the proper experience
 //  - WISH MESSAGING MUST ONLY BE VIA THE ROOT
 
-export class CosmoFeedTilesStack extends withStores(LitElement, [$router]) {
+export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $ui]) {
   static styles = [
     css`
       :host {
@@ -33,12 +40,28 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router]) {
       p {
         font-weight: bold;
       }
+      #root {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: var(--cm-osx-title-bar-height);
+        transition: left var(--sl-transition-medium);
+      }
+      #root.side-bar-open {
+        left: var(--cm-side-bar-width);
+      }
     `
   ];
+  firstUpdated () {
+    const id = nanoid();
+    console.warn(`just for kicks: ${id}`);
+    addBrowserView(id, { x: 500, y: 500, width: 300, height: 300, src: 'https://berjon.com/' });
+  }
   render () {
     const route = $router.value?.route;
     return html`
-      <div id="root">
+      <div id="root" class=${$ui.get().sideBarShowing ? 'side-bar-open' : 'side-bar-closed'}>
         <p>
           ${route}
         </p>
