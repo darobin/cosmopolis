@@ -122,6 +122,5 @@ export function redirectPage (router, name, params) {
 }
 
 function dehash (obj) {
-  console.warn(`dehashed: ${obj.hash.replace('#', '')}`);
   return obj.hash.replace('#', '');
 }

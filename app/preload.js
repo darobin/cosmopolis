@@ -35,16 +35,15 @@ contextBridge.exposeInMainWorld('cosmopolis', {
       id,
     });
   },
-  // XXX none of the below have been reviewed
   // preferences
-  getSetting: (keyPath) => invoke('settings:get', keyPath),
-  setSetting: (keyPath, data) => invoke('settings:set', keyPath, data),
+  getSimpleData: (keyPath) => invoke('simple-data:get', keyPath),
+  setSimpleData: (keyPath, data) => invoke('simple-data:set', keyPath, data),
+  // XXX none of the below have been reviewed
   // picking stuff
   pickDevTile: () => invoke('pick:tile-dev'),
   // stored tiles
   localTiles: () => invoke('tiles:list-local'),
   installTile: (url, installed, wishes) => invoke('tiles:install', url, installed, wishes),
-  likeTile: (url, liked) => invoke('tiles:like', url, liked),
   refreshTile: (url) => invoke('tiles:refresh', url),
   removeTile: (url) => invoke('tiles:remove', url),
 });

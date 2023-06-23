@@ -1,5 +1,7 @@
 
-import { atom, action } from 'nanostores';
+import { atom, computed, action } from 'nanostores';
+import { $router } from './router.js';
+import { $tilesInstalledAppsCached } from './tiles.js';
 
 export const $uiSideBarShowing = atom(true);
 
@@ -7,22 +9,31 @@ export const showSideBar = action($uiSideBarShowing, 'showSideBar', (store) => s
 export const hideSideBar = action($uiSideBarShowing, 'hideSideBar', (store) => store.set(false));
 export const toggleSideBar = action($uiSideBarShowing, 'toggleSideBar', (store) => store.set(!store.get()));
 
-export const $uiFeedWidth = atom(0);
-export const setFeedWidth = action($uiFeedWidth, 'setFeedWidth', (store, width) => {
-  if (typeof width === 'string') width = parseInt(width, 10);
-  if (isNaN(width)) throw new Error(`Invalid width.`);
-  if (width < 0) throw new Error(`Width cannot be negative.`);
-  store.set(width);
+const feedWidths = {
+  apps: 360,
+};
+export const $uiFeedWidth = computed($router, (router) => feedWidths[router.route] || 0);
+
+const feedTitles = {
+  apps: 'Apps',
+};
+export const $uiFeedTitle = computed($router, (router) => {
+  if (feedTitles[router.route]) return feedTitles[router.route];
+  // here we can also derive from feed cache data
+  return '';
 });
 
-export const $uiFeedTitle = atom('');
-export const setFeedTitle = action($uiFeedTitle, 'setFeedTitle', (store, title) => {
-  if (!title || typeof title !== 'string') title = '';
-  store.set(title);
+const feedIcons = {
+  apps: 'builtin:app-indicator',
+};
+export const $uiFeedIcon = computed($router, (router) => {
+  if (feedIcons[router.route]) return feedIcons[router.route];
+  // here we can also derive from feed cache data
+  return '';
 });
 
-export const $uiFeedIcon = atom('');
-export const setFeedIcon = action($uiFeedIcon, 'setFeedIcon', (store, url) => {
-  if (!url || typeof url !== 'string') url = '';
-  store.set(url);
+export const $uiFeedData = computed([$router, $tilesInstalledAppsCached], (router, installedApps) => {
+  if (router.route === 'apps') return installedApps;
+  // here we can also load and feed and such
+  return '';
 });

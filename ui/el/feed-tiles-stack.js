@@ -4,7 +4,7 @@ import { withStores } from "@nanostores/lit";
 // import { nanoid } from 'nanoid';
 import { computed } from 'nanostores'
 import { $router } from '../stores/router.js';
-import { $uiSideBarShowing, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon } from '../stores/ui.js';
+import { $uiSideBarShowing, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedData } from '../stores/ui.js';
 // import { addBrowserView } from '../stores/browser-views.js';
 
 // this has to always be px
@@ -34,7 +34,7 @@ const $left = computed($uiSideBarShowing, ui => ui ? SIDE_BAR_WIDTH : 0);
 //  - NOTE: we must render an element under the window to get the scroll, I think
 //  - need to wipe all BVs on route change. Because they're set by the main process, they persist reloads and bugs. (should wipe on reload)
 
-export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon]) {
+export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedData]) {
   static styles = [
     css`
       :host {
@@ -87,7 +87,6 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
     let feed = nothing;
     if ($uiFeedWidth.value) {
       const iconURL = $uiFeedIcon.value;
-      console.warn(iconURL, $uiFeedIcon);
       let icon = nothing;
       if (iconURL) {
         if (iconURL.startsWith('builtin:')) {
@@ -102,6 +101,9 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
           <div slot="header">
             <h3>${icon} ${$uiFeedTitle.value}</h3>
           </div>
+          <ul>
+            ${$uiFeedData.value.map(ti => html`<li>${ti.name}</li>`)}
+          </ul>
         </sl-card>
       `;
     }

@@ -53,6 +53,8 @@ html {
   background-size: cover;
   background: var(--cm-lightest);
   font-family: var(--cm-body-font);
+  font-weight: 250;
+  font-variation-settings: "wght" 250;
 }
 
 html, body {

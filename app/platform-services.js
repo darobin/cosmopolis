@@ -13,12 +13,11 @@ const { handle } = ipcMain;
 
 export function registerPlatformServiceHandlers () {
   handle('dbg:warn', handleDebugWarn);
-  handle('settings:get', handleSettingsGet);
-  handle('settings:set', handleSettingsSet);
+  handle('simple-data:get', handleSettingsGet);
+  handle('simple-data:set', handleSettingsSet);
   handle('pick:tile-dev', handlePickDevTile);
   handle('tiles:list-local', handleListLocalTiles);
   handle('tiles:install', handleInstallTile);
-  handle('tiles:like', handleLikeTile);
   handle('tiles:refresh', handleRefreshTile);
   handle('tiles:remove', handleRemoveTile);
   handle('wish:pick-local-image', handlePickLocalImage);
@@ -70,7 +69,7 @@ async function handlePickDevTile () {
   if (canceled) return;
   if (filePaths && filePaths.length) {
     const dir = filePaths[0];
-    const devTileMap = await getSetting('developer.tiles.localMap');
+    const devTileMap = await getSetting('developer');
     const found = Object.values(devTileMap || {}).find(info => info.dir === dir);
     if (found) return found;
     try {
@@ -81,9 +80,9 @@ async function handlePickDevTile () {
         id,
         url,
         dir,
-        manifest,
       };
-      await setSetting(`developer.tiles.localMap.${id}`, meta);
+      await setSetting(`developer.${id}`, meta);
+      await setSetting(`cache.${id}`, manifest);
       return meta;
     }
     catch (err) {
@@ -119,36 +118,27 @@ function handleDebugWarn (ev, str) {
 }
 
 async function handleListLocalTiles () {
-  return getSetting('developer.tiles.localMap');
+  return getSetting('developer');
 }
 
 async function handleInstallTile (ev, url, installed = true, wishes) {
-  console.warn(url, installed, wishes);
-  await setLocalTileField(url, 'installed', installed)
+  const id = url2id(url);
+  await setSetting(`installed.${id}`, installed);
   await manageWishInstallation(url, installed, wishes);
-}
-async function handleLikeTile (ev, url, liked = true) {
-  await setLocalTileField(url, 'liked', liked)
 }
 
 async function handleRemoveTile (ev, url) {
-  const id = new URL(url).hostname;
-  return unsetSetting(`developer.tiles.localMap.${id}`);
+  const id = url2id(url);
+  await unsetSetting(`developer.${id}`);
+  await unsetSetting(`cache.${id}`);
 }
 
 async function handleRefreshTile (ev, url) {
-  const id = new URL(url).hostname;
-  const meta = await getSetting(`developer.tiles.localMap.${id}`);
+  const id = url2id(url);
+  const meta = await getSetting(`developer.${id}`);
   if (!meta?.dir) return;
-  meta.manifest = JSON.parse(await readFile(join(meta.dir, 'manifest.json')));
-  return setSetting(`developer.tiles.localMap.${id}`, meta);
-}
-
-
-
-async function setLocalTileField (url, key, value) {
-  const id = new URL(url).hostname;
-  await setSetting(`developer.tiles.localMap.${id}.${key}`, value);
+  const manifest = JSON.parse(await readFile(join(meta.dir, 'manifest.json')));
+  return setSetting(`cache.${id}`, manifest);
 }
 
 async function manageWishInstallation (url, installed, wishes) {
@@ -176,4 +166,8 @@ async function manageWishInstallation (url, installed, wishes) {
     });
   }
   await setSetting('wish.sources', wishSources);
+}
+
+function url2id (url) {
+  return new URL(url).hostname;
 }
