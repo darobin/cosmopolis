@@ -4,7 +4,7 @@ import { withStores } from "@nanostores/lit";
 // import { nanoid } from 'nanoid';
 import { computed } from 'nanostores'
 import { $router } from '../stores/router.js';
-import { $uiSideBarShowing, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedData, $uiFeedMode } from '../stores/ui.js';
+import { $uiSideBarShowing, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedData, $uiFeedMode, $uiTilePrimary } from '../stores/ui.js';
 // import { addBrowserView } from '../stores/browser-views.js';
 
 // this has to always be px
@@ -24,17 +24,13 @@ const $left = computed($uiSideBarShowing, ui => ui ? SIDE_BAR_WIDTH : 0);
 //    - how does this work with horizontal scrolling?
 //    - maybe on scroll they get replaced with an element of the same size, grey (or maybe that's always behind them and they get hidden)
 
-
 // how do we test this?
-//  - only do app
-//  - kinda fake app for now by getting a list of installed tiles
-//  - render the layout/template
 //  - then try to rebuild the proper experience
 //  - WISH MESSAGING MUST ONLY BE VIA THE ROOT
 //  - NOTE: we must render an element under the window to get the scroll, I think
 //  - need to wipe all BVs on route change. Because they're set by the main process, they persist reloads and bugs. (should wipe on reload)
 
-export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedMode, $uiFeedData]) {
+export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedMode, $uiFeedData, $uiTilePrimary]) {
   static styles = [
     css`
       :host {
@@ -143,6 +139,13 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
         </sl-card>
       `;
     }
+    // XXX
+    // use $uiTilePrimary to include a cm-tile and compute its position
+    // we drive position updates from here completely
+    // this is a completely new take on cm-time, restart it from scratch
+    // keep in mind that we need to put it in an sl-card so we'll have to force max heights on
+    // the header and footer
+    // IN FACT: manage the sl-card here, and use cm-tile for pure tile rendering: src+position
     return html`
       <div id="root" style=${`left: ${$left.value}px`}>
         ${feed}

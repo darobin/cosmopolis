@@ -42,3 +42,10 @@ export const $uiFeedData = computed([$router, $tilesInstalledAppsCached], (route
   // here we can also load and feed and such
   return '';
 });
+
+export const $uiTilePrimary = computed([$router], (router) => {
+  if (router.route === 'apps') {
+    if (router.params.authority) return `tile://${router.params.authority}/`;
+  }
+  return null;
+});
