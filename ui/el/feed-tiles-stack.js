@@ -4,7 +4,7 @@ import { withStores } from "@nanostores/lit";
 // import { nanoid } from 'nanoid';
 import { computed } from 'nanostores'
 import { $router } from '../stores/router.js';
-import { $uiSideBarShowing, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedData } from '../stores/ui.js';
+import { $uiSideBarShowing, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedData, $uiFeedMode } from '../stores/ui.js';
 // import { addBrowserView } from '../stores/browser-views.js';
 
 // this has to always be px
@@ -34,7 +34,7 @@ const $left = computed($uiSideBarShowing, ui => ui ? SIDE_BAR_WIDTH : 0);
 //  - NOTE: we must render an element under the window to get the scroll, I think
 //  - need to wipe all BVs on route change. Because they're set by the main process, they persist reloads and bugs. (should wipe on reload)
 
-export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedData]) {
+export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedMode, $uiFeedData]) {
   static styles = [
     css`
       :host {
@@ -82,6 +82,25 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
   //   console.warn(`just for kicks: ${id}`);
   //   addBrowserView(id, { x: 600, y: 600, width: 100, height: 400, src: 'https://berjon.com/' });
   // }
+  renderDataForMode () {
+    if ($uiFeedMode.value === 'icon-grid') {
+      return html`
+        <div class="mode-icon-grid">
+          ${$uiFeedData.value.map(ti => html`
+            <a href=${ti.link}>
+              <span class="icon"><cm-tile-icon size="48" alt=${`${ti.short_name || ti.name} icon`} base=${`tile://${ti.authority}/`} .sources=${ti.icons}></cm-tile-icon></span>
+              <span class="name">${ti.name}</span>
+            </a>
+          `)}
+        </ul>
+      `;
+    }
+    return html`
+      <ul>
+        ${$uiFeedData.value.map(ti => html`<li>${ti.name}</li>`)}
+      </ul>
+    `;
+  }
   render () {
     const route = $router.value?.route;
     let feed = nothing;
@@ -101,9 +120,7 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
           <div slot="header">
             <h3>${icon} ${$uiFeedTitle.value}</h3>
           </div>
-          <ul>
-            ${$uiFeedData.value.map(ti => html`<li>${ti.name}</li>`)}
-          </ul>
+          ${this.renderDataForMode()}
         </sl-card>
       `;
     }

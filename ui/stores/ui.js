@@ -32,8 +32,13 @@ export const $uiFeedIcon = computed($router, (router) => {
   return '';
 });
 
+const feedModes = {
+  apps: 'icon-grid',
+};
+export const $uiFeedMode = computed($router, (router) => feedModes[router.route] || 'tiles-timeline');
+
 export const $uiFeedData = computed([$router, $tilesInstalledAppsCached], (router, installedApps) => {
-  if (router.route === 'apps') return installedApps;
+  if (router.route === 'apps') return installedApps.map(app => ({ ...app, link: `#/apps/${app.authority}` }));
   // here we can also load and feed and such
   return '';
 });

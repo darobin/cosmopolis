@@ -23,5 +23,5 @@ onMount($tilesCache, () => refreshTilesCache());
 
 // Only has installed:true app
 export const $tilesInstalledAppsCached = computed([$tilesInstalledApps, $tilesCache], (installed, cache) => {
-  return installed.map(k => cache[k]).filter(Boolean);
+  return installed.map(k => ({ ...cache[k], authority: k })).filter(Boolean);
 });
