@@ -74,6 +74,25 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
         border-radius: 0;
         height: 100%;
       }
+      .mode-icon-grid {
+        display: grid;
+        grid: auto-flow / repeat(4, 80px);
+      }
+      .mode-icon-grid a {
+        display: block;
+        padding: var(--sl-spacing-x-small);
+        text-align: center;
+        text-decoration: none;
+        color: inherit;
+        font-size: 0.9rem;
+        /* overflow-wrap: break-word; */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: color var(--sl-transition-medium);
+      }
+      .mode-icon-grid a:hover {
+        color: var(--cm-electric-blue);
+      }
     `
   ];
   // XXX probably not in this, just for test
@@ -89,7 +108,7 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
           ${$uiFeedData.value.map(ti => html`
             <a href=${ti.link}>
               <span class="icon"><cm-tile-icon size="48" alt=${`${ti.short_name || ti.name} icon`} base=${`tile://${ti.authority}/`} .sources=${ti.icons}></cm-tile-icon></span>
-              <span class="name">${ti.name}</span>
+              <span class="name">${ti.short_name || ti.name}</span>
             </a>
           `)}
         </ul>

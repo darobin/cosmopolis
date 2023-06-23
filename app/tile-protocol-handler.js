@@ -45,7 +45,7 @@ export default async function tileProtocolHandler (req, cb) {
       }, null, 2)),
     });
   }
-  const meta = await getSetting(`developer.tiles.localMap.${cid}`);
+  const meta = await getSetting(`developer.${cid}`);
   if (!meta) return send404();
   const pathname = (url.pathname === '/' || !url.pathname) ? '/index.html' : url.pathname;
   const path = join(meta.dir, pathname);
