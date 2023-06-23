@@ -50,6 +50,10 @@ export function connectMessaging (mainWindow) {
   });
 }
 
+export function wipeBrowserViews (mainWindow) {
+  Object.keys(browserViews).forEach(k => mainWindow.removeBrowserView(browserViews[k]));
+}
+
 async function handleSettingsGet (ev, keyPath) {
   return getSetting(keyPath);
 }

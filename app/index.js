@@ -3,7 +3,7 @@ import { app, BrowserWindow, protocol }  from 'electron';
 import { manageWindowPosition } from './lib/window-manager.js';
 import makeRel from './lib/rel.js';
 import tileProtocolHandler from './tile-protocol-handler.js';
-import { registerPlatformServiceHandlers, connectMessaging } from './platform-services.js';
+import { registerPlatformServiceHandlers, connectMessaging, wipeBrowserViews } from './platform-services.js';
 
 let mainWindow;
 const rel = makeRel(import.meta.url);
@@ -56,6 +56,7 @@ app.whenReady().then(async () => {
 
 function reload () {
   console.log('RELOAD');
+  wipeBrowserViews(mainWindow);
   mainWindow.reload();
 }
 

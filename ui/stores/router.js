@@ -1,5 +1,6 @@
 
 import { createRouter } from '../lib/router';
+import { setFeedWidth, setFeedTitle, setFeedIcon } from './ui.js';
 
 export const $router = createRouter({
   home: '/',
@@ -9,4 +10,19 @@ export const $router = createRouter({
   social: '/social/:list?',
   library: '/library/:path?',
   apps: '/apps/',
+});
+
+$router.subscribe((store) => {
+  const route = store.route;
+  console.warn(`Deriving from route with ${route}`);
+  if (route === 'apps') {
+    setFeedWidth(360);
+    setFeedTitle('Apps');
+    setFeedIcon('builtin:app-indicator');
+  }
+  else {
+    setFeedWidth(0);
+    setFeedTitle('');
+    setFeedIcon('');
+  }
 });

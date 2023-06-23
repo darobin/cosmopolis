@@ -1,15 +1,15 @@
 
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css, nothing } from 'lit';
 import { withStores } from "@nanostores/lit";
-import { nanoid } from 'nanoid';
-// import { computed } from 'nanostores'
+// import { nanoid } from 'nanoid';
+import { computed } from 'nanostores'
 import { $router } from '../stores/router.js';
-import { $uiSideBarShowing } from '../stores/ui.js';
-import { addBrowserView } from '../stores/browser-views.js';
+import { $uiSideBarShowing, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon } from '../stores/ui.js';
+// import { addBrowserView } from '../stores/browser-views.js';
 
 // this has to always be px
-// const SIDE_BAR_WIDTH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cm-side-bar-width'), 10);
-// const $left = computed($uiSideBarShowing, ui => ui.sideBarShowing ? SIDE_BAR_WIDTH : 0);
+const SIDE_BAR_WIDTH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cm-side-bar-width'), 10);
+const $left = computed($uiSideBarShowing, ui => ui ? SIDE_BAR_WIDTH : 0);
 
 // XXX what happens here
 //  - there is a feed column
@@ -24,6 +24,7 @@ import { addBrowserView } from '../stores/browser-views.js';
 //    - how does this work with horizontal scrolling?
 //    - maybe on scroll they get replaced with an element of the same size, grey (or maybe that's always behind them and they get hidden)
 
+
 // how do we test this?
 //  - only do app
 //  - kinda fake app for now by getting a list of installed tiles
@@ -31,8 +32,9 @@ import { addBrowserView } from '../stores/browser-views.js';
 //  - then try to rebuild the proper experience
 //  - WISH MESSAGING MUST ONLY BE VIA THE ROOT
 //  - NOTE: we must render an element under the window to get the scroll, I think
+//  - need to wipe all BVs on route change. Because they're set by the main process, they persist reloads and bugs. (should wipe on reload)
 
-export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $uiSideBarShowing]) {
+export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon]) {
   static styles = [
     css`
       :host {
@@ -49,21 +51,63 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $uiSid
         top: var(--cm-osx-title-bar-height);
         transition: left var(--sl-transition-medium);
       }
-      #root.side-bar-open {
-        left: var(--cm-side-bar-width);
+      #feed {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+      }
+      h3 {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        font-weight: 100;
+        font-variation-settings: "wght" 100;
+      }
+      h3 sl-icon, h3 img {
+        height: 20px;
+        width: 20px;
+        min-height: 20px;
+        min-width: 20px;
+        margin-right: var(--sl-spacing-small);
+      }
+      sl-card::part(base) {
+        border-radius: 0;
+        height: 100%;
       }
     `
   ];
   // XXX probably not in this, just for test
-  firstUpdated () {
-    const id = nanoid();
-    console.warn(`just for kicks: ${id}`);
-    addBrowserView(id, { x: 500, y: 500, width: 1000, height: 300, src: 'https://berjon.com/' });
-  }
+  // firstUpdated () {
+  //   const id = nanoid();
+  //   console.warn(`just for kicks: ${id}`);
+  //   addBrowserView(id, { x: 600, y: 600, width: 100, height: 400, src: 'https://berjon.com/' });
+  // }
   render () {
     const route = $router.value?.route;
+    let feed = nothing;
+    if ($uiFeedWidth.value) {
+      const iconURL = $uiFeedIcon.value;
+      console.warn(iconURL, $uiFeedIcon);
+      let icon = nothing;
+      if (iconURL) {
+        if (iconURL.startsWith('builtin:')) {
+          icon = html`<sl-icon name=${iconURL.replace('builtin:', '')}></sl-icon>`;
+        }
+        else {
+          icon = html`<img src=${iconURL} width="20" height="20">`;
+        }
+      }
+      feed = html`
+        <sl-card id="feed" style=${`width: ${$uiFeedWidth.value}px`}>
+          <div slot="header">
+            <h3>${icon} ${$uiFeedTitle.value}</h3>
+          </div>
+        </sl-card>
+      `;
+    }
     return html`
-      <div id="root" class=${$uiSideBarShowing.get() ? 'side-bar-open' : 'side-bar-closed'}>
+      <div id="root" style=${`left: ${$left.value}px`}>
+        ${feed}
         <p>
           ${route}
         </p>
