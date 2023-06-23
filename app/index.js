@@ -1,9 +1,9 @@
 
-import { app, BrowserWindow, BrowserView, protocol, MessageChannelMain }  from 'electron';
+import { app, BrowserWindow, protocol }  from 'electron';
 import { manageWindowPosition } from './lib/window-manager.js';
 import makeRel from './lib/rel.js';
 import tileProtocolHandler from './tile-protocol-handler.js';
-import registerPlatformServiceHandlers from './platform-services.js';
+import { registerPlatformServiceHandlers, connectMessaging } from './platform-services.js';
 
 let mainWindow;
 const rel = makeRel(import.meta.url);
@@ -43,29 +43,7 @@ app.whenReady().then(async () => {
     mainWindow.webContents.openDevTools(); // remove this in builds
   });
   const { webContents } = mainWindow;
-
-  // let's talk about this, baby
-  const { port2 } = new MessageChannelMain();
-  webContents.postMessage('port', null, [port2]);
-  // I don't know that we ever need to talk to port1 for BrowserView but we might need it for wishes.
-  // This might be best refactored out as BV/Wish management
-  const browserViews = {};
-  port2.onmessage = (ev) => {
-    const { type, x, y, width, height, src, id } = ev.data;
-    if (type === 'add-browser-view') {
-      const bv = new BrowserView();
-      mainWindow.setBrowserView(bv);
-      bv.setBounds({ x, y, width, height })
-      bv.webContents.loadURL(src);
-      browserViews[id] = bv;
-    }
-    else if (type === 'update-browser-view') {
-      browserViews[id]?.setBounds({ x, y, width, height });
-    }
-    else if (type === 'remove-browser-view') {
-      if (browserViews[id]) mainWindow.removeBrowserView(browserViews[id]);
-    }
-  }
+  connectMessaging(mainWindow);
 
   // reloading
   webContents.on('before-input-event', makeKeyDownMatcher('cmd+R', reload));

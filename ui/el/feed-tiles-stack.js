@@ -30,6 +30,7 @@ import { addBrowserView } from '../stores/browser-views.js';
 //  - render the layout/template
 //  - then try to rebuild the proper experience
 //  - WISH MESSAGING MUST ONLY BE VIA THE ROOT
+//  - NOTE: we must render an element under the window to get the scroll, I think
 
 export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $ui]) {
   static styles = [
@@ -53,6 +54,7 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $ui]) 
       }
     `
   ];
+  // XXX probably not in this, just for test
   firstUpdated () {
     const id = nanoid();
     console.warn(`just for kicks: ${id}`);

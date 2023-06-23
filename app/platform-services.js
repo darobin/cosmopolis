@@ -1,7 +1,7 @@
 
 import { join } from 'node:path';
 import { readFile } from 'node:fs/promises';
-import { ipcMain, dialog }  from 'electron';
+import { ipcMain, dialog, BrowserView }  from 'electron';
 import { get as getSetting, set as setSetting, unset as unsetSetting } from 'electron-settings';
 import mime from 'mime-types';
 import chalk from 'chalk';
@@ -11,7 +11,7 @@ import nanoid from './lib/smallid.js';
 
 const { handle } = ipcMain;
 
-export default function registerPlatformServiceHandlers () {
+export function registerPlatformServiceHandlers () {
   handle('dbg:warn', handleDebugWarn);
   handle('settings:get', handleSettingsGet);
   handle('settings:set', handleSettingsSet);
@@ -22,6 +22,32 @@ export default function registerPlatformServiceHandlers () {
   handle('tiles:refresh', handleRefreshTile);
   handle('tiles:remove', handleRemoveTile);
   handle('wish:pick-local-image', handlePickLocalImage);
+}
+
+let receiveMessagePort;
+const browserViews = {};
+export function connectMessaging (mainWindow) {
+  ipcMain.on('connect-port', (ev) => {
+    receiveMessagePort = ev.ports[0];
+    receiveMessagePort.postMessage('test-yo');
+    receiveMessagePort.on('message', (ev) => {
+      const { type, x, y, width, height, src, id } = ev.data;
+      if (type === 'add-browser-view') {
+        const bv = new BrowserView();
+        mainWindow.setBrowserView(bv);
+        bv.setBounds({ x, y, width, height })
+        bv.webContents.loadURL(src);
+        browserViews[id] = bv;
+      }
+      else if (type === 'update-browser-view') {
+        browserViews[id]?.setBounds({ x, y, width, height });
+      }
+      else if (type === 'remove-browser-view') {
+        if (browserViews[id]) mainWindow.removeBrowserView(browserViews[id]);
+      }
+    });
+    receiveMessagePort.start();
+  });
 }
 
 async function handleSettingsGet (ev, keyPath) {
