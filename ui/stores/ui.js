@@ -1,12 +1,8 @@
 
-import { map, action } from 'nanostores';
+import { atom, action } from 'nanostores';
 
-export const $ui = map({
-  sideBarShowing: true,
-});
+export const $uiSideBarShowing = atom(true);
 
-export const showSideBar = action($ui, 'showSideBar', (store) => store.setKey('sideBarShowing', true));
-export const hideSideBar = action($ui, 'hideSideBar', (store) => store.setKey('sideBarShowing', false));
-export const toggleSideBar = action($ui, 'toggleSideBar', (store) => {
-  store.setKey('sideBarShowing', !store.value.sideBarShowing);
-});
+export const showSideBar = action($uiSideBarShowing, 'showSideBar', (store) => store.set(true));
+export const hideSideBar = action($uiSideBarShowing, 'hideSideBar', (store) => store.set(false));
+export const toggleSideBar = action($uiSideBarShowing, 'toggleSideBar', (store) => store.set(!store.get()));

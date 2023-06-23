@@ -1,9 +1,9 @@
 
 import { LitElement, html, css } from 'lit';
 import { withStores } from "@nanostores/lit";
-import { $ui, toggleSideBar } from '../stores/ui.js';
+import { $uiSideBarShowing, toggleSideBar } from '../stores/ui.js';
 
-export class CosmoTitleBar extends withStores(LitElement, [$ui]) {
+export class CosmoTitleBar extends withStores(LitElement, [$uiSideBarShowing]) {
   static styles = [
     css`
       #root {
@@ -47,7 +47,7 @@ export class CosmoTitleBar extends withStores(LitElement, [$ui]) {
     `
   ];
   render () {
-    const open = $ui.get().sideBarShowing;
+    const open = $uiSideBarShowing.get();
     const label = open ? 'Hide side bar' : 'Show side bar';
     return html`
       <div id="root" class=${open ? 'open' : 'closed'}>

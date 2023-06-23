@@ -4,12 +4,12 @@ import { withStores } from "@nanostores/lit";
 import { nanoid } from 'nanoid';
 // import { computed } from 'nanostores'
 import { $router } from '../stores/router.js';
-import { $ui } from '../stores/ui.js';
+import { $uiSideBarShowing } from '../stores/ui.js';
 import { addBrowserView } from '../stores/browser-views.js';
 
 // this has to always be px
 // const SIDE_BAR_WIDTH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cm-side-bar-width'), 10);
-// const $left = computed($ui, ui => ui.sideBarShowing ? SIDE_BAR_WIDTH : 0);
+// const $left = computed($uiSideBarShowing, ui => ui.sideBarShowing ? SIDE_BAR_WIDTH : 0);
 
 // XXX what happens here
 //  - there is a feed column
@@ -32,7 +32,7 @@ import { addBrowserView } from '../stores/browser-views.js';
 //  - WISH MESSAGING MUST ONLY BE VIA THE ROOT
 //  - NOTE: we must render an element under the window to get the scroll, I think
 
-export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $ui]) {
+export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $uiSideBarShowing]) {
   static styles = [
     css`
       :host {
@@ -58,12 +58,12 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $ui]) 
   firstUpdated () {
     const id = nanoid();
     console.warn(`just for kicks: ${id}`);
-    addBrowserView(id, { x: 500, y: 500, width: 300, height: 300, src: 'https://berjon.com/' });
+    addBrowserView(id, { x: 500, y: 500, width: 1000, height: 300, src: 'https://berjon.com/' });
   }
   render () {
     const route = $router.value?.route;
     return html`
-      <div id="root" class=${$ui.get().sideBarShowing ? 'side-bar-open' : 'side-bar-closed'}>
+      <div id="root" class=${$uiSideBarShowing.get() ? 'side-bar-open' : 'side-bar-closed'}>
         <p>
           ${route}
         </p>

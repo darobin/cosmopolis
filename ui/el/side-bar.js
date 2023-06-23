@@ -1,10 +1,10 @@
 
 import { LitElement, html, css } from 'lit';
 import { withStores } from "@nanostores/lit";
-import { $ui } from '../stores/ui.js';
+import { $uiSideBarShowing } from '../stores/ui.js';
 import { $router } from '../stores/router.js';
 
-export class CosmoSideBar extends withStores(LitElement, [$ui, $router]) {
+export class CosmoSideBar extends withStores(LitElement, [$uiSideBarShowing, $router]) {
   static styles = [
     css`
       #root {
@@ -65,7 +65,7 @@ export class CosmoSideBar extends withStores(LitElement, [$ui, $router]) {
   render () {
     const route = $router.value?.route;
     return html`
-      <div id="root" class=${$ui.get().sideBarShowing ? 'open' : 'closed'}>
+      <div id="root" class=${$uiSideBarShowing.get() ? 'open' : 'closed'}>
         <cm-identity-switcher></cm-identity-switcher>
 
         <details class=${ route === 'search' ? 'selected' : ''} ?open=${route === 'search'}>
