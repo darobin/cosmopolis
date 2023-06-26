@@ -1,11 +1,9 @@
 
 import { LitElement, html, css, nothing } from 'lit';
 import { withStores } from "@nanostores/lit";
-// import { nanoid } from 'nanoid';
 import { computed } from 'nanostores'
 import { $router } from '../stores/router.js';
 import { $uiSideBarShowing, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedData, $uiFeedMode, $uiTilePrimary } from '../stores/ui.js';
-// import { addBrowserView } from '../stores/browser-views.js';
 
 // this has to always be px
 const SIDE_BAR_WIDTH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cm-side-bar-width'), 10);
@@ -32,10 +30,11 @@ const CARD_HEADER_HEIGHT = 45;
 // how do we test this?
 //  - then try to rebuild the proper experience
 //  - WISH MESSAGING MUST ONLY BE VIA THE ROOT
-//  - NOTE: we must render an element under the window to get the scroll, I think
 //  - need to wipe all BVs on route change. Because they're set by the main process, they persist reloads and bugs. (should wipe on reload)
 
-// XXX change fixed to absolute
+// ISSUES
+//  - need to render the side bar inside a BV if we want it to z-index on top
+//  - scroll events don't bubble up from the tile viewport
 
 export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedMode, $uiFeedData, $uiTilePrimary]) {
   static styles = [
@@ -104,12 +103,19 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
       }
     `
   ];
-  // XXX probably not in this, just for test
-  // firstUpdated () {
-  //   const id = nanoid();
-  //   console.warn(`just for kicks: ${id}`);
-  //   addBrowserView(id, { x: 600, y: 600, width: 100, height: 400, src: 'https://berjon.com/' });
-  // }
+  static properties = {
+    scrollLeft: { type: Number },
+    scrollTick: { type: Boolean },
+  };
+  updateScroll () {
+    if (!this.scrollTick) {
+      window.requestAnimationFrame(() => {
+        this.scrollLeft = this.shadowRoot.querySelector('#root').scrollLeft;
+        this.scrollTick = false;
+      });
+      this.scrollTick = true;
+    }
+  }
   renderDataForMode () {
     if ($uiFeedMode.value === 'icon-grid') {
       return html`
@@ -120,7 +126,7 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
               <span class="name">${ti.short_name || ti.name}</span>
             </a>
           `)}
-        </ul>
+        </div>
       `;
     }
     return html`
@@ -152,30 +158,23 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
       `;
     }
     let primaryTile = nothing;
-    if ($uiTilePrimary.value) {
+    const root = this.shadowRoot.querySelector('#root');
+    if ($uiTilePrimary.value && root) {
       const left =  $uiFeedWidth.value;
-      const tileX = left + $left.value + BORDER_WIDTH;
+      const tileX = left + $left.value + BORDER_WIDTH - (this.scrollLeft || 0);
       const tileY = TITLE_BAR_HEIGHT + CARD_HEADER_HEIGHT + BORDER_WIDTH;
-      const tileHeight = this.shadowRoot.querySelector('#root')?.clientHeight - (CARD_HEADER_HEIGHT + BORDER_WIDTH);
+      const tileHeight = (root.clientHeight || 0) - (CARD_HEADER_HEIGHT + BORDER_WIDTH);
       primaryTile = html`
         <sl-card id="primary-tile" style=${`left: ${left}px; width: ${PRIMARY_TILE_WIDTH + (BORDER_WIDTH * 2)}px`}>
           <div slot="header">
             <h3>Tile</h3>
           </div>
-          <cm-tile x=${tileX} y=${tileY} width=${PRIMARY_TILE_WIDTH} height=${tileHeight} src="https://berjon.com/internet-transition/"></cm-tile>
+          <cm-tile .x=${tileX} .y=${tileY} .width=${PRIMARY_TILE_WIDTH} .height=${tileHeight} src="https://berjon.com/internet-transition/"></cm-tile>
         </sl-card>
       `;
     }
-    // XXX
-    // use $uiTilePrimary to include a cm-tile and compute its position
-    // we drive position updates from here completely
-    // this is a completely new take on cm-time, restart it from scratch
-    // keep in mind that we need to put it in an sl-card so we'll have to force max heights on
-    // the header and footer
-    // IN FACT: manage the sl-card here, and use cm-tile for pure tile rendering: src+position
-    // Plus, manage scrolling
     return html`
-      <div id="root" style=${`left: ${$left.value}px`}>
+      <div id="root" style=${`left: ${$left.value}px`} @scroll=${this.updateScroll}>
         ${feed}
         ${primaryTile}
       </div>

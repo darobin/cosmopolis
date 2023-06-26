@@ -31,6 +31,7 @@ export function connectMessaging (mainWindow) {
     receiveMessagePort.postMessage('test-yo');
     receiveMessagePort.on('message', (ev) => {
       const { type, x, y, width, height, src, id } = ev.data;
+      console.warn(`#${type}(${id}): `, x, y, width, height, src);
       if (type === 'add-browser-view') {
         const bv = new BrowserView();
         mainWindow.setBrowserView(bv);
