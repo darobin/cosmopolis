@@ -3,8 +3,9 @@ import { LitElement, html, css } from 'lit';
 import { withStores } from "@nanostores/lit";
 import { $uiSideBarShowing } from '../stores/ui.js';
 import { $router } from '../stores/router.js';
+import { $tilesDevMode } from '../stores/tiles.js';
 
-export class CosmoSideBar extends withStores(LitElement, [$uiSideBarShowing, $router]) {
+export class CosmoSideBar extends withStores(LitElement, [$uiSideBarShowing, $router, $tilesDevMode]) {
   static styles = [
     css`
       #root {
@@ -62,8 +63,34 @@ export class CosmoSideBar extends withStores(LitElement, [$uiSideBarShowing, $ro
       }
     `
   ];
+
+  // XXX
+  //  - style the tree usabilty
+  //  - handle pathing (with special paths that start with $ and the rest picks an ID that might be nested in the tree)
+  //    to generate a feed in the store
+  //  - produce the dev apps feed
+  //  - render dev apps feed as cards
+  //  - activate those to load them, with the right route too
+  //  - use that to load wishes, and return to wish management
   render () {
     const route = $router.value?.route;
+    let library = html`
+      <ul>
+        <li class="no-results">Nothing saved to library.</li>
+      </ul>
+    `;
+    if ($tilesDevMode?.value?.length) {
+      library = html`
+        <sl-tree>
+          <sl-tree-item>
+            <a href="#/library/$developer-mode-tiles">
+              <sl-icon name="code-square"></sl-icon>
+              Developer Mode Tiles
+            </a>
+          </sl-tree-item>
+        </sl-tree>
+      `;
+    }
     return html`
       <div id="root" class=${$uiSideBarShowing.get() ? 'open' : 'closed'}>
         <cm-identity-switcher></cm-identity-switcher>
@@ -84,9 +111,7 @@ export class CosmoSideBar extends withStores(LitElement, [$uiSideBarShowing, $ro
 
         <details class=${ route === 'library' ? 'selected' : ''} ?open=${route === 'library'}>
           <summary><sl-icon name="collection"></sl-icon> <a href="#/library/">Library</a></summary>
-          <ul>
-            <li class="no-results">Nothing saved to library.</li>
-          </ul>
+          ${library}
         </details>
 
         <details class=${ route === 'apps' ? 'selected' : ''} ?open=${route === 'apps'}>
