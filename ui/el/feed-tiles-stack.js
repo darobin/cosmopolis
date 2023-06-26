@@ -10,6 +10,11 @@ import { $uiSideBarShowing, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedData
 // this has to always be px
 const SIDE_BAR_WIDTH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cm-side-bar-width'), 10);
 const $left = computed($uiSideBarShowing, ui => ui ? SIDE_BAR_WIDTH : 0);
+const PRIMARY_TILE_WIDTH = 880;
+const BORDER_WIDTH = 1;
+const TITLE_BAR_HEIGHT = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cm-osx-title-bar-height'), 10);
+const CARD_HEADER_HEIGHT = 45;
+// const CARD_FOOTER_HEIGHT = 0; // XXX this will obviously have to change
 
 // XXX what happens here
 //  - there is a feed column
@@ -30,6 +35,8 @@ const $left = computed($uiSideBarShowing, ui => ui ? SIDE_BAR_WIDTH : 0);
 //  - NOTE: we must render an element under the window to get the scroll, I think
 //  - need to wipe all BVs on route change. Because they're set by the main process, they persist reloads and bugs. (should wipe on reload)
 
+// XXX change fixed to absolute
+
 export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedMode, $uiFeedData, $uiTilePrimary]) {
   static styles = [
     css`
@@ -41,6 +48,7 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
       }
       #root {
         position: fixed;
+        overflow-y: auto;
         left: 0;
         right: 0;
         bottom: 0;
@@ -48,6 +56,11 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
         transition: left var(--sl-transition-medium);
       }
       #feed {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+      }
+      #primary-tile {
         position: absolute;
         top: 0;
         bottom: 0;
@@ -117,7 +130,6 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
     `;
   }
   render () {
-    const route = $router.value?.route;
     let feed = nothing;
     if ($uiFeedWidth.value) {
       const iconURL = $uiFeedIcon.value;
@@ -139,6 +151,21 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
         </sl-card>
       `;
     }
+    let primaryTile = nothing;
+    if ($uiTilePrimary.value) {
+      const left =  $uiFeedWidth.value;
+      const tileX = left + $left.value + BORDER_WIDTH;
+      const tileY = TITLE_BAR_HEIGHT + CARD_HEADER_HEIGHT + BORDER_WIDTH;
+      const tileHeight = this.shadowRoot.querySelector('#root')?.clientHeight - (CARD_HEADER_HEIGHT + BORDER_WIDTH);
+      primaryTile = html`
+        <sl-card id="primary-tile" style=${`left: ${left}px; width: ${PRIMARY_TILE_WIDTH + (BORDER_WIDTH * 2)}px`}>
+          <div slot="header">
+            <h3>Tile</h3>
+          </div>
+          <cm-tile x=${tileX} y=${tileY} width=${PRIMARY_TILE_WIDTH} height=${tileHeight} src="https://berjon.com/internet-transition/"></cm-tile>
+        </sl-card>
+      `;
+    }
     // XXX
     // use $uiTilePrimary to include a cm-tile and compute its position
     // we drive position updates from here completely
@@ -146,12 +173,11 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
     // keep in mind that we need to put it in an sl-card so we'll have to force max heights on
     // the header and footer
     // IN FACT: manage the sl-card here, and use cm-tile for pure tile rendering: src+position
+    // Plus, manage scrolling
     return html`
       <div id="root" style=${`left: ${$left.value}px`}>
         ${feed}
-        <p>
-          ${route}
-        </p>
+        ${primaryTile}
       </div>
     `;
   }
