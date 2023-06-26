@@ -1,14 +1,15 @@
 
 import { join } from 'node:path';
 import { readFile } from 'node:fs/promises';
-import { ipcMain, dialog, BrowserView }  from 'electron';
+import { ipcMain, dialog, BrowserView, MessageChannelMain }  from 'electron';
 import { get as getSetting, set as setSetting, unset as unsetSetting } from 'electron-settings';
 import mime from 'mime-types';
 import chalk from 'chalk';
 import loadJSON from './lib/load-json.js';
 import nanoid from './lib/smallid.js';
+import makeRel from './lib/rel.js';
 
-
+const rel = makeRel(import.meta.url);
 const { handle } = ipcMain;
 
 export function registerPlatformServiceHandlers () {
@@ -28,21 +29,32 @@ const browserViews = {};
 export function connectMessaging (mainWindow) {
   ipcMain.on('connect-port', (ev) => {
     receiveMessagePort = ev.ports[0];
-    receiveMessagePort.postMessage('test-yo');
     receiveMessagePort.on('message', (ev) => {
       const { type, x, y, width, height, src, id } = ev.data;
       console.warn(`#${type}(${id}): `, x, y, width, height, src);
       if (type === 'add-browser-view') {
-        const bv = new BrowserView();
+        const bv = new BrowserView({
+          webPreferences: {
+            webviewTag: false,
+            preload: rel('./preload-browserview.js'),
+          },
+        });
         mainWindow.setBrowserView(bv);
         bv.setBounds({ x, y, width, height })
         bv.webContents.loadURL(src);
+        const { port1, port2 } = new MessageChannelMain();
+        mainWindow.webContents.postMessage(`connect-tile-${id}`, null, [port1]);
+        bv.webContents.once('dom-ready', () => { // not sure that this event isn't too late, but what is good for preload?
+          bv.webContents.postMessage('connect-tile', null, [port2]);
+        });
         browserViews[id] = bv;
       }
       else if (type === 'update-browser-view') {
+        if (!id) return;
         browserViews[id]?.setBounds({ x, y, width, height });
       }
       else if (type === 'remove-browser-view') {
+        // XXX also disconnect tile
         if (browserViews[id]) mainWindow.removeBrowserView(browserViews[id]);
       }
     });

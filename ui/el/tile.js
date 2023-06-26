@@ -9,7 +9,7 @@ export class CosmoTile extends LitElement {
   static styles = [
     css`
       #tile {
-        background: orange;
+        background: #fff;
         position: fixed;
       }
     `
@@ -22,8 +22,6 @@ export class CosmoTile extends LitElement {
     src: { type: String },
     id: { type: String },
   };
-  // XXX
-  //  - in the backend: need CSP, preload, background
   firstUpdated () {
     this.addBV();
   }
@@ -50,7 +48,7 @@ export class CosmoTile extends LitElement {
     removeBrowserView(this.id);
   }
   render () {
-    return html`<div id="tile" style=${`top: ${this.y}px; left: ${this.x}px; width: ${this.width}px; height: ${this.height}px;`}>${this.src}</div>`;
+    return html`<div id="tile" style=${`top: ${this.y}px; left: ${this.x}px; width: ${this.width}px; height: ${this.height}px;`}></div>`;
   }
 }
 

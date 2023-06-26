@@ -3,6 +3,8 @@
 const { contextBridge, ipcRenderer } = require('electron');
 const { invoke } = ipcRenderer;
 
+const tilePorts = {};
+
 let sendMessagePort;
 contextBridge.exposeInMainWorld('cosmopolis', {
   connectPort: () => {
@@ -14,6 +16,9 @@ contextBridge.exposeInMainWorld('cosmopolis', {
   // browser view management
   addBrowserView: (id, props) => {
     if (!sendMessagePort) throw new Error('Cannot create a BrowserView before the message port is initialised.');
+    ipcRenderer.once(`connect-tile-${id}`, (ev) => {
+      registerTileHandling(id, ev.ports[0]);
+    });
     sendMessagePort.postMessage({
       ...props,
       type: 'add-browser-view',
@@ -30,6 +35,7 @@ contextBridge.exposeInMainWorld('cosmopolis', {
   },
   removeBrowserView: (id) => {
     if (!sendMessagePort) throw new Error('Cannot remove a BrowserView before the message port is initialised.');
+    delete tilePorts[id];
     sendMessagePort.postMessage({
       type: 'remove-browser-view',
       id,
@@ -47,3 +53,10 @@ contextBridge.exposeInMainWorld('cosmopolis', {
   refreshTile: (url) => invoke('tiles:refresh', url),
   removeTile: (url) => invoke('tiles:remove', url),
 });
+
+function registerTileHandling (id, port) {
+  tilePorts[id] = port;
+  port.onmessage = (msg) => {
+    console.warn(`msg`, msg);
+  };
+}
