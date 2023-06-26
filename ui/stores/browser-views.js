@@ -24,7 +24,7 @@ export const updateBrowserView = action($browserViews, 'updateBrowserView', (sto
   store.setKey(id, props);
 });
 
-export const removeBrowserView = action($browserViews, 'removeBrowserView', (store, id) => {
-  window.cosmopolis.removeBrowserView(id);
+export const removeBrowserView = action($browserViews, 'removeBrowserView', async (store, id) => {
+  await window.cosmopolis.removeBrowserView(id);
   store.setKey(id, undefined);
 });

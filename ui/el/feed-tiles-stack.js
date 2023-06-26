@@ -34,7 +34,7 @@ const CARD_HEADER_HEIGHT = 45;
 
 // ISSUES
 //  - need to render the side bar inside a BV if we want it to z-index on top
-//  - scroll events don't bubble up from the tile viewport
+//  - scroll events don't bubble up from the tile viewport, we'll have to make sure they do
 
 export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedMode, $uiFeedData, $uiTilePrimary]) {
   static styles = [
@@ -169,7 +169,7 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
           <div slot="header">
             <h3>Tile</h3>
           </div>
-          <cm-tile .x=${tileX} .y=${tileY} .width=${PRIMARY_TILE_WIDTH} .height=${tileHeight} src="https://berjon.com/internet-transition/"></cm-tile>
+          <cm-tile .x=${tileX} .y=${tileY} .width=${PRIMARY_TILE_WIDTH} .height=${tileHeight} src=${$uiTilePrimary.value}></cm-tile>
         </sl-card>
       `;
     }

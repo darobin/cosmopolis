@@ -23,17 +23,30 @@ export class CosmoTile extends LitElement {
     id: { type: String },
   };
   // XXX
-  //  - in the backend: need CSP, preload
+  //  - in the backend: need CSP, preload, background
   firstUpdated () {
+    this.addBV();
+  }
+  willUpdate (changedProps) {
+    if (changedProps.has('src') && this.id) {
+      this.removeBV();
+      this.addBV();
+    }
+    else if (['x', 'y', 'width', 'height'].find(k => changedProps.has(k))) {
+      this.updateBV();
+    }
+  }
+  disconnectedCallback () {
+    removeBrowserView(this.id);
+  }
+  addBV () {
     this.id = nanoid();
     addBrowserView(this.id, { x: this.x || 0, y: this.y || 0, width: this.width || 0, height: this.height || 0, src: this.src });
   }
-  willUpdate (changedProps) {
-    const chg = ['x', 'y', 'width', 'height', 'src'].find(k => changedProps.has(k));
-    console.warn(`changed`, chg, this.x);
-    if (chg) updateBrowserView(this.id, { x: this.x || 0, y: this.y || 0, width: this.width || 0, height: this.height || 0, src: this.src });
+  updateBV () {
+    updateBrowserView(this.id, { x: this.x || 0, y: this.y || 0, width: this.width || 0, height: this.height || 0, src: this.src });
   }
-  disconnectedCallback () {
+  removeBV () {
     removeBrowserView(this.id);
   }
   render () {
