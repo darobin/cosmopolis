@@ -4,6 +4,7 @@ import { withStores } from "@nanostores/lit";
 import { computed } from 'nanostores'
 import { $router } from '../stores/router.js';
 import { $uiSideBarShowing, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedData, $uiFeedMode, $uiTilePrimary } from '../stores/ui.js';
+import { $wishSelector, showWishSelector } from '../stores/wishes.js';
 
 // this has to always be px
 const SIDE_BAR_WIDTH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cm-side-bar-width'), 10);
@@ -36,7 +37,10 @@ const CARD_HEADER_HEIGHT = 45;
 //  - need to render the side bar inside a BV if we want it to z-index on top
 //  - scroll events don't bubble up from the tile viewport, we'll have to make sure they do
 
-export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedMode, $uiFeedData, $uiTilePrimary]) {
+export class CosmoFeedTilesStack extends withStores(
+    LitElement,
+    [$router, $left, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedMode, $uiFeedData, $uiTilePrimary, $wishSelector]
+  ) {
   static styles = [
     css`
       :host {
@@ -64,6 +68,12 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
         top: 0;
         bottom: 0;
       }
+      #selector {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 360px;
+      }
       h3 {
         margin: 0;
         display: flex;
@@ -85,7 +95,7 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
       sl-card::part(body) {
         --padding: 0;
       }
-      .mode-icon-grid {
+      .mode-icon-grid, .selector-icon-grid {
         display: grid;
         grid: auto-flow / repeat(4, 80px);
         padding: var(--sl-spacing-large);
@@ -111,6 +121,11 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
     scrollLeft: { type: Number },
     scrollTick: { type: Boolean },
   };
+  // { tileID: the target tile, type: make-wish|, wish: { id: wish ID, ...} }
+  wishHandler (data) {
+    console.warn(`wishing`, data);
+    if (data.type === 'make-wish') showWishSelector(data.tileID, data.wish);
+  }
   updateScroll () {
     if (!this.scrollTick) {
       window.requestAnimationFrame(() => {
@@ -180,7 +195,23 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
           <div slot="header">
             <h3>Tile</h3>
           </div>
-          <cm-tile .x=${tileX} .y=${tileY} .width=${PRIMARY_TILE_WIDTH} .height=${tileHeight} src=${$uiTilePrimary.value}></cm-tile>
+          <cm-tile .x=${tileX} .y=${tileY} .width=${PRIMARY_TILE_WIDTH} .height=${tileHeight} src=${$uiTilePrimary.value} .wishhandler=${this.wishHandler}></cm-tile>
+        </sl-card>
+      `;
+    }
+    let selector = nothing;
+    if ($wishSelector.value.showing) {
+      // XXX this gets more complicated when we factor in wishes
+      const left =  $uiFeedWidth.value + PRIMARY_TILE_WIDTH;
+      // XXX need to scroll this into view but only when it switches from visible to non-visible and after the DOM has updated
+      selector = html`
+        <sl-card id="selector" style=${`left: ${left}px;`}>
+          <div slot="header">
+            <h3>${$wishSelector.value.title}</h3>
+          </div>
+          <div class="selector-icon-grid">
+            <!-- XXX fill this -->
+          </div>
         </sl-card>
       `;
     }
@@ -188,6 +219,7 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
       <div id="root" style=${`left: ${$left.value}px`} @scroll=${this.updateScroll}>
         ${feed}
         ${primaryTile}
+        ${selector}
       </div>
     `;
   }

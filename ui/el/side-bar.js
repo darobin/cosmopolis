@@ -84,10 +84,6 @@ export class CosmoSideBar extends withStores(LitElement, [$uiSideBarShowing, $ro
     if (!details) return;
     details.open = true;
   }
-  // XXX
-  //  - render dev apps feed as cards
-  //  - activate those to load them, with the right route too
-  //  - use that to load wishes, and return to wish management
   render () {
     const route = $router.value?.route;
     let library = html`

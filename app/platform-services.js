@@ -22,6 +22,7 @@ export function registerPlatformServiceHandlers () {
   handle('tiles:refresh', handleRefreshTile);
   handle('tiles:remove', handleRemoveTile);
   handle('wish:pick-local-image', handlePickLocalImage);
+  handle('wish:generate-id', handleGenerateID);
 }
 
 let receiveMessagePort;
@@ -179,6 +180,10 @@ async function manageWishInstallation (url, installed, wishes) {
     });
   }
   await setSetting('wish.sources', wishSources);
+}
+
+async function handleGenerateID () {
+  return nanoid();
 }
 
 function url2id (url) {

@@ -14,10 +14,10 @@ contextBridge.exposeInMainWorld('cosmopolis', {
     ipcRenderer.postMessage('connect-port', null, [port2]);
   },
   // browser view management
-  addBrowserView: (id, props) => {
+  addBrowserView: (id, props, wishHandler) => {
     if (!sendMessagePort) throw new Error('Cannot create a BrowserView before the message port is initialised.');
     ipcRenderer.once(`connect-tile-${id}`, (ev) => {
-      registerTileHandling(id, ev.ports[0]);
+      registerTileHandling(id, ev.ports[0], wishHandler);
     });
     sendMessagePort.postMessage({
       ...props,
@@ -44,6 +44,8 @@ contextBridge.exposeInMainWorld('cosmopolis', {
   // preferences
   getSimpleData: (keyPath) => invoke('simple-data:get', keyPath),
   setSimpleData: (keyPath, data) => invoke('simple-data:set', keyPath, data),
+  // pick local file
+  pickLocalFile: () => invoke('wish:pick-local-image'),
   // XXX none of the below have been reviewed
   // picking stuff
   pickDevTile: () => invoke('pick:tile-dev'),
@@ -54,9 +56,7 @@ contextBridge.exposeInMainWorld('cosmopolis', {
   removeTile: (url) => invoke('tiles:remove', url),
 });
 
-function registerTileHandling (id, port) {
+function registerTileHandling (id, port, wishHandler) {
   tilePorts[id] = port;
-  port.onmessage = (msg) => {
-    console.warn(`msg`, msg);
-  };
+  port.onmessage = (msg) => wishHandler(msg.data || {});
 }

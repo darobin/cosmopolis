@@ -1,7 +1,7 @@
 /* eslint-disable global-require */
 /* global require */
 const { contextBridge, ipcRenderer } = require('electron');
-// const { invoke } = ipcRenderer;
+const { invoke } = ipcRenderer;
 
 let primaryPort;
 ipcRenderer.once(`connect-tile`, (ev) => {
@@ -13,7 +13,18 @@ contextBridge.exposeInMainWorld('makeWish', makeWish);
 
 // we want options for multiple, title, message too
 async function makeWish (type, options = {}) {
-  primaryPort.postMessage({ type: 'make-wish', wish: { type, options }});
+  const id = await invoke('wish:generate-id');
+  primaryPort.postMessage({ type: 'make-wish', wish: { id, type, options }});
+  return new Promise((resolve, reject) => {
+    const wishHandler = (ev) => {
+      const { type, wish } = ev.data;
+      if (!wish || wish.id !== id) return;
+      primaryPort.removeEventListener('message', wishHandler);
+      if (type === 'cancel-wish') return reject();
+      if (type === 'grant-wish') return resolve(); // XXX need to have some data in there
+    };
+    primaryPort.addEventListener('message', wishHandler);
+  });
 }
 
 // async function getSetting (keyPath) {
@@ -33,65 +44,8 @@ async function makeWish (type, options = {}) {
 // });
 // // ipcRenderer.sendToHost('cm-test', { value: 'AFTER' });
 
-// const WISH_TYPES = new Set(['pick', 'edit']);
 // const ICONS_PATH = 'file:ui/assets/icons';
 // const wishRegistry = {};
-
-// let interactionID = 1;
-// function nanoid () {
-//   return interactionID++;
-// }
-
-// // Each wish is described by:
-// //  - name
-// //  - description
-// //  - icons
-// //  - mediaTypes
-// //  - headless?
-// //  - url
-// //  - internal (points to the implementation)
-// async function findMatchingWish (type, options = {}) {
-//   if (!WISH_TYPES.has(type)) throw new Error(`Unknown wish type "${type}".`);
-//   let granters = await getSetting(`wish.sources.${type}`) || [];
-//   if (options.filters && (type === 'pick' || type === 'edit')) granters = granters.filter(grant => hasMatchingType(grant.mediaTypes, options.filters));
-//   if (type === 'pick') {
-//     granters.unshift({
-//       name: 'Local device file',
-//       description: 'Pick a file from a local device drive',
-//       icons: [{ src: `${ICONS_PATH}/file-earmark-fill.svg` }],
-//       headless: true,
-//       internal: new FilePickerPickWish({ filters: options.filters }),
-//       type: 'pick',
-//     });
-//   }
-//   return granters.map(g => ({...g, id: nanoid() }));
-// }
-
-// function hasMatchingType (supported, filters) {
-//   if (supported.some(sup => sup === '*')) return true;
-//   if (filters.some(fil => fil === '*')) return true;
-//   return filters.some(fil => {
-//     if (/\w+\/\*/.test(fil)) return supported.some(sup => sup.startsWith(fil.replace(/\*$/, '')));
-//     const wild = fil.replace(/\/\w+/, '/*');
-//     return supported.some(sup => sup === fil || sup === wild);
-//   });
-// }
-
-// async function listPotentialGranters (type, granters) {
-//   ww(`listPotential`, JSON.stringify(granters))
-//   return new Promise((resolve) => {
-//     const wishID = nanoid();
-//     const handler = (ev, gid, wid) => {
-//       if (wid !== wishID) return;
-//       ipcRenderer.off('cm-wish-granter-selected', handler);
-//       // this is == on purpose for casting purposes
-//       if (gid) resolve({ granter: granters.find(g => g.id == gid) });
-//       else resolve({});
-//     };
-//     ipcRenderer.on('cm-wish-granter-selected', handler);
-//     ipcRenderer.sendToHost('cm-wish-select-granter', { type, granters }, wishID);
-//   });
-// }
 
 // async function instantiateWish (granter, data) {
 //   if (data) data = await cloneableBlob(data);
@@ -150,18 +104,6 @@ async function makeWish (type, options = {}) {
 //     wishRegistry[wid]?.();
 //   }
 // });
-
-// // this is an internal wish implementation
-// // probably factor out at some point
-// class FilePickerPickWish {
-//   constructor ({ filters } = {}) {
-//     this.filters = filters;
-//   }
-//   async run () {
-//     const data = await invoke('wish:pick-local-image');
-//     return new Blob([data.blob], { type: data.type });
-//   }
-// }
 
 // function ww (...str) {
 //   ipcRenderer.sendToHost('cm-debug', { message: str.join(' ') })
