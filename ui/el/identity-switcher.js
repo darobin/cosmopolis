@@ -1,9 +1,7 @@
 
 import { LitElement, html, css } from 'lit';
-import { withStores } from "@nanostores/lit";
 
-
-export class CosmoIdentitySwitcher extends withStores(LitElement, []) {
+export class CosmoIdentitySwitcher extends LitElement {
   static styles = [
     css`
       :host {
@@ -12,7 +10,7 @@ export class CosmoIdentitySwitcher extends withStores(LitElement, []) {
       #root {
         display: flex;
       }
-      #avatar sl-skeleton {
+      #avatar sl-avatar {
         width: var(--sl-spacing-3x-large);
         height: var(--sl-spacing-3x-large);
         margin-right: var(--sl-spacing-small);
@@ -34,7 +32,7 @@ export class CosmoIdentitySwitcher extends withStores(LitElement, []) {
       #details sl-skeleton:not(:first-child)::part(base) {
         min-height: var(--sl-spacing-2x-small);
       }
-      sl-skeleton {
+      sl-skeleton, sl-avatar {
         --color: var(--cm-lightest);
         opacity: 0.8;
       }
@@ -44,7 +42,7 @@ export class CosmoIdentitySwitcher extends withStores(LitElement, []) {
     return html`
       <div id="root">
         <div id="avatar">
-          <sl-skeleton></sl-skeleton>
+          <sl-avatar label="This could be YOU!"></sl-avatar>
         </div>
         <div id="details">
           <sl-skeleton></sl-skeleton>

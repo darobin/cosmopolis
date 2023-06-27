@@ -61,14 +61,30 @@ export class CosmoSideBar extends withStores(LitElement, [$uiSideBarShowing, $ro
       li.no-results {
         list-style-type: none;
       }
+      sl-tree {
+        --indent-guide-width: 1px;
+      }
+      sl-tree-item::part(base), sl-tree-item::part(expand-button) {
+        color: var(--cm-lightest);
+      }
+      sl-tree-item::part(item--selected) {
+        background-color: transparent;
+        border-color: transparent;
+      }
+      sl-tree-item::part(expand-button) {
+        rotate: none;
+      }
     `
   ];
 
+  // if we do this in render() it will override user choice; all this does is open the current route because that
+  // has useful context
+  updated () {
+    const details = $router.value?.route && this.shadowRoot.getElementById($router.value.route);
+    if (!details) return;
+    details.open = true;
+  }
   // XXX
-  //  - style the tree usabilty
-  //  - handle pathing (with special paths that start with $ and the rest picks an ID that might be nested in the tree)
-  //    to generate a feed in the store
-  //  - produce the dev apps feed
   //  - render dev apps feed as cards
   //  - activate those to load them, with the right route too
   //  - use that to load wishes, and return to wish management
@@ -80,11 +96,16 @@ export class CosmoSideBar extends withStores(LitElement, [$uiSideBarShowing, $ro
       </ul>
     `;
     if ($tilesDevMode?.value?.length) {
+      // <sl-tree-item>
+      //   <sl-icon name="card-list"></sl-icon> <a href="#">Sit Amet</a>
+      // </sl-tree-item>
       library = html`
         <sl-tree>
+          <sl-icon name="folder2" slot="expand-icon"></sl-icon>
+          <sl-icon name="folder2-open" slot="collapse-icon"></sl-icon>
           <sl-tree-item>
+            <sl-icon name="code-square"></sl-icon>
             <a href="#/library/$developer-mode-tiles">
-              <sl-icon name="code-square"></sl-icon>
               Developer Mode Tiles
             </a>
           </sl-tree-item>
@@ -95,26 +116,26 @@ export class CosmoSideBar extends withStores(LitElement, [$uiSideBarShowing, $ro
       <div id="root" class=${$uiSideBarShowing.get() ? 'open' : 'closed'}>
         <cm-identity-switcher></cm-identity-switcher>
 
-        <details class=${ route === 'search' ? 'selected' : ''} ?open=${route === 'search'}>
+        <details id="search" class=${ route === 'search' ? 'selected' : ''}>
           <summary><sl-icon name="search"></sl-icon> <a href="#/search/">Search</a></summary>
           <ul>
             <li class="no-results">No saved searches.</li>
           </ul>
         </details>
 
-        <details class=${ route === 'social' ? 'selected' : ''} ?open=${route === 'social'}>
+        <details id="social" class=${ route === 'social' ? 'selected' : ''}>
           <summary><sl-icon name="people-fill"></sl-icon> <a href="#/social/">Social</a></summary>
           <ul>
             <li class="no-results">No lists.</li>
           </ul>
         </details>
 
-        <details class=${ route === 'library' ? 'selected' : ''} ?open=${route === 'library'}>
+        <details id="library" class=${ route === 'library' ? 'selected' : ''}>
           <summary><sl-icon name="collection"></sl-icon> <a href="#/library/">Library</a></summary>
           ${library}
         </details>
 
-        <details class=${ route === 'apps' ? 'selected' : ''} ?open=${route === 'apps'}>
+        <details id="apps" class=${ route === 'apps' ? 'selected' : ''}>
           <summary><sl-icon name="app-indicator"></sl-icon> <a href="#/apps/">Apps</a></summary>
         </details>
       </div>

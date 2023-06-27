@@ -82,9 +82,13 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
         border-radius: 0;
         height: 100%;
       }
+      sl-card::part(body) {
+        --padding: 0;
+      }
       .mode-icon-grid {
         display: grid;
         grid: auto-flow / repeat(4, 80px);
+        padding: var(--sl-spacing-large);
       }
       .mode-icon-grid a {
         display: block;
@@ -126,6 +130,13 @@ export class CosmoFeedTilesStack extends withStores(LitElement, [$router, $left,
               <span class="name">${ti.short_name || ti.name}</span>
             </a>
           `)}
+        </div>
+      `;
+    }
+    if ($uiFeedMode.value === 'tiles-timeline') {
+      return html`
+        <div class="mode-tiles-timeline">
+          ${$uiFeedData.value.map(tile => html`<cm-tile-card .tile=${tile}></cm-tile-card>`)}
         </div>
       `;
     }

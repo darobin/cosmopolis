@@ -44,6 +44,9 @@ sources:
 
 ![A long list of feed sources](lots.jpg)
 
+Dave sugggested Federated Wiki and it's really cool:
+http://makecommoningwork.fed.wiki/view/federated-wiki/view/discrimination-free-infrastructure/view/federated-wiki/view/commons
+
 ## Reader Inspiration
 
 Overall, I looked at a bunch of RSS readers and read-later apps: Web Subscriber, lire,

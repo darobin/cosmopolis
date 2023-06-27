@@ -22,6 +22,7 @@ import './stores/local-tiles.js';
 import './el/title-bar.js';
 import './el/side-bar.js';
 import './el/tile-icon.js';
+import './el/tile-card.js';
 import './el/tile.js';
 import './el/identity-switcher.js';
 import './el/feed-tiles-stack.js';

@@ -1,7 +1,7 @@
 
 import { atom, computed, action } from 'nanostores';
 import { $router } from './router.js';
-import { $tilesInstalledAppsCached } from './tiles.js';
+import { $tilesInstalledAppsCached, $tilesDevModeCached } from './tiles.js';
 
 export const $uiSideBarShowing = atom(true);
 
@@ -11,25 +11,26 @@ export const toggleSideBar = action($uiSideBarShowing, 'toggleSideBar', (store) 
 
 const feedWidths = {
   apps: 360,
+  library: 360,
 };
 export const $uiFeedWidth = computed($router, (router) => feedWidths[router.route] || 0);
 
 const feedTitles = {
   apps: 'Apps',
+  library: 'Library',
+  '$developer-mode-tiles': 'Developer Tiles',
 };
 export const $uiFeedTitle = computed($router, (router) => {
-  if (feedTitles[router.route]) return feedTitles[router.route];
-  // here we can also derive from feed cache data
-  return '';
+  return specialSelector(router, feedTitles);
 });
 
 const feedIcons = {
   apps: 'builtin:app-indicator',
+  library: 'builtin:collection',
+  '$developer-mode-tiles': 'builtin:code-square',
 };
 export const $uiFeedIcon = computed($router, (router) => {
-  if (feedIcons[router.route]) return feedIcons[router.route];
-  // here we can also derive from feed cache data
-  return '';
+  return specialSelector(router, feedIcons);
 });
 
 const feedModes = {
@@ -37,15 +38,27 @@ const feedModes = {
 };
 export const $uiFeedMode = computed($router, (router) => feedModes[router.route] || 'tiles-timeline');
 
-export const $uiFeedData = computed([$router, $tilesInstalledAppsCached], (router, installedApps) => {
+export const $uiFeedData = computed([$router, $tilesInstalledAppsCached, $tilesDevModeCached], (router, installedApps, devModeTiles) => {
   if (router.route === 'apps') return installedApps.map(app => ({ ...app, link: `#/apps/${app.authority}` }));
+  if (router.route === 'library') {
+    if (router.params.path === '$developer-mode-tiles') return devModeTiles.map(tile => ({ ...tile, link: `#/library/$developer-mode-tiles/${tile.authority}` }));
+    // special paths start with $, the rest are just IDs that select into the tree (the view has to unfold to match)
+    return [];
+  }
   // here we can also load and feed and such
-  return '';
+  return [];
 });
 
 export const $uiTilePrimary = computed([$router], (router) => {
-  if (router.route === 'apps') {
-    if (router.params.authority) return `tile://${router.params.authority}/`;
-  }
+  if (router.params.authority) return `tile://${router.params.authority}/`;
   return null;
 });
+
+function specialSelector (router, data) {
+  let selector = router.route;
+  if (router.route === 'library' && router.params?.path?.startsWith('$') && data[router.params.path]) {
+    selector = router.params.path;
+  }
+  if (data[selector]) return data[selector];
+  return '';
+}
