@@ -10,10 +10,13 @@ export class CosmoIdentitySwitcher extends LitElement {
       #root {
         display: flex;
       }
-      #avatar sl-avatar {
+      sl-avatar {
         width: var(--sl-spacing-3x-large);
         height: var(--sl-spacing-3x-large);
         margin-right: var(--sl-spacing-small);
+      }
+      sl-avatar::part(base) {
+        background: var(--cm-electric-blue);
       }
       #details {
         flex-grow: 1;
@@ -21,6 +24,7 @@ export class CosmoIdentitySwitcher extends LitElement {
       }
       #details sl-skeleton:first-child {
         width: 70%;
+        --color: #666;
       }
       #details sl-skeleton:last-child {
         width: 90%;
@@ -28,12 +32,12 @@ export class CosmoIdentitySwitcher extends LitElement {
       #details sl-skeleton:not(:first-child) {
         height: var(--sl-spacing-2x-small);
         margin-top: var(--sl-spacing-2x-small);
+        --color: var(--cm-mid-grey);;
       }
       #details sl-skeleton:not(:first-child)::part(base) {
         min-height: var(--sl-spacing-2x-small);
       }
-      sl-skeleton, sl-avatar {
-        --color: var(--cm-lightest);
+      sl-skeleton {
         opacity: 0.8;
       }
     `

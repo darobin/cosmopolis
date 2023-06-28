@@ -9,7 +9,7 @@ export class CosmoTitleBar extends withStores(LitElement, [$uiSideBarShowing]) {
       #root {
         -webkit-app-region: drag;
         color: var(--cm-complementary-electric);
-        background: var(--cm-lightest);
+        background: var(--cm-neutral-grey);
         display: flex;
         align-items: center;
         /* NOTE: this is OSX-specific */
@@ -29,8 +29,12 @@ export class CosmoTitleBar extends withStores(LitElement, [$uiSideBarShowing]) {
         min-height: var(--cm-osx-title-bar-height);
       }
       #title {
+        display: flex;
+        align-items: center;
         width: -webkit-fill-available;
         border-left: 1px solid var(--cm-mid-grey);
+        background: var(--cm-lightest);
+        height: 100%;
       }
       h1 {
         padding: 0 0 0 var(--sl-spacing-x-small);
