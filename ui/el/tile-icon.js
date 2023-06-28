@@ -6,6 +6,9 @@ const empty = (size) => html`<div style=${`display: inline-block; width: ${size}
 export class CosmoTileIcon extends LitElement {
   static styles = [
     css`
+    :host {
+      display: flex;
+    }
     `
   ];
   static properties = {

@@ -105,7 +105,7 @@ export class CosmoFeedTilesStack extends withStores(
       sl-card::part(footer) {
         text-align: right;
       }
-      .mode-icon-grid, .selector-icon-grid {
+      .mode-icon-grid {
         display: grid;
         grid: auto-flow / repeat(4, 80px);
         padding: var(--sl-spacing-large);
@@ -124,6 +124,18 @@ export class CosmoFeedTilesStack extends withStores(
       }
       .mode-icon-grid a:hover {
         color: var(--cm-electric-blue);
+      }
+      .selector-icon-grid {
+        padding: var(--sl-spacing-medium);
+      }
+      .selector-icon-grid > div {
+        padding-bottom: var(--sl-spacing-small);
+      }
+      .selector-icon-grid sl-button {
+        width: 100%;
+      }
+      .selector-icon-grid sl-button::part(base) {
+        justify-content: flex-start;
       }
     `
   ];
@@ -247,16 +259,16 @@ export class CosmoFeedTilesStack extends withStores(
           </div>
           <div class="selector-icon-grid">
             ${$wishGranterCandidates.value.map(ti => html`
-            <sl-button data-link=${ti.link} @click=${this.handleSelectWish}>
-              <span class="icon">
+            <div>
+              <sl-button data-link=${ti.link} @click=${this.handleSelectWish} size="large">
                 ${
                   typeof ti.icons === 'string' && ti.icons.startsWith('builtin:')
-                  ? html`<sl-icon name=${ti.icons.replace('builtin:', '')}></sl-icon>`
-                  : html`<cm-tile-icon size="48" alt=${`${ti.short_name || ti.name} icon`} base=${`tile://${ti.authority}/`} .sources=${ti.icons}></cm-tile-icon>`
+                  ? html`<sl-icon name=${ti.icons.replace('builtin:', '')} slot="prefix" style="font-size: 24px"></sl-icon>`
+                  : html`<cm-tile-icon size="32" alt=${`${ti.short_name || ti.name} icon`} base=${`tile://${ti.authority}/`} .sources=${ti.icons} slot="prefix"></cm-tile-icon>`
                 }
-              </span>
-              <span class="name">${ti.short_name || ti.name}</span>
-            </sl-button>
+                ${ti.short_name || ti.name}
+              </sl-button>
+            </div>
           `)}
           </div>
           <div slot="footer">
