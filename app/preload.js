@@ -44,6 +44,14 @@ contextBridge.exposeInMainWorld('cosmopolis', {
   // preferences
   getSimpleData: (keyPath) => invoke('simple-data:get', keyPath),
   setSimpleData: (keyPath, data) => invoke('simple-data:set', keyPath, data),
+  // wishes
+  cancelWish: (tid, wid) => {
+    const port = tilePorts[tid];
+    console.warn(`we have port(${tid})`, port);
+    if (!port) return;
+    console.warn(`sending`, { type: 'cancel-wish', wish: { id: wid }});
+    port.postMessage({ type: 'cancel-wish', wish: { id: wid }});
+  },
   // pick local file
   pickLocalFile: () => invoke('wish:pick-local-image'),
   // XXX none of the below have been reviewed

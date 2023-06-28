@@ -15,15 +15,16 @@ contextBridge.exposeInMainWorld('makeWish', makeWish);
 async function makeWish (type, options = {}) {
   const id = await invoke('wish:generate-id');
   primaryPort.postMessage({ type: 'make-wish', wish: { id, type, options }});
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const wishHandler = (ev) => {
       const { type, wish } = ev.data;
       if (!wish || wish.id !== id) return;
-      primaryPort.removeEventListener('message', wishHandler);
-      if (type === 'cancel-wish') return reject();
+      primaryPort.onmessage = null;
+      // NOTE: we resolve empty, cancellation isn't an error
+      if (type === 'cancel-wish') return resolve();
       if (type === 'grant-wish') return resolve(); // XXX need to have some data in there
     };
-    primaryPort.addEventListener('message', wishHandler);
+    primaryPort.onmessage = wishHandler;
   });
 }
 

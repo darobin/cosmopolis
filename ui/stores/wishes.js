@@ -14,6 +14,7 @@ export const $wishSelector = atom({
   title: null,
   filters: [],
   wishID: null,
+  tileID: null,
 });
 export const showWishSelector = action($wishSelector, 'showWishSelector', (store, tileID, wish) => {
   if (tileID === $uiTilePrimary.get()) {
@@ -37,8 +38,21 @@ export const showWishSelector = action($wishSelector, 'showWishSelector', (store
     title: selectorTitle[wish.type] || wish.type,
     wishID: wish.id,
     filters: wish.filters,
+    tileID,
   });
   updateMatchingWishes(wish.type, wish.filters);
+});
+export const cancelWishSelection = action($wishSelector, 'cancelWishSelection', (store) => {
+  const tid = store.get().tileID;
+  const wid = store.get().wishID;
+  store.set({
+    showing: false,
+    type: null,
+    title: '',
+    wishID: null,
+    filters: [],
+  });
+  window.cosmopolis.cancelWish(tid, wid);
 });
 
 // Each wish is described by:

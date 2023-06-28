@@ -4,7 +4,7 @@ import { withStores } from "@nanostores/lit";
 import { computed } from 'nanostores'
 import { $router } from '../stores/router.js';
 import { $uiSideBarShowing, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedData, $uiFeedMode, $uiTilePrimary } from '../stores/ui.js';
-import { $wishSelector, showWishSelector } from '../stores/wishes.js';
+import { $wishSelector, showWishSelector, cancelWishSelection, $wishGranterCandidates } from '../stores/wishes.js';
 
 // this has to always be px
 const SIDE_BAR_WIDTH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cm-side-bar-width'), 10);
@@ -121,6 +121,7 @@ export class CosmoFeedTilesStack extends withStores(
     scrollLeft: { type: Number },
     scrollTick: { type: Boolean },
   };
+  // this is called whenver a tile makes a wish
   // { tileID: the target tile, type: make-wish|, wish: { id: wish ID, ...} }
   wishHandler (data) {
     console.warn(`wishing`, data);
@@ -161,8 +162,7 @@ export class CosmoFeedTilesStack extends withStores(
       </ul>
     `;
   }
-  render () {
-    let feed = nothing;
+  renderFeed () {
     if ($uiFeedWidth.value) {
       const iconURL = $uiFeedIcon.value;
       let icon = nothing;
@@ -174,7 +174,7 @@ export class CosmoFeedTilesStack extends withStores(
           icon = html`<img src=${iconURL} width="20" height="20">`;
         }
       }
-      feed = html`
+      return html`
         <sl-card id="feed" style=${`width: ${$uiFeedWidth.value}px`}>
           <div slot="header">
             <h3>${icon} ${$uiFeedTitle.value}</h3>
@@ -183,14 +183,16 @@ export class CosmoFeedTilesStack extends withStores(
         </sl-card>
       `;
     }
-    let primaryTile = nothing;
+    return nothing;
+  }
+  renderPrimaryTile () {
     const root = this.shadowRoot.querySelector('#root');
     if ($uiTilePrimary.value && root) {
       const left =  $uiFeedWidth.value;
       const tileX = left + $left.value + BORDER_WIDTH - (this.scrollLeft || 0);
       const tileY = TITLE_BAR_HEIGHT + CARD_HEADER_HEIGHT + BORDER_WIDTH;
       const tileHeight = (root.clientHeight || 0) - (CARD_HEADER_HEIGHT + BORDER_WIDTH);
-      primaryTile = html`
+      return html`
         <sl-card id="primary-tile" style=${`left: ${left}px; width: ${PRIMARY_TILE_WIDTH + (BORDER_WIDTH * 2)}px`}>
           <div slot="header">
             <h3>Tile</h3>
@@ -199,27 +201,37 @@ export class CosmoFeedTilesStack extends withStores(
         </sl-card>
       `;
     }
-    let selector = nothing;
+    return nothing;
+  }
+  renderWishSelector () {
     if ($wishSelector.value.showing) {
       // XXX this gets more complicated when we factor in wishes
       const left =  $uiFeedWidth.value + PRIMARY_TILE_WIDTH;
       // XXX need to scroll this into view but only when it switches from visible to non-visible and after the DOM has updated
-      selector = html`
+      // NOTE: we can always just scroll all the way right!
+      return html`
         <sl-card id="selector" style=${`left: ${left}px;`}>
           <div slot="header">
             <h3>${$wishSelector.value.title}</h3>
           </div>
           <div class="selector-icon-grid">
             <!-- XXX fill this -->
+            <!-- XXX include cancel button -->
+          </div>
+          <div slot="footer">
+            <sl-button @click=${cancelWishSelection}>Cancel</sl-button>
           </div>
         </sl-card>
       `;
     }
+    return nothing;
+  }
+  render () {
     return html`
       <div id="root" style=${`left: ${$left.value}px`} @scroll=${this.updateScroll}>
-        ${feed}
-        ${primaryTile}
-        ${selector}
+        ${this.renderFeed()}
+        ${this.renderPrimaryTile()}
+        ${this.renderWishSelector()}
       </div>
     `;
   }
