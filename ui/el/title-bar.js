@@ -27,12 +27,12 @@ export class CosmoTitleBar extends withStores(LitElement, [$uiSideBarShowing]) {
         align-items: center;
         min-width: var(--cm-osx-title-bar-height);
         min-height: var(--cm-osx-title-bar-height);
+        border-right: 1px solid var(--cm-mid-grey);
       }
       #title {
         display: flex;
         align-items: center;
         width: -webkit-fill-available;
-        border-left: 1px solid var(--cm-mid-grey);
         background: var(--cm-lightest);
         height: 100%;
       }

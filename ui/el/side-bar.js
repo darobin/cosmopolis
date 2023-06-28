@@ -16,7 +16,6 @@ export class CosmoSideBar extends withStores(LitElement, [$uiSideBarShowing, $ro
         width: var(--cm-side-bar-width);
         transition: left var(--sl-transition-medium);
         background: var(--cm-neutral-grey);
-        border-right: 1px solid var(--cm-mid-grey);
       }
       #root.open {
         left: 0;

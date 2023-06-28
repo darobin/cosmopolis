@@ -4,7 +4,7 @@ import { withStores } from "@nanostores/lit";
 import { computed } from 'nanostores'
 import { $router } from '../stores/router.js';
 import { $uiSideBarShowing, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedData, $uiFeedMode, $uiTilePrimary } from '../stores/ui.js';
-import { $wishSelector, showWishSelector, cancelWishSelection, $wishGranterCandidates } from '../stores/wishes.js';
+import { $wishSelector, showWishSelector, cancelWishSelection, $wishGranterCandidates, makeAWish, $wishTiles } from '../stores/wishes.js';
 
 // this has to always be px
 const SIDE_BAR_WIDTH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cm-side-bar-width'), 10);
@@ -39,7 +39,12 @@ const CARD_HEADER_HEIGHT = 45;
 
 export class CosmoFeedTilesStack extends withStores(
     LitElement,
-    [$router, $left, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedMode, $uiFeedData, $uiTilePrimary, $wishSelector]
+    [
+      $router,
+      $left,
+      $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedMode, $uiFeedData, $uiTilePrimary,
+      $wishSelector, $wishGranterCandidates, $wishTiles,
+    ]
   ) {
   static styles = [
     css`
@@ -94,6 +99,11 @@ export class CosmoFeedTilesStack extends withStores(
       }
       sl-card::part(body) {
         --padding: 0;
+        flex-grow: 1;
+        overflow: auto;
+      }
+      sl-card::part(footer) {
+        text-align: right;
       }
       .mode-icon-grid, .selector-icon-grid {
         display: grid;
@@ -121,11 +131,32 @@ export class CosmoFeedTilesStack extends withStores(
     scrollLeft: { type: Number },
     scrollTick: { type: Boolean },
   };
+  constructor () {
+    super();
+    $wishSelector.subscribe((sel) => {
+      if (sel.showing) this.scrollRight();
+    });
+    $wishTiles.subscribe(() => this.scrollRight());
+  }
   // this is called whenver a tile makes a wish
   // { tileID: the target tile, type: make-wish|, wish: { id: wish ID, ...} }
   wishHandler (data) {
     console.warn(`wishing`, data);
     if (data.type === 'make-wish') showWishSelector(data.tileID, data.wish);
+  }
+  handleSelectWish (ev) {
+    const link = ev.currentTarget.getAttribute('data-link');
+    makeAWish(link);
+  }
+  scrollRight () {
+    const root = this.shadowRoot?.querySelector('#root');
+    if (!root) return;
+    setTimeout(() => {
+      root.scrollLeft = root.scrollWidth;
+      // Smooth sounds good but trying to update the BrowserView fast enough throws an endless
+      // series of exceptions. There may be a fix (hiding the BV), I haven't dug into it.
+      // root.scrollTo({ left: root.scrollWidth, behavior: 'smooth' });
+    }, 100);
   }
   updateScroll () {
     if (!this.scrollTick) {
@@ -215,8 +246,18 @@ export class CosmoFeedTilesStack extends withStores(
             <h3>${$wishSelector.value.title}</h3>
           </div>
           <div class="selector-icon-grid">
-            <!-- XXX fill this -->
-            <!-- XXX include cancel button -->
+            ${$wishGranterCandidates.value.map(ti => html`
+            <sl-button data-link=${ti.link} @click=${this.handleSelectWish}>
+              <span class="icon">
+                ${
+                  typeof ti.icons === 'string' && ti.icons.startsWith('builtin:')
+                  ? html`<sl-icon name=${ti.icons.replace('builtin:', '')}></sl-icon>`
+                  : html`<cm-tile-icon size="48" alt=${`${ti.short_name || ti.name} icon`} base=${`tile://${ti.authority}/`} .sources=${ti.icons}></cm-tile-icon>`
+                }
+              </span>
+              <span class="name">${ti.short_name || ti.name}</span>
+            </sl-button>
+          `)}
           </div>
           <div slot="footer">
             <sl-button @click=${cancelWishSelection}>Cancel</sl-button>
@@ -226,11 +267,22 @@ export class CosmoFeedTilesStack extends withStores(
     }
     return nothing;
   }
+  renderWishes () {
+    if ($wishTiles.value?.length) {
+      return html`
+        <p>
+          ${$wishTiles.value.map(w => w.link)}
+        </p>
+      `;
+    }
+    return nothing;
+  }
   render () {
     return html`
       <div id="root" style=${`left: ${$left.value}px`} @scroll=${this.updateScroll}>
         ${this.renderFeed()}
         ${this.renderPrimaryTile()}
+        ${this.renderWishes()}
         ${this.renderWishSelector()}
       </div>
     `;

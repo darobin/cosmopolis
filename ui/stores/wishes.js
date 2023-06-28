@@ -8,7 +8,7 @@ const selectorTitle = {
   pick: 'Pick',
   edit: 'Edit',
 }
-export const $wishSelector = atom({
+const defaultSelector = () => ({
   showing: false,
   type: null,
   title: null,
@@ -16,22 +16,10 @@ export const $wishSelector = atom({
   wishID: null,
   tileID: null,
 });
+export const $wishSelector = atom(defaultSelector());
 export const showWishSelector = action($wishSelector, 'showWishSelector', (store, tileID, wish) => {
-  if (tileID === $uiTilePrimary.get()) {
-    setWishTiles([]);
-  }
-  else {
-    let seen = false;
-    const newWishes = $wishTiles.get().filter(tid => {
-      if (tid === tileID) {
-        seen = true;
-        return true;
-      }
-      if (seen) return false;
-      return true;
-    });
-    setWishTiles(newWishes);
-  }
+  if (tileID === $uiTilePrimary.get()) emptyWishTiles([]);
+  else trimWishTilesAfter(tileID);
   store.set({
     showing: true,
     type: wish.type,
@@ -45,15 +33,18 @@ export const showWishSelector = action($wishSelector, 'showWishSelector', (store
 export const cancelWishSelection = action($wishSelector, 'cancelWishSelection', (store) => {
   const tid = store.get().tileID;
   const wid = store.get().wishID;
-  store.set({
-    showing: false,
-    type: null,
-    title: '',
-    wishID: null,
-    filters: [],
-  });
+  store.set(defaultSelector());
   window.cosmopolis.cancelWish(tid, wid);
 });
+export const hideWishSelector = action($wishSelector, 'hideWishSelector', (store) => {
+  const sel = store.get();
+  sel.showing = false;
+  store.set(sel);
+});
+export const restoreWishSelector = action($wishSelector, 'restoreWishSelector', (store, data) => {
+  store.set(data);
+});
+
 
 // Each wish is described by:
 //  - name
@@ -76,7 +67,7 @@ export const updateMatchingWishes = action($wishGranterCandidates, 'updateMatchi
     granters.unshift({
       name: 'Local device file',
       description: 'Pick a file from a local device drive',
-      icons: [{ src: `builtin:file-earmark-fill` }],
+      icons: `builtin:file-earmark-fill`,
       headless: true,
       internal: new FilePickerPickWish({ filters }),
       type: 'pick',
@@ -95,8 +86,35 @@ function hasMatchingType (supported, filters) {
   });
 }
 
+// This list stashes selector parameters: they are what produced this wish and they can be
+// used to restore the selector on wish cancel.
 export const $wishTiles = atom([]);
-const setWishTiles = action($wishTiles, 'setWishTiles', (store, value) => store.set(value));
+export const emptyWishTiles = action($wishTiles, 'emptyWishTiles', (store) => store.set([]));
+export const trimWishTilesAfter = action($wishTiles, 'trimWishTilesAfter', (store, tileID) => {
+  let seen = false;
+  const newWishes = store.get().filter(w => {
+    if (w.tileID === tileID) {
+      seen = true;
+      return true;
+    }
+    if (seen) return false;
+    return true;
+  });
+  store.set(newWishes);
+});
+export const makeAWish = action($wishTiles, 'makeAWish', (store, link) => {
+  const selector = $wishSelector.get();
+  const wishes = store.get();
+  wishes.push({ ...selector, link });
+  hideWishSelector();
+  store.set(wishes);
+});
+export const cancelWish = action($wishTiles, 'cancelWish', (store) => {
+  const wishes = store.get();
+  const selector = wishes.pop();
+  restoreWishSelector(selector);
+  store.set(wishes);
+});
 
 // this is an internal wish implementation
 // probably factor out at some point
