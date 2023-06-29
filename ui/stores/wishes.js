@@ -95,9 +95,9 @@ export const emptyWishTiles = action($wishTiles, 'emptyWishTiles', (store) => st
 export const trimWishTilesAfter = action($wishTiles, 'trimWishTilesAfter', (store, tileID) => {
   let seen = false;
   const newWishes = store.get().filter(w => {
-    if (w.tileID === tileID) {
+    if (w.selector.tileID === tileID) { // XXX this is not correct, we don't have that tileID
       seen = true;
-      return true;
+      return false;
     }
     if (seen) return false;
     return true;
@@ -129,6 +129,28 @@ export const cancelWish = action($wishTiles, 'cancelWish', (store, wid) => {
   restoreWishSelector(top.selector);
   store.set([...wishes]);
 });
+
+// We need to know which wish is being granted (with wish.id) because a wish in the middle of the
+// list of wish tiles could decide to grant because YOLO.
+// This means clear all the ones on the right
+export const grantWish = action($wishTiles, 'grantWish', (store, tileID, wish, data) => {
+  console.warn(`
+    [primary ${$wishTiles.get().map(w => w.selector.tileID).join(' ')}]
+    looking for ${tileID}
+  `);
+  let wishes = store.get();
+  const primaryTileID = wishes[0].selector.tileID;
+  // For any given wish tile in $wishTiles, the .selector.tileID is the ID of the tile to its left (that
+  // caused it). If we find it, that means we're granting from the middle of a wish list. We wipe that
+  // tile and all of those right of it. Then we wipe the last of the remaining list (which is the granting one).
+  const idx = wishes.findIndex(w => w.selector.tileID === tileID);
+  if (idx > -1) wishes = wishes.slice(0, idx);
+  wishes.pop();
+  const grantTo = wishes[wishes.length - 1];
+  window.cosmopolis.grantWish(grantTo?.selector?.tileID || primaryTileID, wish, data);
+  store.set([...wishes]);
+});
+
 
 // this is an internal wish implementation
 // probably factor out at some point

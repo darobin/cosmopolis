@@ -14,7 +14,7 @@ contextBridge.exposeInMainWorld('cosmopolis', {
     ipcRenderer.postMessage('connect-port', null, [port2]);
   },
   // browser view management
-  addBrowserView: (id, props, wishHandler, wishType, wishData) => {
+  addBrowserView: (id, props, wishHandler, wishType, wishID, wishData) => {
     if (!sendMessagePort) throw new Error('Cannot create a BrowserView before the message port is initialised.');
     ipcRenderer.once(`connect-tile-${id}`, (ev) => {
       const port = ev.ports[0];
@@ -24,6 +24,7 @@ contextBridge.exposeInMainWorld('cosmopolis', {
           type: 'instantiate-wish',
           wish: {
             type: wishType,
+            id: wishID,
             data: wishData,
           }
         });
@@ -55,11 +56,16 @@ contextBridge.exposeInMainWorld('cosmopolis', {
   getSimpleData: (keyPath) => invoke('simple-data:get', keyPath),
   setSimpleData: (keyPath, data) => invoke('simple-data:set', keyPath, data),
   // wishes
-  cancelWish: (tid, wid) => {
+  grantWish: (tid, wish, data) => {
     const port = tilePorts[tid];
     console.warn(`we have port(${tid})`, port);
     if (!port) return;
-    console.warn(`sending`, { type: 'cancel-wish', wish: { id: wid }});
+    console.warn(`sending`, { type: 'grant-wish', wish, data });
+    port.postMessage({ type: 'grant-wish', wish, data });
+  },
+  cancelWish: (tid, wid) => {
+    const port = tilePorts[tid];
+    if (!port) return;
     port.postMessage({ type: 'cancel-wish', wish: { id: wid }});
   },
   // pick local file

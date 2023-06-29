@@ -21,6 +21,7 @@ export class CosmoTile extends LitElement {
     height: { type: Number },
     src: { type: String },
     wishtype: { type: String },
+    wishid: { type: String },
     wishhandler: { attribute: false },
     wishdata: { attribute: false },
     id: { type: String },
@@ -43,7 +44,7 @@ export class CosmoTile extends LitElement {
   }
   addBV () {
     this.id = nanoid();
-    addBrowserView(this.id, { x: this.x || 0, y: this.y || 0, width: this.width || 0, height: this.height || 0, src: this.src }, this.wishhandler, this.wishtype, this.wishdata);
+    addBrowserView(this.id, { x: this.x || 0, y: this.y || 0, width: this.width || 0, height: this.height || 0, src: this.src }, this.wishhandler, this.wishtype, this.wishid, this.wishdata);
   }
   updateBV () {
     updateBrowserView(this.id, { x: this.x || 0, y: this.y || 0, width: this.width || 0, height: this.height || 0, src: this.src });

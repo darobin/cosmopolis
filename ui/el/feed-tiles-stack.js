@@ -4,7 +4,7 @@ import { withStores } from "@nanostores/lit";
 import { computed } from 'nanostores'
 import { $router } from '../stores/router.js';
 import { $uiSideBarShowing, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedData, $uiFeedMode, $uiTilePrimary } from '../stores/ui.js';
-import { $wishSelector, showWishSelector, cancelWishSelection, $wishGranterCandidates, makeAWishFromSelector, cancelWish, $wishTiles } from '../stores/wishes.js';
+import { $wishSelector, showWishSelector, cancelWishSelection, $wishGranterCandidates, makeAWishFromSelector, cancelWish, $wishTiles, grantWish } from '../stores/wishes.js';
 
 // this has to always be px
 const SIDE_BAR_WIDTH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cm-side-bar-width'), 10);
@@ -151,6 +151,11 @@ export class CosmoFeedTilesStack extends withStores(
   wishHandler (data) {
     console.warn(`wishing`, data);
     if (data.type === 'make-wish') showWishSelector(data.tileID, data.wish);
+    // NOTE: when granting, the wish.id is the wish made by the tile left of the one granting.
+    // We automatically get a tileID, which is from the *granting* tile.
+    else if (data.type === 'granting-wish') {
+      grantWish(data.tileID, data.wish, data.data);
+    }
   }
   handleSelectWish (ev) {
     const id = ev.currentTarget.getAttribute('data-id');
@@ -299,7 +304,7 @@ export class CosmoFeedTilesStack extends withStores(
             <div slot="header">
               <h3>${granter.name}</h3>
             </div>
-            <cm-tile .x=${x} .y=${y} .width=${width} .height=${height} src=${granter.url} wishtype=${selector.wish.type} .wishhandler=${this.wishHandler} .wishdata=${selector.wish?.data}></cm-tile>
+            <cm-tile .x=${x} .y=${y} .width=${width} .height=${height} src=${granter.url} wishtype=${selector.wish.type} wishid=${selector.wish.id} .wishhandler=${this.wishHandler} .wishdata=${selector.wish?.data}></cm-tile>
             <div slot="footer">
               <sl-button @click=${this.handleCancelWish} data-selector-wish-id=${selector.wish.id}>Cancel</sl-button>
             </div>

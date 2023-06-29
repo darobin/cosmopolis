@@ -14,12 +14,12 @@ export const $browserViews = map({});
 // Async actions can be awaited with allTasks() but postMessage is just fire and forget. We could wait for
 // a response confirming load.
 // props: x, y, width, height, src
-export const addBrowserView = action($browserViews, 'addBrowserView', (store, id, props, wishHandler, wishType, wishData) => {
+export const addBrowserView = action($browserViews, 'addBrowserView', (store, id, props, wishHandler, wishType, wishID, wishData) => {
   const handlerWrapper = (data) => {
     data.tileID = id;
     wishHandler(data);
   };
-  window.cosmopolis.addBrowserView(id, props, handlerWrapper, wishType, wishData);
+  window.cosmopolis.addBrowserView(id, props, handlerWrapper, wishType, wishID, wishData);
   store.setKey(id, props);
 });
 

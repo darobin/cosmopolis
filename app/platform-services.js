@@ -28,7 +28,8 @@ export function registerPlatformServiceHandlers () {
 let receiveMessagePort;
 const browserViews = {};
 export function connectMessaging (mainWindow) {
-  ipcMain.on('connect-port', (ev) => {
+  ipcMain.on('connect-port', async (ev) => {
+    await wipeBrowserViews(mainWindow);
     receiveMessagePort = ev.ports[0];
     receiveMessagePort.on('message', (ev) => {
       const { type, x, y, width, height, src, id } = ev.data;
@@ -64,7 +65,10 @@ export function connectMessaging (mainWindow) {
 }
 
 export function wipeBrowserViews (mainWindow) {
-  Object.keys(browserViews).forEach(k => mainWindow.removeBrowserView(browserViews[k]));
+  Object.keys(browserViews).forEach(k => {
+    mainWindow.removeBrowserView(browserViews[k]);
+    delete browserViews[k];
+  });
 }
 
 async function handleSettingsGet (ev, keyPath) {

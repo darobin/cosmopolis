@@ -25,16 +25,15 @@ function wishHandler (ev) {
     activeWishResolver();
   }
   else if (type === 'grant-wish') {
-    if (!wish.id || wish.id !== activeWishID) return;
     activeWishResolver(ev.data.data || true); // ev.data.data is for returned data
   }
   else if (type === 'instantiate-wish') {
-    alert('wishing ' + wish.type);
     contextBridge.exposeInMainWorld('currentWish', {
       type: wish.type,
       // data: data ? blobFromCloneable(data) : undefined, // XXX I hope we don't need blobFromCloneable
       data: wish.data, // wish.data is for sent data
       grant: async (blob) => {
+        // alert('granting ' + wish.type);
         primaryPort.postMessage({ type: 'granting-wish', wish: { ...wish }, data: blob });
         // XXX OLD
         // This is a bit of a mindfuck. Each preload is a different instance. Here we are in a wish tile. We send the
