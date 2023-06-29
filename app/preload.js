@@ -14,10 +14,20 @@ contextBridge.exposeInMainWorld('cosmopolis', {
     ipcRenderer.postMessage('connect-port', null, [port2]);
   },
   // browser view management
-  addBrowserView: (id, props, wishHandler) => {
+  addBrowserView: (id, props, wishHandler, wishType, wishData) => {
     if (!sendMessagePort) throw new Error('Cannot create a BrowserView before the message port is initialised.');
     ipcRenderer.once(`connect-tile-${id}`, (ev) => {
-      registerTileHandling(id, ev.ports[0], wishHandler);
+      const port = ev.ports[0];
+      registerTileHandling(id, port, wishHandler);
+      if (wishType) {
+        port.postMessage({
+          type: 'instantiate-wish',
+          wish: {
+            type: wishType,
+            data: wishData,
+          }
+        });
+      }
     });
     sendMessagePort.postMessage({
       ...props,

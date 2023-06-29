@@ -6,47 +6,67 @@ const { invoke } = ipcRenderer;
 let primaryPort;
 ipcRenderer.once(`connect-tile`, (ev) => {
   primaryPort = ev.ports[0];
+  primaryPort.onmessage = wishHandler;
+  primaryPort.start();
 });
+
+// If we are *making* a wish, then we can receive cancel-wish or grant-wish, which will call
+// activeWishResolver() to resolve the window.makeWish() promise with. It needs to match the
+// activeWishID to make sure that we are keeping track of what is landing where.
+// If we are *handling* a wish, then we expose currentWish and trigger an event.
+// XXX write up full wish steps.
+let activeWishResolver = () => {};
+let activeWishID;
+function wishHandler (ev) {
+  const { type, wish } = ev.data;
+  if (!type || !wish) return;
+  if (type === 'cancel-wish') {
+    if (!wish.id || wish.id !== activeWishID) return;
+    activeWishResolver();
+  }
+  else if (type === 'grant-wish') {
+    if (!wish.id || wish.id !== activeWishID) return;
+    activeWishResolver(ev.data.data || true); // ev.data.data is for returned data
+  }
+  else if (type === 'instantiate-wish') {
+    alert('wishing ' + wish.type);
+    contextBridge.exposeInMainWorld('currentWish', {
+      type: wish.type,
+      // data: data ? blobFromCloneable(data) : undefined, // XXX I hope we don't need blobFromCloneable
+      data: wish.data, // wish.data is for sent data
+      grant: async (blob) => {
+        primaryPort.postMessage({ type: 'granting-wish', wish: { ...wish }, data: blob });
+        // XXX OLD
+        // This is a bit of a mindfuck. Each preload is a different instance. Here we are in a wish tile. We send the
+        // granted blob to our host, a webview in a cm-tile element. That cm-tile element has a parent cm-tile element.
+        // It tells the parent cm-tile element about the granted blob. The parent then dispatches a cm-wish-granted
+        // event to its own webview, which is where the other preload exists. That's the code below handling this event
+        // by hitting the wishRegistry.
+        // To make things EVEN MORE interesting, in this case Electron refuses to structure-clone a blob. So instead we
+        // convert it to an ArrayBuffer and type, and rebuild it on the other side
+        // ipcRenderer.sendToHost('cm-wish-granted', await cloneableBlob(blob), wid);
+      },
+    });
+    const wev = new CustomEvent('wish');
+    window.dispatchEvent(wev);
+  }
+  activeWishResolver = () => {};
+}
 
 // wishing
 contextBridge.exposeInMainWorld('makeWish', makeWish);
 
-// we want options for multiple, title, message too
+// We want options for multiple, title, message too.
+// Note that options contains the data if applicable.
 async function makeWish (type, options = {}) {
   const id = await invoke('wish:generate-id');
   primaryPort.postMessage({ type: 'make-wish', wish: { id, type, options }});
+  activeWishID = id;
   return new Promise((resolve) => {
-    const wishHandler = (ev) => {
-      const { type, wish } = ev.data;
-      if (!wish || wish.id !== id) return;
-      primaryPort.onmessage = null;
-      // NOTE: we resolve empty, cancellation isn't an error
-      if (type === 'cancel-wish') return resolve();
-      if (type === 'grant-wish') return resolve(); // XXX need to have some data in there
-    };
-    primaryPort.onmessage = wishHandler;
+    activeWishResolver = resolve;
   });
 }
 
-// async function getSetting (keyPath) {
-//   return invoke('settings:get', keyPath);
-// }
-
-// debug
-// contextBridge.exposeInMainWorld('debug', (...msg) => ipcRenderer.sendToHost('cm-debug', { message: msg.join(' ') }));
-
-// // ipcRenderer.sendToHost('cm-test', { value: 'BEFORE' });
-// window.addEventListener('DOMContentLoaded', () => {
-//   const rob = new ResizeObserver((entries) => {
-//     const height = entries[0]?.contentRect?.height;
-//     ipcRenderer.sendToHost('cm-tile-resize', { height });
-//   });
-//   rob.observe(document.documentElement);
-// });
-// // ipcRenderer.sendToHost('cm-test', { value: 'AFTER' });
-
-// const ICONS_PATH = 'file:ui/assets/icons';
-// const wishRegistry = {};
 
 // async function instantiateWish (granter, data) {
 //   if (data) data = await cloneableBlob(data);

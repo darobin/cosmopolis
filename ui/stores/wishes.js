@@ -13,7 +13,7 @@ const defaultSelector = () => ({
   type: null,
   title: null,
   filters: [],
-  wishID: null,
+  wish: {},
   tileID: null,
 });
 export const $wishSelector = atom(defaultSelector());
@@ -24,7 +24,7 @@ export const showWishSelector = action($wishSelector, 'showWishSelector', (store
     showing: true,
     type: wish.type,
     title: selectorTitle[wish.type] || wish.type,
-    wishID: wish.id,
+    wish,
     filters: wish.filters,
     tileID,
   });
@@ -32,7 +32,7 @@ export const showWishSelector = action($wishSelector, 'showWishSelector', (store
 });
 export const cancelWishSelection = action($wishSelector, 'cancelWishSelection', (store) => {
   const tid = store.get().tileID;
-  const wid = store.get().wishID;
+  const wid = store.get().wish.id;
   store.set(defaultSelector());
   window.cosmopolis.cancelWish(tid, wid);
 });
@@ -104,8 +104,7 @@ export const trimWishTilesAfter = action($wishTiles, 'trimWishTilesAfter', (stor
   });
   store.set(newWishes);
 });
-// XXX we need to get data properly here
-export const makeAWish = action($wishTiles, 'makeAWish', (store, id, data) => {
+export const makeAWishFromSelector = action($wishTiles, 'makeAWishFromSelector', (store, id) => {
   const selector = { ...$wishSelector.get() };
   hideWishSelector();
   const granter = $wishGranterCandidates.get().find(g => g.id === id);
@@ -113,20 +112,16 @@ export const makeAWish = action($wishTiles, 'makeAWish', (store, id, data) => {
     console.warn(`No granter for ${id}`);
     return cancelWish();
   }
-  // XXX THIS IS WRONG
-  // it only works for loaded granters, but not internal ones
   if (granter.internal) {
-    granter.internal.run(selector.type, data);
+    granter.internal.run(selector.type, selector.wish.data);
     return;
   }
-  // XXX HOW DO WE PASS DATA TO THE WISH HERE?
-  store.set([...store.get(), { selector, granter, data }]);
+  store.set([...store.get(), { selector, granter }]);
 });
-// XXX needs an id because it might not be the top one that gets cancelled
 export const cancelWish = action($wishTiles, 'cancelWish', (store, wid) => {
   const wishes = store.get();
   let top = wishes.pop();
-  while (top && top.selector.wishID !== wid) top = wishes.pop();
+  while (top && top.selector.wish.id !== wid) top = wishes.pop();
   if (!top) {
     console.warn(`Found no wish to cancel for ${wid}`);
     return;

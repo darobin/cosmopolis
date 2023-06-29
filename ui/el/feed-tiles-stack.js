@@ -4,7 +4,7 @@ import { withStores } from "@nanostores/lit";
 import { computed } from 'nanostores'
 import { $router } from '../stores/router.js';
 import { $uiSideBarShowing, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedData, $uiFeedMode, $uiTilePrimary } from '../stores/ui.js';
-import { $wishSelector, showWishSelector, cancelWishSelection, $wishGranterCandidates, makeAWish, cancelWish, $wishTiles } from '../stores/wishes.js';
+import { $wishSelector, showWishSelector, cancelWishSelection, $wishGranterCandidates, makeAWishFromSelector, cancelWish, $wishTiles } from '../stores/wishes.js';
 
 // this has to always be px
 const SIDE_BAR_WIDTH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cm-side-bar-width'), 10);
@@ -147,14 +147,14 @@ export class CosmoFeedTilesStack extends withStores(
     $wishTiles.subscribe(() => this.scrollRight());
   }
   // this is called whenver a tile makes a wish
-  // { tileID: the target tile, type: make-wish|, wish: { id: wish ID, ...} }
+  // { tileID: the target tile, type: make-wish|, wish: { id: wish ID, options: { data… } ...} }
   wishHandler (data) {
     console.warn(`wishing`, data);
     if (data.type === 'make-wish') showWishSelector(data.tileID, data.wish);
   }
   handleSelectWish (ev) {
     const id = ev.currentTarget.getAttribute('data-id');
-    makeAWish(id);
+    makeAWishFromSelector(id);
   }
   handleCancelWish (ev) {
     const id = ev.currentTarget.getAttribute('data-selector-wish-id');
@@ -299,9 +299,9 @@ export class CosmoFeedTilesStack extends withStores(
             <div slot="header">
               <h3>${granter.name}</h3>
             </div>
-            <cm-tile .x=${x} .y=${y} .width=${width} .height=${height} src=${granter.url} .wishhandler=${this.wishHandler}></cm-tile>
+            <cm-tile .x=${x} .y=${y} .width=${width} .height=${height} src=${granter.url} wishtype=${selector.wish.type} .wishhandler=${this.wishHandler} .wishdata=${selector.wish?.data}></cm-tile>
             <div slot="footer">
-              <sl-button @click=${this.handleCancelWish} data-selector-wish-id=${selector.wishID}>Cancel</sl-button>
+              <sl-button @click=${this.handleCancelWish} data-selector-wish-id=${selector.wish.id}>Cancel</sl-button>
             </div>
           </sl-card>
         `;
