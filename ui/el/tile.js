@@ -39,7 +39,6 @@ export class CosmoTile extends LitElement {
     }
   }
   disconnectedCallback () {
-    console.warn(`tile ${this.id} disconnecting`);
     removeBrowserView(this.id);
   }
   addBV () {
@@ -53,7 +52,7 @@ export class CosmoTile extends LitElement {
     removeBrowserView(this.id);
   }
   render () {
-    return html`<div id="tile" style=${`top: ${this.y}px; left: ${this.x}px; width: ${this.width}px; height: ${this.height}px;`}></div>`;
+    return html`<div id="tile" data-tile-id=${this.id} style=${`top: ${this.y}px; left: ${this.x}px; width: ${this.width}px; height: ${this.height}px;`}></div>`;
   }
 }
 

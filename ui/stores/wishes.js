@@ -140,8 +140,7 @@ export const grantWish = action($wishTiles, 'grantWish', (store, tileID, wish, d
   // tile and all of those right of it. Then we wipe the last of the remaining list (which is the granting one).
   const idx = wishes.findIndex(w => w.selector.tileID === tileID);
   if (idx > -1) wishes = wishes.slice(0, idx);
-  wishes.pop();
-  const grantTo = wishes[wishes.length - 1];
+  const grantTo = wishes.pop();
   window.cosmopolis.grantWish(grantTo?.selector?.tileID || primaryTileID, wish, data);
   store.set([...wishes]);
 });

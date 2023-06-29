@@ -300,7 +300,7 @@ export class CosmoFeedTilesStack extends withStores(
             <div slot="header">
               <h3>${granter.name}</h3>
             </div>
-            <cm-tile .x=${x} .y=${y} .width=${width} .height=${height} src=${granter.url} wishtype=${selector.wish.type} wishid=${selector.wish.id} .wishhandler=${this.wishHandler} .wishdata=${selector.wish?.data}></cm-tile>
+            <cm-tile .x=${x} .y=${y} .width=${width} .height=${height} src=${granter.url} wishtype=${selector.wish.type} wishid=${selector.wish.id} .wishhandler=${this.wishHandler} .wishdata=${selector.wish?.options?.data}></cm-tile>
             <div slot="footer">
               <sl-button @click=${this.handleCancelWish} data-selector-wish-id=${selector.wish.id}>Cancel</sl-button>
             </div>

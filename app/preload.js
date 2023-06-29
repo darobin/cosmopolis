@@ -80,5 +80,5 @@ contextBridge.exposeInMainWorld('cosmopolis', {
 
 function registerTileHandling (id, port, wishHandler) {
   tilePorts[id] = port;
-  port.onmessage = (msg) => wishHandler(msg.data || {});
+  port.onmessage = (msg) => wishHandler(msg?.data || {});
 }
