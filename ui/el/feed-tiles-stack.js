@@ -149,7 +149,6 @@ export class CosmoFeedTilesStack extends withStores(
   // this is called whenver a tile makes a wish
   // { tileID: the target tile, type: make-wish|, wish: { id: wish ID, options: { data… } ...} }
   wishHandler (data) {
-    console.warn(`wishing`, data);
     if (data.type === 'make-wish') showWishSelector(data.tileID, data.wish);
     // NOTE: when granting, the wish.id is the wish made by the tile left of the one granting.
     // We automatically get a tileID, which is from the *granting* tile.
@@ -163,7 +162,6 @@ export class CosmoFeedTilesStack extends withStores(
   }
   handleCancelWish (ev) {
     const id = ev.currentTarget.getAttribute('data-selector-wish-id');
-    console.warn(`got wish id`, id, ev.currentTarget);
     cancelWish(id);
   }
   scrollRight () {
@@ -190,8 +188,8 @@ export class CosmoFeedTilesStack extends withStores(
     return {
       x: left + $left.value + BORDER_WIDTH - (this.scrollLeft || 0),
       y: TITLE_BAR_HEIGHT + CARD_HEADER_HEIGHT + BORDER_WIDTH,
-      height: (root.clientHeight || 0) - (CARD_HEADER_HEIGHT + BORDER_WIDTH + FOOTER_HEIGHT),
-      width: (root.clientHeight || 0) - (CARD_HEADER_HEIGHT + BORDER_WIDTH),
+      height: (root.clientHeight || 0) - (CARD_HEADER_HEIGHT + (BORDER_WIDTH * 2) + FOOTER_HEIGHT),
+      width: PRIMARY_TILE_WIDTH,
     };
   }
   renderDataForMode () {
@@ -263,9 +261,7 @@ export class CosmoFeedTilesStack extends withStores(
   renderWishSelector () {
     if ($wishSelector.value.showing) {
       // XXX this gets more complicated when we factor in wishes
-      const left =  $uiFeedWidth.value + PRIMARY_TILE_WIDTH;
-      // XXX need to scroll this into view but only when it switches from visible to non-visible and after the DOM has updated
-      // NOTE: we can always just scroll all the way right!
+      const left =  $uiFeedWidth.value + PRIMARY_TILE_WIDTH + (($wishTiles.value?.length || 0) * PRIMARY_TILE_WIDTH);
       return html`
         <sl-card id="selector" style=${`left: ${left}px;`}>
           <div slot="header">

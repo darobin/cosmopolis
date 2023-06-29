@@ -39,7 +39,6 @@ export const cancelWishSelection = action($wishSelector, 'cancelWishSelection', 
 export const hideWishSelector = action($wishSelector, 'hideWishSelector', (store) => {
   const sel = store.get();
   sel.showing = false;
-  console.warn(`updating wish selector`, sel);
   store.set({...sel});
 });
 export const restoreWishSelector = action($wishSelector, 'restoreWishSelector', (store, data) => {
@@ -109,7 +108,7 @@ export const makeAWishFromSelector = action($wishTiles, 'makeAWishFromSelector',
   hideWishSelector();
   const granter = $wishGranterCandidates.get().find(g => g.id === id);
   if (!granter) {
-    console.warn(`No granter for ${id}`);
+    console.error(`No granter for ${id}`);
     return cancelWish();
   }
   if (granter.internal) {
@@ -123,7 +122,7 @@ export const cancelWish = action($wishTiles, 'cancelWish', (store, wid) => {
   let top = wishes.pop();
   while (top && top.selector.wish.id !== wid) top = wishes.pop();
   if (!top) {
-    console.warn(`Found no wish to cancel for ${wid}`);
+    console.error(`Found no wish to cancel for ${wid}`);
     return;
   }
   restoreWishSelector(top.selector);
@@ -134,10 +133,6 @@ export const cancelWish = action($wishTiles, 'cancelWish', (store, wid) => {
 // list of wish tiles could decide to grant because YOLO.
 // This means clear all the ones on the right
 export const grantWish = action($wishTiles, 'grantWish', (store, tileID, wish, data) => {
-  console.warn(`
-    [primary ${$wishTiles.get().map(w => w.selector.tileID).join(' ')}]
-    looking for ${tileID}
-  `);
   let wishes = store.get();
   const primaryTileID = wishes[0].selector.tileID;
   // For any given wish tile in $wishTiles, the .selector.tileID is the ID of the tile to its left (that

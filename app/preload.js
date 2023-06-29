@@ -58,9 +58,7 @@ contextBridge.exposeInMainWorld('cosmopolis', {
   // wishes
   grantWish: (tid, wish, data) => {
     const port = tilePorts[tid];
-    console.warn(`we have port(${tid})`, port);
     if (!port) return;
-    console.warn(`sending`, { type: 'grant-wish', wish, data });
     port.postMessage({ type: 'grant-wish', wish, data });
   },
   cancelWish: (tid, wid) => {
