@@ -36,6 +36,7 @@ const CARD_HEADER_HEIGHT = 45;
 // ISSUES
 //  - need to render the side bar inside a BV if we want it to z-index on top
 //  - scroll events don't bubble up from the tile viewport, we'll have to make sure they do
+//  - some feed views are only to launch things (like the app view), they should autoclose
 
 export class CosmoFeedTilesStack extends withStores(
     LitElement,
@@ -63,20 +64,12 @@ export class CosmoFeedTilesStack extends withStores(
         top: var(--cm-osx-title-bar-height);
         transition: left var(--sl-transition-medium);
       }
-      #feed {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-      }
-      #primary-tile {
+      #feed, #primary-tile, #selector, .wish-tile {
         position: absolute;
         top: 0;
         bottom: 0;
       }
       #selector {
-        position: absolute;
-        top: 0;
-        bottom: 0;
         width: 360px;
       }
       h3 {
@@ -157,8 +150,9 @@ export class CosmoFeedTilesStack extends withStores(
     if (data.type === 'make-wish') showWishSelector(data.tileID, data.wish);
   }
   handleSelectWish (ev) {
-    const link = ev.currentTarget.getAttribute('data-link');
-    makeAWish(link);
+    const id = ev.currentTarget.getAttribute('data-id');
+    console.warn(`got wish id`, id, ev.currentTarget);
+    makeAWish(id);
   }
   scrollRight () {
     const root = this.shadowRoot?.querySelector('#root');
@@ -178,6 +172,15 @@ export class CosmoFeedTilesStack extends withStores(
       });
       this.scrollTick = true;
     }
+  }
+  computeTileBox (left) {
+    const root = this.shadowRoot.querySelector('#root');
+    return {
+      x: left + $left.value + BORDER_WIDTH - (this.scrollLeft || 0),
+      y: TITLE_BAR_HEIGHT + CARD_HEADER_HEIGHT + BORDER_WIDTH,
+      height: (root.clientHeight || 0) - (CARD_HEADER_HEIGHT + BORDER_WIDTH),
+      width: (root.clientHeight || 0) - (CARD_HEADER_HEIGHT + BORDER_WIDTH),
+    };
   }
   renderDataForMode () {
     if ($uiFeedMode.value === 'icon-grid') {
@@ -232,15 +235,13 @@ export class CosmoFeedTilesStack extends withStores(
     const root = this.shadowRoot.querySelector('#root');
     if ($uiTilePrimary.value && root) {
       const left =  $uiFeedWidth.value;
-      const tileX = left + $left.value + BORDER_WIDTH - (this.scrollLeft || 0);
-      const tileY = TITLE_BAR_HEIGHT + CARD_HEADER_HEIGHT + BORDER_WIDTH;
-      const tileHeight = (root.clientHeight || 0) - (CARD_HEADER_HEIGHT + BORDER_WIDTH);
+      const { x, y, width, height } = this.computeTileBox(left);
       return html`
         <sl-card id="primary-tile" style=${`left: ${left}px; width: ${PRIMARY_TILE_WIDTH + (BORDER_WIDTH * 2)}px`}>
           <div slot="header">
             <h3>Tile</h3>
           </div>
-          <cm-tile .x=${tileX} .y=${tileY} .width=${PRIMARY_TILE_WIDTH} .height=${tileHeight} src=${$uiTilePrimary.value} .wishhandler=${this.wishHandler}></cm-tile>
+          <cm-tile .x=${x} .y=${y} .width=${width} .height=${height} src=${$uiTilePrimary.value} .wishhandler=${this.wishHandler}></cm-tile>
         </sl-card>
       `;
     }
@@ -260,7 +261,7 @@ export class CosmoFeedTilesStack extends withStores(
           <div class="selector-icon-grid">
             ${$wishGranterCandidates.value.map(ti => html`
             <div>
-              <sl-button data-link=${ti.link} @click=${this.handleSelectWish} size="large">
+              <sl-button data-id=${ti.id} @click=${this.handleSelectWish} size="large">
                 ${
                   typeof ti.icons === 'string' && ti.icons.startsWith('builtin:')
                   ? html`<sl-icon name=${ti.icons.replace('builtin:', '')} slot="prefix" style="font-size: 24px"></sl-icon>`
@@ -281,11 +282,20 @@ export class CosmoFeedTilesStack extends withStores(
   }
   renderWishes () {
     if ($wishTiles.value?.length) {
-      return html`
-        <p>
-          ${$wishTiles.value.map(w => w.link)}
-        </p>
-      `;
+      // XXX the map holds the data — we need to pass it in once the wish is instantiated somehow
+      return $wishTiles.value.map(({ granter }, idx) => {
+        const left =  $uiFeedWidth.value + (PRIMARY_TILE_WIDTH * (idx + 1));
+        const { x, y, width, height } = this.computeTileBox(left);
+        return html`
+          <sl-card class="wish-tile" style=${`left: ${left}px; width: ${PRIMARY_TILE_WIDTH + (BORDER_WIDTH * 2)}px`}>
+            <div slot="header">
+              <h3>${granter.name}</h3>
+            </div>
+            <cm-tile .x=${x} .y=${y} .width=${width} .height=${height} src=${granter.url} .wishhandler=${this.wishHandler}></cm-tile>
+            <!-- XXX we need cancel -->
+          </sl-card>
+        `;
+      });
     }
     return nothing;
   }

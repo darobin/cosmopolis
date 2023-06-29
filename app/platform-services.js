@@ -40,7 +40,7 @@ export function connectMessaging (mainWindow) {
             preload: rel('./preload-browserview.js'),
           },
         });
-        mainWindow.setBrowserView(bv);
+        mainWindow.addBrowserView(bv);
         bv.setBounds({ x, y, width, height })
         bv.webContents.loadURL(src);
         const { port1, port2 } = new MessageChannelMain();

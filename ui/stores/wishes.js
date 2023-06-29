@@ -39,7 +39,8 @@ export const cancelWishSelection = action($wishSelector, 'cancelWishSelection', 
 export const hideWishSelector = action($wishSelector, 'hideWishSelector', (store) => {
   const sel = store.get();
   sel.showing = false;
-  store.set(sel);
+  console.warn(`updating wish selector`, sel);
+  store.set({...sel});
 });
 export const restoreWishSelector = action($wishSelector, 'restoreWishSelector', (store, data) => {
   store.set(data);
@@ -71,6 +72,7 @@ export const updateMatchingWishes = action($wishGranterCandidates, 'updateMatchi
       headless: true,
       internal: new FilePickerPickWish({ filters }),
       type: 'pick',
+      id: 'internal:file-picker-pick-wish',
     });
   }
   store.set(granters);
@@ -102,12 +104,23 @@ export const trimWishTilesAfter = action($wishTiles, 'trimWishTilesAfter', (stor
   });
   store.set(newWishes);
 });
-export const makeAWish = action($wishTiles, 'makeAWish', (store, link) => {
-  const selector = $wishSelector.get();
-  const wishes = store.get();
-  wishes.push({ ...selector, link });
+// XXX we need to get data properly here
+export const makeAWish = action($wishTiles, 'makeAWish', (store, id, data) => {
+  const selector = { ...$wishSelector.get() };
   hideWishSelector();
-  store.set(wishes);
+  const granter = $wishGranterCandidates.get().find(g => g.id === id);
+  if (!granter) {
+    console.warn(`No granter for ${id}`);
+    return cancelWish();
+  }
+  // XXX THIS IS WRONG
+  // it only works for loaded granters, but not internal ones
+  if (granter.internal) {
+    granter.internal.run(selector.type, data);
+    return;
+  }
+  // XXX HOW DO WE PASS DATA TO THE WISH HERE?
+  store.set([...store.get(), { selector, granter, data }]);
 });
 export const cancelWish = action($wishTiles, 'cancelWish', (store) => {
   const wishes = store.get();
