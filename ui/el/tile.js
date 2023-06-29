@@ -36,6 +36,7 @@ export class CosmoTile extends LitElement {
     }
   }
   disconnectedCallback () {
+    console.warn(`tile ${this.id} disconnecting`);
     removeBrowserView(this.id);
   }
   addBV () {

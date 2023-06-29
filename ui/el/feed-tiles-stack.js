@@ -4,7 +4,7 @@ import { withStores } from "@nanostores/lit";
 import { computed } from 'nanostores'
 import { $router } from '../stores/router.js';
 import { $uiSideBarShowing, $uiFeedWidth, $uiFeedTitle, $uiFeedIcon, $uiFeedData, $uiFeedMode, $uiTilePrimary } from '../stores/ui.js';
-import { $wishSelector, showWishSelector, cancelWishSelection, $wishGranterCandidates, makeAWish, $wishTiles } from '../stores/wishes.js';
+import { $wishSelector, showWishSelector, cancelWishSelection, $wishGranterCandidates, makeAWish, cancelWish, $wishTiles } from '../stores/wishes.js';
 
 // this has to always be px
 const SIDE_BAR_WIDTH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cm-side-bar-width'), 10);
@@ -12,6 +12,7 @@ const $left = computed($uiSideBarShowing, ui => ui ? SIDE_BAR_WIDTH : 0);
 const PRIMARY_TILE_WIDTH = 880;
 const BORDER_WIDTH = 1;
 const TITLE_BAR_HEIGHT = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cm-osx-title-bar-height'), 10);
+const FOOTER_HEIGHT = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cm-footer-height'), 10);
 const CARD_HEADER_HEIGHT = 45;
 // const CARD_FOOTER_HEIGHT = 0; // XXX this will obviously have to change
 
@@ -97,6 +98,8 @@ export class CosmoFeedTilesStack extends withStores(
       }
       sl-card::part(footer) {
         text-align: right;
+        --padding: var(--sl-spacing-small);
+        height: var(--cm-footer-height);
       }
       .mode-icon-grid {
         display: grid;
@@ -151,8 +154,12 @@ export class CosmoFeedTilesStack extends withStores(
   }
   handleSelectWish (ev) {
     const id = ev.currentTarget.getAttribute('data-id');
-    console.warn(`got wish id`, id, ev.currentTarget);
     makeAWish(id);
+  }
+  handleCancelWish (ev) {
+    const id = ev.currentTarget.getAttribute('data-selector-wish-id');
+    console.warn(`got wish id`, id, ev.currentTarget);
+    cancelWish(id);
   }
   scrollRight () {
     const root = this.shadowRoot?.querySelector('#root');
@@ -178,7 +185,7 @@ export class CosmoFeedTilesStack extends withStores(
     return {
       x: left + $left.value + BORDER_WIDTH - (this.scrollLeft || 0),
       y: TITLE_BAR_HEIGHT + CARD_HEADER_HEIGHT + BORDER_WIDTH,
-      height: (root.clientHeight || 0) - (CARD_HEADER_HEIGHT + BORDER_WIDTH),
+      height: (root.clientHeight || 0) - (CARD_HEADER_HEIGHT + BORDER_WIDTH + FOOTER_HEIGHT),
       width: (root.clientHeight || 0) - (CARD_HEADER_HEIGHT + BORDER_WIDTH),
     };
   }
@@ -242,6 +249,7 @@ export class CosmoFeedTilesStack extends withStores(
             <h3>Tile</h3>
           </div>
           <cm-tile .x=${x} .y=${y} .width=${width} .height=${height} src=${$uiTilePrimary.value} .wishhandler=${this.wishHandler}></cm-tile>
+          <div slot="footer"></div>
         </sl-card>
       `;
     }
@@ -273,7 +281,7 @@ export class CosmoFeedTilesStack extends withStores(
           `)}
           </div>
           <div slot="footer">
-            <sl-button @click=${cancelWishSelection}>Cancel</sl-button>
+            <sl-button @click=${cancelWishSelection} size="small">Cancel</sl-button>
           </div>
         </sl-card>
       `;
@@ -283,7 +291,7 @@ export class CosmoFeedTilesStack extends withStores(
   renderWishes () {
     if ($wishTiles.value?.length) {
       // XXX the map holds the data — we need to pass it in once the wish is instantiated somehow
-      return $wishTiles.value.map(({ granter }, idx) => {
+      return $wishTiles.value.map(({ granter, selector }, idx) => {
         const left =  $uiFeedWidth.value + (PRIMARY_TILE_WIDTH * (idx + 1));
         const { x, y, width, height } = this.computeTileBox(left);
         return html`
@@ -292,7 +300,9 @@ export class CosmoFeedTilesStack extends withStores(
               <h3>${granter.name}</h3>
             </div>
             <cm-tile .x=${x} .y=${y} .width=${width} .height=${height} src=${granter.url} .wishhandler=${this.wishHandler}></cm-tile>
-            <!-- XXX we need cancel -->
+            <div slot="footer">
+              <sl-button @click=${this.handleCancelWish} data-selector-wish-id=${selector.wishID}>Cancel</sl-button>
+            </div>
           </sl-card>
         `;
       });

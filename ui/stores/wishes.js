@@ -122,11 +122,17 @@ export const makeAWish = action($wishTiles, 'makeAWish', (store, id, data) => {
   // XXX HOW DO WE PASS DATA TO THE WISH HERE?
   store.set([...store.get(), { selector, granter, data }]);
 });
-export const cancelWish = action($wishTiles, 'cancelWish', (store) => {
+// XXX needs an id because it might not be the top one that gets cancelled
+export const cancelWish = action($wishTiles, 'cancelWish', (store, wid) => {
   const wishes = store.get();
-  const selector = wishes.pop();
-  restoreWishSelector(selector);
-  store.set(wishes);
+  let top = wishes.pop();
+  while (top && top.selector.wishID !== wid) top = wishes.pop();
+  if (!top) {
+    console.warn(`Found no wish to cancel for ${wid}`);
+    return;
+  }
+  restoreWishSelector(top.selector);
+  store.set([...wishes]);
 });
 
 // this is an internal wish implementation
