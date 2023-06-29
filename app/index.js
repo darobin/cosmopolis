@@ -3,7 +3,7 @@ import { app, BrowserWindow, protocol }  from 'electron';
 import { manageWindowPosition } from './lib/window-manager.js';
 import makeRel from './lib/rel.js';
 import tileProtocolHandler from './tile-protocol-handler.js';
-import { registerPlatformServiceHandlers, connectMessaging, wipeBrowserViews } from './platform-services.js';
+import { registerPlatformServiceHandlers, connectMessaging, wipeBrowserViews, setupMenu } from './platform-services.js';
 
 let mainWindow;
 const rel = makeRel(import.meta.url);
@@ -37,6 +37,7 @@ app.whenReady().then(async () => {
     },
   });
   await manageWindowPosition(mainWindow);
+  setupMenu();
   mainWindow.loadFile('index.html');
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();

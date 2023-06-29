@@ -1,7 +1,8 @@
 
 import { join } from 'node:path';
 import { readFile } from 'node:fs/promises';
-import { ipcMain, dialog, BrowserView, MessageChannelMain }  from 'electron';
+import process from 'node:process';
+import { ipcMain, dialog, BrowserView, MessageChannelMain, Menu, shell }  from 'electron';
 import { get as getSetting, set as setSetting, unset as unsetSetting } from 'electron-settings';
 import mime from 'mime-types';
 import chalk from 'chalk';
@@ -71,6 +72,65 @@ export function wipeBrowserViews (mainWindow) {
   });
 }
 
+export function setupMenu () {
+  if (process.platform !== 'darwin') {
+    console.error(chalk.bold.red(`I don't know how to set the menu on platform ${process.platform}`));
+    return;
+  }
+  const template = [
+    {
+      label: 'Cosmopolis',
+      submenu: [
+        { role: 'about' }, // XXX this could be nicer
+        { type: 'separator' },
+        { role: 'services' },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideOthers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' },
+      ],
+    },
+    { role: 'editMenu' },
+    // { role: 'viewMenu' }
+    {
+      label: 'View',
+      submenu: [
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' },
+      ],
+    },
+    {
+      label: 'Developer',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { role: 'toggleDevTools' },
+        {
+          label: 'Load developer mode tile',
+          click: async () => await handlePickDevTile(),
+        },
+      ],
+    },
+    { role: 'windowMenu' },
+    {
+      role: 'help',
+      submenu: [
+        {
+          label: 'Learn More',
+          click: async () => await shell.openExternal('https://berjon.com/'),
+        },
+      ],
+    },
+  ];
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
+}
+
 async function handleSettingsGet (ev, keyPath) {
   return getSetting(keyPath);
 }
@@ -101,7 +161,6 @@ async function handlePickDevTile () {
       };
       await setSetting(`developer.${id}`, meta);
       await setSetting(`cache.${id}`, manifest);
-      return meta;
     }
     catch (err) {
       return {
